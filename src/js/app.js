@@ -235,6 +235,11 @@ const App = {
             AudioManager.playClick();
         });
 
+        // Remote control toggle
+        document.getElementById('toggle-remote').addEventListener('click', async () => {
+            await this.toggleRemoteControl();
+        });
+
         // Set initial values from state
         document.getElementById('volume-slider').value = this.state.volume;
         document.getElementById('timer-interval').value = this.state.timerInterval;
@@ -569,6 +574,69 @@ const App = {
             vehicleEl.classList.add('paused');
         } else {
             vehicleEl.classList.remove('paused');
+        }
+    },
+
+    // Toggle remote control
+    async toggleRemoteControl() {
+        const btn = document.getElementById('toggle-remote');
+        const status = document.getElementById('remote-status');
+        const codeDiv = document.getElementById('remote-code');
+
+        if (RemoteControl.isConnected()) {
+            // Disconnect
+            RemoteControl.disconnect();
+            btn.textContent = '📱 Remote Starten';
+            btn.classList.remove('active');
+            status.innerHTML = '<span class="remote-off">Niet actief</span>';
+            codeDiv.style.display = 'none';
+            AudioManager.playClick();
+        } else {
+            // Connect
+            btn.textContent = 'Verbinden...';
+            btn.disabled = true;
+
+            try {
+                const code = await RemoteControl.createRoom();
+
+                // Set up callback for when piece is received
+                RemoteControl.onPieceReceived = () => {
+                    this.onRemotePieceReceived();
+                };
+
+                btn.textContent = '🔴 Remote Stoppen';
+                btn.classList.add('active');
+                btn.disabled = false;
+                status.innerHTML = '<span class="remote-on">✓ Wacht op verbinding...</span>';
+                codeDiv.style.display = 'block';
+                codeDiv.querySelector('.code-display').textContent = code;
+
+                AudioManager.playClick();
+            } catch (error) {
+                console.error('Remote control error:', error);
+                btn.textContent = '📱 Remote Starten';
+                btn.disabled = false;
+                status.innerHTML = '<span class="remote-off">Fout: ' + error.message + '</span>';
+            }
+        }
+    },
+
+    // Handle piece received from remote
+    onRemotePieceReceived() {
+        console.log('Remote piece received!');
+
+        // Update status to show connected
+        const status = document.getElementById('remote-status');
+        status.innerHTML = '<span class="remote-on">✓ Verbonden!</span>';
+
+        // Add a saved piece (same as task button)
+        this.state.savedPieces++;
+        this.updateSavedCount();
+        AudioManager.playTaskComplete();
+
+        // Auto-place piece if puzzle not complete
+        if (!PuzzleEngine.isComplete()) {
+            this.placeSavedPiece();
         }
     }
 };

@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#4CAF50">
+    <title>Puzzel Remote - Ouder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .container {
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 350px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        /* Connect Screen */
+        .code-input-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .code-digit {
+            width: 50px;
+            height: 60px;
+            font-size: 28px;
+            text-align: center;
+            border: 3px solid #ddd;
+            border-radius: 12px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .code-digit:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+        .connect-btn {
+            width: 100%;
+            padding: 18px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .connect-btn:active {
+            transform: scale(0.98);
+        }
+
+        .connect-btn:disabled {
+            background: #ccc;
+            box-shadow: none;
+        }
+
+        .error-msg {
+            color: #f44336;
+            font-size: 14px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        /* Connected Screen */
+        .connected-screen {
+            display: none;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 25px;
+            color: #4CAF50;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            background: #4CAF50;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+
+        .piece-btn {
+            width: 100%;
+            padding: 40px 20px;
+            font-size: 24px;
+            font-weight: bold;
+            border: none;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 6px 25px rgba(255, 107, 107, 0.4);
+            margin-bottom: 15px;
+            transition: transform 0.1s;
+        }
+
+        .piece-btn:active {
+            transform: scale(0.95);
+        }
+
+        .piece-btn.success {
+            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+        }
+
+        .piece-btn .emoji {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .quick-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .quick-btn {
+            padding: 20px 10px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .quick-btn:active {
+            transform: scale(0.95);
+        }
+
+        .quick-btn.song { background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%); }
+        .quick-btn.book { background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%); }
+        .quick-btn.task { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .quick-btn.extra { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+
+        .disconnect-btn {
+            margin-top: 25px;
+            padding: 12px 25px;
+            font-size: 14px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            background: white;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .instructions {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .instructions strong {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Connect Screen -->
+        <div class="card connect-screen" id="connect-screen">
+            <h1>🎮 Puzzel Remote</h1>
+            <p class="subtitle">Verbind met de tablet van je kind</p>
+
+            <div class="code-input-container">
+                <input type="tel" class="code-digit" maxlength="1" id="digit1" inputmode="numeric" pattern="[0-9]">
+                <input type="tel" class="code-digit" maxlength="1" id="digit2" inputmode="numeric" pattern="[0-9]">
+                <input type="tel" class="code-digit" maxlength="1" id="digit3" inputmode="numeric" pattern="[0-9]">
+                <input type="tel" class="code-digit" maxlength="1" id="digit4" inputmode="numeric" pattern="[0-9]">
+            </div>
+
+            <button class="connect-btn" id="connect-btn" disabled>Verbinden</button>
+
+            <p class="error-msg" id="error-msg"></p>
+
+            <div class="instructions">
+                <strong>Hoe werkt het?</strong><br>
+                1. Open instellingen op de tablet<br>
+                2. Tik op "📱 Remote Control"<br>
+                3. Voer de 4-cijferige code hier in
+            </div>
+        </div>
+
+        <!-- Connected Screen -->
+        <div class="card connected-screen" id="connected-screen">
+            <h1>🎮 Verbonden!</h1>
+
+            <div class="status">
+                <div class="status-dot"></div>
+                <span>Verbonden met tablet</span>
+            </div>
+
+            <button class="piece-btn" id="piece-btn">
+                <span class="emoji">🧩</span>
+                Stukje Geven!
+            </button>
+
+            <div class="quick-buttons">
+                <button class="quick-btn song" id="btn-song">🎵 Liedje</button>
+                <button class="quick-btn book" id="btn-book">📖 Boek</button>
+                <button class="quick-btn task" id="btn-task">✅ Taak</button>
+                <button class="quick-btn extra" id="btn-extra">⭐ Extra</button>
+            </div>
+
+            <button class="disconnect-btn" id="disconnect-btn">Verbinding verbreken</button>
+        </div>
+    </div>
+
+    <script src="src/js/remote.js"></script>
+    <script>
+        // Elements
+        const connectScreen = document.getElementById('connect-screen');
+        const connectedScreen = document.getElementById('connected-screen');
+        const connectBtn = document.getElementById('connect-btn');
+        const errorMsg = document.getElementById('error-msg');
+        const pieceBtn = document.getElementById('piece-btn');
+        const disconnectBtn = document.getElementById('disconnect-btn');
+        const digits = [
+            document.getElementById('digit1'),
+            document.getElementById('digit2'),
+            document.getElementById('digit3'),
+            document.getElementById('digit4')
+        ];
+
+        // Auto-focus and move between digits
+        digits.forEach((digit, index) => {
+            digit.addEventListener('input', (e) => {
+                const value = e.target.value.replace(/\D/g, '');
+                e.target.value = value.slice(-1);
+
+                if (value && index < 3) {
+                    digits[index + 1].focus();
+                }
+
+                updateConnectButton();
+            });
+
+            digit.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                    digits[index - 1].focus();
+                }
+            });
+
+            digit.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const paste = (e.clipboardData || window.clipboardData).getData('text');
+                const numbers = paste.replace(/\D/g, '').slice(0, 4);
+                numbers.split('').forEach((num, i) => {
+                    if (digits[i]) digits[i].value = num;
+                });
+                if (numbers.length === 4) digits[3].focus();
+                updateConnectButton();
+            });
+        });
+
+        function updateConnectButton() {
+            const code = digits.map(d => d.value).join('');
+            connectBtn.disabled = code.length !== 4;
+        }
+
+        function getCode() {
+            return digits.map(d => d.value).join('');
+        }
+
+        // Connect button
+        connectBtn.addEventListener('click', async () => {
+            const code = getCode();
+            connectBtn.disabled = true;
+            connectBtn.textContent = 'Verbinden...';
+            errorMsg.style.display = 'none';
+
+            try {
+                await RemoteControl.joinRoom(code);
+                showConnectedScreen();
+            } catch (error) {
+                errorMsg.textContent = error.message || 'Verbinding mislukt';
+                errorMsg.style.display = 'block';
+                connectBtn.disabled = false;
+                connectBtn.textContent = 'Verbinden';
+            }
+        });
+
+        function showConnectedScreen() {
+            connectScreen.style.display = 'none';
+            connectedScreen.style.display = 'block';
+        }
+
+        function showConnectScreen() {
+            connectScreen.style.display = 'block';
+            connectedScreen.style.display = 'none';
+            digits.forEach(d => d.value = '');
+            updateConnectButton();
+        }
+
+        // Send piece
+        async function sendPiece(btn) {
+            try {
+                btn.classList.add('success');
+                await RemoteControl.sendPiece();
+
+                // Visual feedback
+                setTimeout(() => {
+                    btn.classList.remove('success');
+                }, 500);
+            } catch (error) {
+                alert('Verzenden mislukt: ' + error.message);
+            }
+        }
+
+        pieceBtn.addEventListener('click', () => sendPiece(pieceBtn));
+        document.getElementById('btn-song').addEventListener('click', (e) => sendPiece(e.target));
+        document.getElementById('btn-book').addEventListener('click', (e) => sendPiece(e.target));
+        document.getElementById('btn-task').addEventListener('click', (e) => sendPiece(e.target));
+        document.getElementById('btn-extra').addEventListener('click', (e) => sendPiece(e.target));
+
+        // Disconnect
+        disconnectBtn.addEventListener('click', () => {
+            RemoteControl.disconnect();
+            showConnectScreen();
+        });
+
+        // Focus first digit on load
+        digits[0].focus();
+    </script>
+</body>
+</html>
