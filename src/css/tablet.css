@@ -72,7 +72,7 @@ html, body {
     font-size: 40px;
     left: 60px;
     top: 50%;
-    transform: translateY(-50%);
+    transform: translateY(-50%) scaleX(-1);
     z-index: 3;
     transition: left 0.5s ease-out;
     filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.3));
@@ -83,8 +83,8 @@ html, body {
 }
 
 @keyframes bounce {
-    0%, 100% { transform: translateY(-50%); }
-    50% { transform: translateY(-60%); }
+    0%, 100% { transform: translateY(-50%) scaleX(-1); }
+    50% { transform: translateY(-60%) scaleX(-1); }
 }
 
 .timer-info {
@@ -243,6 +243,33 @@ html, body {
 @keyframes flashFade {
     from { opacity: 1; }
     to { opacity: 0; }
+}
+
+/* Version info */
+.version-info {
+    position: fixed;
+    bottom: 5px;
+    right: 10px;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Pairing code display */
+.pairing-code {
+    position: fixed;
+    bottom: 5px;
+    left: 10px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    background: rgba(0, 0, 0, 0.3);
+    padding: 4px 10px;
+    border-radius: 10px;
+}
+
+.pairing-code strong {
+    font-size: 16px;
+    letter-spacing: 2px;
+    color: #FFD700;
 }
 
 /* Responsive */

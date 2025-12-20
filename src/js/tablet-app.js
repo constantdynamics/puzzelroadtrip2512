@@ -73,6 +73,9 @@ const TabletApp = {
             const code = await RemoteControl.createRoom();
             console.log('Remote control ready, code:', code);
 
+            // Display the code on screen
+            this.showPairingCode(code);
+
             // Store code in state for remote to read
             this.state.remoteCode = code;
             this.saveState();
@@ -384,6 +387,14 @@ const TabletApp = {
         const vehicleEl = document.getElementById('timer-vehicle');
         if (vehicleEl) {
             vehicleEl.textContent = emoji;
+        }
+    },
+
+    // Show pairing code on screen
+    showPairingCode(code) {
+        const codeEl = document.getElementById('pairing-code-value');
+        if (codeEl) {
+            codeEl.textContent = code;
         }
     },
 
