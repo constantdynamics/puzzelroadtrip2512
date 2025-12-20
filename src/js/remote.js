@@ -2,15 +2,15 @@
 // Allows parents to control the puzzle from another device
 
 const RemoteControl = {
-    // Firebase configuration - using a public project for the puzzle app
+    // Firebase configuration
     firebaseConfig: {
-        apiKey: "AIzaSyDummyKeyForPublicDemo",
+        apiKey: "AIzaSyAzEzTtdH9axMK7xmVkjzMqZR0R35Pbj7Y",
         authDomain: "roadtrip-puzzel.firebaseapp.com",
         databaseURL: "https://roadtrip-puzzel-default-rtdb.europe-west1.firebasedatabase.app",
         projectId: "roadtrip-puzzel",
-        storageBucket: "roadtrip-puzzel.appspot.com",
-        messagingSenderId: "000000000000",
-        appId: "1:000000000000:web:0000000000000000000000"
+        storageBucket: "roadtrip-puzzel.firebasestorage.app",
+        messagingSenderId: "314636515478",
+        appId: "1:314636515478:web:456718ddc2fe41437f2ab7"
     },
 
     database: null,
