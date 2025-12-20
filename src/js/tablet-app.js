@@ -34,7 +34,7 @@ const TabletApp = {
 
         // Set up timer callbacks
         TimerManager.onTick = (remaining) => this.updateTimeDisplay();
-        TimerManager.onComplete = () => this.onTimerComplete();
+        TimerManager.onPieceEarned = () => this.onTimerComplete();
 
         // Load current puzzle
         await PuzzleEngine.loadPuzzle(this.state.currentPuzzleIndex);
@@ -202,7 +202,7 @@ const TabletApp = {
         // Award a piece
         this.state.savedPieces++;
         this.updateSavedCount();
-        AudioManager.playTimerComplete();
+        AudioManager.playTimerDing();
 
         // Reset timer
         TimerManager.reset();
@@ -244,7 +244,7 @@ const TabletApp = {
         }
 
         // Show celebration
-        AudioManager.playVictory();
+        AudioManager.playPuzzleComplete();
         this.showCelebration();
     },
 

@@ -1097,109 +1097,239 @@ const PuzzleEngine = {
         this.ctx.strokeRect(0, 0, this.puzzleWidth, this.puzzleHeight);
     },
 
-    // Draw a single piece
+    // Generate edge pattern for a piece (determines tab direction)
+    // Uses seeded random based on piece position for consistency
+    getEdgePattern(pieceIndex) {
+        const col = pieceIndex % this.cols;
+        const row = Math.floor(pieceIndex / this.cols);
+
+        // Each edge: 1 = tab (outward), -1 = blank (inward), 0 = flat (border)
+        return {
+            top: row === 0 ? 0 : ((row + col) % 2 === 0 ? 1 : -1),
+            right: col === this.cols - 1 ? 0 : ((row + col + 1) % 2 === 0 ? 1 : -1),
+            bottom: row === this.rows - 1 ? 0 : ((row + col) % 2 === 0 ? -1 : 1),
+            left: col === 0 ? 0 : ((row + col + 1) % 2 === 0 ? -1 : 1)
+        };
+    },
+
+    // Create jigsaw piece path with bezier curves for smooth tabs
+    createPiecePath(x, y, width, height, edges) {
+        const tabSize = Math.min(width, height) * 0.18; // Tab size relative to piece
+        const neckWidth = tabSize * 0.5;
+
+        this.ctx.beginPath();
+
+        // Start at top-left
+        this.ctx.moveTo(x, y);
+
+        // Top edge
+        if (edges.top === 0) {
+            this.ctx.lineTo(x + width, y);
+        } else {
+            const dir = edges.top;
+            const midX = x + width / 2;
+            this.ctx.lineTo(midX - tabSize, y);
+            this.ctx.bezierCurveTo(
+                midX - neckWidth, y,
+                midX - neckWidth, y - dir * tabSize * 0.3,
+                midX - neckWidth, y - dir * tabSize * 0.5
+            );
+            this.ctx.bezierCurveTo(
+                midX - tabSize * 0.8, y - dir * tabSize,
+                midX + tabSize * 0.8, y - dir * tabSize,
+                midX + neckWidth, y - dir * tabSize * 0.5
+            );
+            this.ctx.bezierCurveTo(
+                midX + neckWidth, y - dir * tabSize * 0.3,
+                midX + neckWidth, y,
+                midX + tabSize, y
+            );
+            this.ctx.lineTo(x + width, y);
+        }
+
+        // Right edge
+        if (edges.right === 0) {
+            this.ctx.lineTo(x + width, y + height);
+        } else {
+            const dir = edges.right;
+            const midY = y + height / 2;
+            this.ctx.lineTo(x + width, midY - tabSize);
+            this.ctx.bezierCurveTo(
+                x + width, midY - neckWidth,
+                x + width + dir * tabSize * 0.3, midY - neckWidth,
+                x + width + dir * tabSize * 0.5, midY - neckWidth
+            );
+            this.ctx.bezierCurveTo(
+                x + width + dir * tabSize, midY - tabSize * 0.8,
+                x + width + dir * tabSize, midY + tabSize * 0.8,
+                x + width + dir * tabSize * 0.5, midY + neckWidth
+            );
+            this.ctx.bezierCurveTo(
+                x + width + dir * tabSize * 0.3, midY + neckWidth,
+                x + width, midY + neckWidth,
+                x + width, midY + tabSize
+            );
+            this.ctx.lineTo(x + width, y + height);
+        }
+
+        // Bottom edge (reverse direction)
+        if (edges.bottom === 0) {
+            this.ctx.lineTo(x, y + height);
+        } else {
+            const dir = edges.bottom;
+            const midX = x + width / 2;
+            this.ctx.lineTo(midX + tabSize, y + height);
+            this.ctx.bezierCurveTo(
+                midX + neckWidth, y + height,
+                midX + neckWidth, y + height + dir * tabSize * 0.3,
+                midX + neckWidth, y + height + dir * tabSize * 0.5
+            );
+            this.ctx.bezierCurveTo(
+                midX + tabSize * 0.8, y + height + dir * tabSize,
+                midX - tabSize * 0.8, y + height + dir * tabSize,
+                midX - neckWidth, y + height + dir * tabSize * 0.5
+            );
+            this.ctx.bezierCurveTo(
+                midX - neckWidth, y + height + dir * tabSize * 0.3,
+                midX - neckWidth, y + height,
+                midX - tabSize, y + height
+            );
+            this.ctx.lineTo(x, y + height);
+        }
+
+        // Left edge (reverse direction)
+        if (edges.left === 0) {
+            this.ctx.lineTo(x, y);
+        } else {
+            const dir = edges.left;
+            const midY = y + height / 2;
+            this.ctx.lineTo(x, midY + tabSize);
+            this.ctx.bezierCurveTo(
+                x, midY + neckWidth,
+                x - dir * tabSize * 0.3, midY + neckWidth,
+                x - dir * tabSize * 0.5, midY + neckWidth
+            );
+            this.ctx.bezierCurveTo(
+                x - dir * tabSize, midY + tabSize * 0.8,
+                x - dir * tabSize, midY - tabSize * 0.8,
+                x - dir * tabSize * 0.5, midY - neckWidth
+            );
+            this.ctx.bezierCurveTo(
+                x - dir * tabSize * 0.3, midY - neckWidth,
+                x, midY - neckWidth,
+                x, midY - tabSize
+            );
+            this.ctx.lineTo(x, y);
+        }
+
+        this.ctx.closePath();
+    },
+
+    // Draw a single piece with jigsaw shape
     drawPiece(pieceIndex) {
         if (!this.puzzleImage) return;
 
         const pos = this.getPiecePosition(pieceIndex);
         const sourceScale = 2; // Because we create image at 2x resolution
-
-        // Draw the piece from the puzzle image
-        this.ctx.drawImage(
-            this.puzzleImage,
-            pos.x * sourceScale, pos.y * sourceScale,
-            this.pieceWidth * sourceScale, this.pieceHeight * sourceScale,
-            pos.x, pos.y,
-            this.pieceWidth, this.pieceHeight
-        );
-
-        // Draw jigsaw-style border for visual effect
-        this.drawPieceBorder(pos.x, pos.y, this.pieceWidth, this.pieceHeight, pieceIndex);
-    },
-
-    // Draw jigsaw piece border
-    drawPieceBorder(x, y, width, height, pieceIndex) {
-        const col = pieceIndex % this.cols;
-        const row = Math.floor(pieceIndex / this.cols);
+        const edges = this.getEdgePattern(pieceIndex);
+        const tabSize = Math.min(this.pieceWidth, this.pieceHeight) * 0.18;
 
         this.ctx.save();
-        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
-        this.ctx.lineWidth = 2;
 
-        // Draw the border with tabs/notches for jigsaw effect
-        this.ctx.beginPath();
+        // Create clipping path with jigsaw shape
+        this.createPiecePath(pos.x, pos.y, this.pieceWidth, this.pieceHeight, edges);
+        this.ctx.clip();
 
-        // Top edge
-        this.ctx.moveTo(x, y);
-        if (row > 0) {
-            this.ctx.lineTo(x + width * 0.35, y);
-            this.ctx.arc(x + width * 0.5, y, width * 0.08, Math.PI, 0, pieceIndex % 2 === 0);
-            this.ctx.lineTo(x + width, y);
-        } else {
-            this.ctx.lineTo(x + width, y);
-        }
+        // Draw the piece image with extra margin for tabs
+        const margin = tabSize;
+        this.ctx.drawImage(
+            this.puzzleImage,
+            (pos.x - margin) * sourceScale, (pos.y - margin) * sourceScale,
+            (this.pieceWidth + margin * 2) * sourceScale, (this.pieceHeight + margin * 2) * sourceScale,
+            pos.x - margin, pos.y - margin,
+            this.pieceWidth + margin * 2, this.pieceHeight + margin * 2
+        );
 
-        // Right edge
-        if (col < this.cols - 1) {
-            this.ctx.lineTo(x + width, y + height * 0.35);
-            this.ctx.arc(x + width, y + height * 0.5, height * 0.08, -Math.PI/2, Math.PI/2, (pieceIndex + 1) % 2 === 0);
-            this.ctx.lineTo(x + width, y + height);
-        } else {
-            this.ctx.lineTo(x + width, y + height);
-        }
+        this.ctx.restore();
 
-        // Bottom edge
-        if (row < this.rows - 1) {
-            this.ctx.lineTo(x + width * 0.65, y + height);
-            this.ctx.arc(x + width * 0.5, y + height, width * 0.08, 0, Math.PI, (pieceIndex + row) % 2 === 0);
-            this.ctx.lineTo(x, y + height);
-        } else {
-            this.ctx.lineTo(x, y + height);
-        }
+        // Draw piece border
+        this.drawPieceBorder(pos.x, pos.y, this.pieceWidth, this.pieceHeight, edges);
+    },
 
-        // Left edge
-        if (col > 0) {
-            this.ctx.lineTo(x, y + height * 0.65);
-            this.ctx.arc(x, y + height * 0.5, height * 0.08, Math.PI/2, -Math.PI/2, (pieceIndex + col) % 2 === 0);
-            this.ctx.lineTo(x, y);
-        } else {
-            this.ctx.lineTo(x, y);
-        }
+    // Draw jigsaw piece border with shadow effect
+    drawPieceBorder(x, y, width, height, edges) {
+        this.ctx.save();
 
+        // Draw shadow/depth effect
+        this.createPiecePath(x, y, width, height, edges);
+        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.4)';
+        this.ctx.lineWidth = 2.5;
         this.ctx.stroke();
+
+        // Draw highlight
+        this.createPiecePath(x - 0.5, y - 0.5, width, height, edges);
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        this.ctx.lineWidth = 1;
+        this.ctx.stroke();
+
         this.ctx.restore();
     },
 
-    // Draw the animating piece
+    // Draw the animating piece with jigsaw shape
     drawAnimatingPiece() {
         if (!this.animatingPiece || !this.puzzleImage) return;
 
-        const { pieceIndex, currentX, currentY, targetX, targetY, scale, opacity } = this.animatingPiece;
+        const { pieceIndex, currentX, currentY, scale, opacity } = this.animatingPiece;
         const sourceScale = 2;
         const pos = this.getPiecePosition(pieceIndex);
+        const edges = this.getEdgePattern(pieceIndex);
 
         this.ctx.save();
         this.ctx.globalAlpha = opacity;
 
-        // Draw piece at current animation position
+        // Calculate scaled dimensions and position
         const drawWidth = this.pieceWidth * scale;
         const drawHeight = this.pieceHeight * scale;
         const drawX = currentX - drawWidth / 2;
         const drawY = currentY - drawHeight / 2;
+        const tabSize = Math.min(drawWidth, drawHeight) * 0.18;
 
-        // Shadow
-        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-        this.ctx.shadowBlur = 15;
-        this.ctx.shadowOffsetY = 5;
+        // Scale the edges for animated piece
+        const scaledEdges = {
+            top: edges.top,
+            right: edges.right,
+            bottom: edges.bottom,
+            left: edges.left
+        };
 
+        // Shadow effect
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+        this.ctx.shadowBlur = 20;
+        this.ctx.shadowOffsetY = 8;
+
+        // Create clipping path for jigsaw shape
+        this.createPiecePath(drawX, drawY, drawWidth, drawHeight, scaledEdges);
+        this.ctx.clip();
+
+        // Draw the piece image
+        const margin = tabSize;
         this.ctx.drawImage(
             this.puzzleImage,
-            pos.x * sourceScale, pos.y * sourceScale,
-            this.pieceWidth * sourceScale, this.pieceHeight * sourceScale,
-            drawX, drawY,
-            drawWidth, drawHeight
+            (pos.x - margin / scale) * sourceScale, (pos.y - margin / scale) * sourceScale,
+            (this.pieceWidth + margin * 2 / scale) * sourceScale, (this.pieceHeight + margin * 2 / scale) * sourceScale,
+            drawX - margin, drawY - margin,
+            drawWidth + margin * 2, drawHeight + margin * 2
         );
 
+        this.ctx.restore();
+
+        // Draw border on animated piece
+        this.ctx.save();
+        this.ctx.globalAlpha = opacity;
+        this.createPiecePath(drawX, drawY, drawWidth, drawHeight, scaledEdges);
+        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+        this.ctx.lineWidth = 3;
+        this.ctx.stroke();
         this.ctx.restore();
     },
 
