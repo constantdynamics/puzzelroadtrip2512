@@ -42,7 +42,7 @@ const TabletApp = {
 
         // Update UI
         this.updateUI();
-        this.updateVehicle(this.state.vehicle || '🚗');
+        this.updateVehicle(this.state.vehicle || '🏍️');
 
         // Start timer
         TimerManager.start();

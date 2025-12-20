@@ -80,7 +80,7 @@ html, body {
     font-size: 40px;
     left: 60px;
     top: 50%;
-    transform: translateY(-50%) scaleX(-1);
+    transform: translateY(-50%);
     z-index: 3;
     transition: left 0.5s ease-out;
     filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.3));
@@ -91,8 +91,8 @@ html, body {
 }
 
 @keyframes bounce {
-    0%, 100% { transform: translateY(-50%) scaleX(-1); }
-    50% { transform: translateY(-60%) scaleX(-1); }
+    0%, 100% { transform: translateY(-50%); }
+    50% { transform: translateY(-60%); }
 }
 
 .timer-info {

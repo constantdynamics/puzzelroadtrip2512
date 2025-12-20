@@ -935,6 +935,11 @@ const PuzzleEngine = {
         const containerWidth = container.clientWidth - 40;
         const containerHeight = container.clientHeight - 40;
 
+        // Ensure minimum size
+        if (containerWidth <= 0 || containerHeight <= 0) {
+            return; // Container not ready yet
+        }
+
         // Calculate puzzle dimensions maintaining aspect ratio
         const aspectRatio = this.cols / this.rows;
         let width = containerWidth;
@@ -945,6 +950,10 @@ const PuzzleEngine = {
             width = height * aspectRatio;
         }
 
+        // Check if size actually changed significantly
+        const oldWidth = this.puzzleWidth;
+        const sizeChanged = Math.abs(width - oldWidth) > 10;
+
         this.canvas.width = width;
         this.canvas.height = height;
         this.puzzleWidth = width;
@@ -952,7 +961,14 @@ const PuzzleEngine = {
         this.pieceWidth = width / this.cols;
         this.pieceHeight = height / this.rows;
 
-        this.redraw();
+        // Regenerate puzzle image if size changed and we have a puzzle loaded
+        if (sizeChanged && this.puzzles[this.currentPuzzleIndex]) {
+            this.createPuzzleImage(this.puzzles[this.currentPuzzleIndex]).then(() => {
+                this.redraw();
+            });
+        } else {
+            this.redraw();
+        }
     },
 
     // Load a puzzle by index

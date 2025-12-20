@@ -16,7 +16,7 @@ const StorageManager = {
         volume: 50,
         lastSaveTime: null,
         pieceCount: 40, // Aantal stukjes (12, 20, 30, 40, 60)
-        vehicle: '🚗', // Voertuig voor timer animatie
+        vehicle: '🏍️', // Voertuig voor timer animatie (wijst naar rechts)
         customImage: null // Base64 van eigen afbeelding
     },
 
