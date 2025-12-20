@@ -16,6 +16,16 @@ const PuzzleEngine = {
     puzzleHeight: 0,
     offsetX: 0,
     offsetY: 0,
+    customImageData: null, // Voor eigen afbeelding
+
+    // Piece configurations: pieceCount -> {rows, cols}
+    pieceConfigs: {
+        12: { rows: 3, cols: 4 },
+        20: { rows: 4, cols: 5 },
+        30: { rows: 5, cols: 6 },
+        40: { rows: 5, cols: 8 },
+        60: { rows: 6, cols: 10 }
+    },
 
     // Kleurrijke scene puzzels - vol met leuke dingen voor 2-jarigen!
     puzzles: [
@@ -595,6 +605,27 @@ const PuzzleEngine = {
         window.addEventListener('resize', () => this.resizeCanvas());
     },
 
+    // Set piece count and update grid
+    setPieceCount(count) {
+        const config = this.pieceConfigs[count];
+        if (config) {
+            this.totalPieces = count;
+            this.rows = config.rows;
+            this.cols = config.cols;
+            this.resizeCanvas();
+        }
+    },
+
+    // Set custom image from base64 data
+    setCustomImage(base64Data) {
+        this.customImageData = base64Data;
+    },
+
+    // Clear custom image
+    clearCustomImage() {
+        this.customImageData = null;
+    },
+
     // Resize canvas to fit container
     resizeCanvas() {
         const container = this.canvas.parentElement;
@@ -635,6 +666,30 @@ const PuzzleEngine = {
     // Generate puzzle image using canvas - nu met kleurrijke scenes!
     async createPuzzleImage(puzzle) {
         return new Promise((resolve) => {
+            // Check if we should use custom image
+            if (this.customImageData) {
+                const customImg = new Image();
+                customImg.onload = () => {
+                    const img = document.createElement('canvas');
+                    img.width = this.puzzleWidth * 2;
+                    img.height = this.puzzleHeight * 2;
+                    const ctx = img.getContext('2d');
+
+                    // Draw custom image scaled to fit
+                    const scale = Math.max(img.width / customImg.width, img.height / customImg.height);
+                    const scaledWidth = customImg.width * scale;
+                    const scaledHeight = customImg.height * scale;
+                    const offsetX = (img.width - scaledWidth) / 2;
+                    const offsetY = (img.height - scaledHeight) / 2;
+
+                    ctx.drawImage(customImg, offsetX, offsetY, scaledWidth, scaledHeight);
+                    this.puzzleImage = img;
+                    resolve();
+                };
+                customImg.src = this.customImageData;
+                return;
+            }
+
             const img = document.createElement('canvas');
             img.width = this.puzzleWidth * 2; // Higher resolution
             img.height = this.puzzleHeight * 2;

@@ -14,7 +14,10 @@ const StorageManager = {
         completedPuzzles: [],
         soundEnabled: true,
         volume: 50,
-        lastSaveTime: null
+        lastSaveTime: null,
+        pieceCount: 40, // Aantal stukjes (12, 20, 30, 40, 60)
+        vehicle: '🚗', // Voertuig voor timer animatie
+        customImage: null // Base64 van eigen afbeelding
     },
 
     // Load state from LocalStorage

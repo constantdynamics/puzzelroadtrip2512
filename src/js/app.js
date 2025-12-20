@@ -3,6 +3,7 @@
 const App = {
     state: null,
     isAnimating: false,
+    timerAnimationFrame: null,
 
     // Initialize the application
     async init() {
@@ -16,8 +17,14 @@ const App = {
         AudioManager.setEnabled(this.state.soundEnabled);
         AudioManager.setVolume(this.state.volume / 100);
 
-        // Initialize puzzle engine
+        // Initialize puzzle engine with piece count
         PuzzleEngine.init('puzzle-canvas');
+        PuzzleEngine.setPieceCount(this.state.pieceCount || 40);
+
+        // Load custom image if saved
+        if (this.state.customImage) {
+            PuzzleEngine.setCustomImage(this.state.customImage);
+        }
 
         // Initialize timer
         TimerManager.init(this.state.timerInterval);
@@ -38,8 +45,14 @@ const App = {
         this.setupUI();
         this.updateUI();
 
+        // Set vehicle emoji
+        this.updateVehicle(this.state.vehicle || '🚗');
+
         // Start timer
         TimerManager.start();
+
+        // Start visual timer animation
+        this.startVisualTimerAnimation();
 
         // Populate tasks grid
         TasksManager.populateTasksGrid('tasks-grid', (task) => this.onTaskSelected(task));
@@ -171,9 +184,66 @@ const App = {
             });
         });
 
+        // Piece count selector
+        document.getElementById('piece-count').addEventListener('change', (e) => {
+            const count = parseInt(e.target.value);
+            this.state.pieceCount = count;
+            PuzzleEngine.setPieceCount(count);
+            this.resetCurrentPuzzle();
+            AudioManager.playClick();
+        });
+
+        // Vehicle selector
+        document.getElementById('vehicle-select').addEventListener('change', (e) => {
+            this.state.vehicle = e.target.value;
+            this.updateVehicle(e.target.value);
+            AudioManager.playClick();
+        });
+
+        // Custom image upload
+        document.getElementById('custom-image').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = async (event) => {
+                    const base64 = event.target.result;
+                    this.state.customImage = base64;
+                    PuzzleEngine.setCustomImage(base64);
+                    document.getElementById('file-name').textContent = file.name;
+                    document.getElementById('clear-custom-image').style.display = 'inline-block';
+
+                    // Reload current puzzle with custom image
+                    await PuzzleEngine.loadPuzzle(this.state.currentPuzzleIndex);
+                    this.resetCurrentPuzzle();
+                    AudioManager.playClick();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Clear custom image
+        document.getElementById('clear-custom-image').addEventListener('click', async () => {
+            this.state.customImage = null;
+            PuzzleEngine.clearCustomImage();
+            document.getElementById('file-name').textContent = '';
+            document.getElementById('clear-custom-image').style.display = 'none';
+            document.getElementById('custom-image').value = '';
+
+            // Reload current puzzle without custom image
+            await PuzzleEngine.loadPuzzle(this.state.currentPuzzleIndex);
+            this.resetCurrentPuzzle();
+            AudioManager.playClick();
+        });
+
         // Set initial values from state
         document.getElementById('volume-slider').value = this.state.volume;
         document.getElementById('timer-interval').value = this.state.timerInterval;
+        document.getElementById('piece-count').value = this.state.pieceCount || 40;
+        document.getElementById('vehicle-select').value = this.state.vehicle || '🚗';
+        if (this.state.customImage) {
+            document.getElementById('file-name').textContent = 'Eigen foto geladen';
+            document.getElementById('clear-custom-image').style.display = 'inline-block';
+        }
     },
 
     // Update UI elements
@@ -456,6 +526,50 @@ const App = {
             timerPaused: timerState.isPaused,
             piecesPlaced: PuzzleEngine.placedPieces.length
         });
+    },
+
+    // Update vehicle emoji
+    updateVehicle(emoji) {
+        const vehicleEl = document.getElementById('timer-vehicle');
+        if (vehicleEl) {
+            vehicleEl.textContent = emoji;
+        }
+    },
+
+    // Start visual timer animation loop
+    startVisualTimerAnimation() {
+        const animate = () => {
+            this.updateVisualTimer();
+            this.timerAnimationFrame = requestAnimationFrame(animate);
+        };
+        animate();
+    },
+
+    // Update visual timer position
+    updateVisualTimer() {
+        const vehicleEl = document.getElementById('timer-vehicle');
+        if (!vehicleEl) return;
+
+        const timerState = TimerManager.getState();
+        const totalTime = this.state.timerInterval * 60; // total seconds
+        const elapsed = totalTime - timerState.remaining;
+        const progress = Math.min(elapsed / totalTime, 1);
+
+        // Calculate position (60px from left edge to track width - 60px from right)
+        const trackWidth = vehicleEl.parentElement.offsetWidth;
+        const startPos = 60;
+        const endPos = trackWidth - 60;
+        const travelDistance = endPos - startPos;
+        const currentPos = startPos + (travelDistance * progress);
+
+        vehicleEl.style.left = `${currentPos}px`;
+
+        // Add paused class for bounce animation
+        if (timerState.isPaused) {
+            vehicleEl.classList.add('paused');
+        } else {
+            vehicleEl.classList.remove('paused');
+        }
     }
 };
 

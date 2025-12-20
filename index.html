@@ -15,6 +15,16 @@
 </head>
 <body>
     <div id="app">
+        <!-- Visual Timer Bar - Voertuig animatie -->
+        <div class="visual-timer-bar">
+            <div class="timer-track">
+                <div class="timer-house timer-house-start">🏠</div>
+                <div class="timer-road"></div>
+                <div class="timer-vehicle" id="timer-vehicle">🚗</div>
+                <div class="timer-house timer-house-end">🏠</div>
+            </div>
+        </div>
+
         <!-- Status Bar -->
         <header class="status-bar">
             <div class="status-left">
@@ -25,10 +35,11 @@
                 <button id="settings-btn" class="icon-btn" aria-label="Instellingen">⚙️</button>
             </div>
             <div class="status-center">
-                <span id="puzzle-indicator">Puzzel 1 van 10</span>
+                <span id="puzzle-indicator">Puzzel 1 van 25</span>
             </div>
             <div class="status-right">
-                <span id="current-time"></span>
+                <span id="timer-countdown">15:00</span>
+                <button id="timer-pause" class="icon-btn timer-pause-btn">⏸️</button>
             </div>
         </header>
 
@@ -41,25 +52,33 @@
                     <div class="saved-label">Gespaarde Stukjes</div>
                 </div>
 
-                <div class="timer-display">
-                    <div class="timer-label">Volgend stukje over:</div>
-                    <div class="timer-countdown" id="timer-countdown">15:00</div>
-                    <button id="timer-pause" class="timer-btn">⏸️ Pauze</button>
-                </div>
-
-                <div class="task-buttons">
-                    <button class="task-btn task-btn-song" data-task="song">
-                        🎵 Liedje Gezongen
-                    </button>
-                    <button class="task-btn task-btn-book" data-task="book">
-                        📖 Boek Gelezen
-                    </button>
-                    <button class="task-btn task-btn-task" data-task="task">
-                        ✅ Taak Gedaan
-                    </button>
-                    <button class="task-btn task-btn-extra" data-task="extra">
-                        ⭐ Extra Stukje
-                    </button>
+                <div class="task-buttons-scroll">
+                    <div class="task-buttons">
+                        <button class="task-btn task-btn-song" data-task="song">
+                            🎵 Liedje Gezongen
+                        </button>
+                        <button class="task-btn task-btn-book" data-task="book">
+                            📖 Boek Gelezen
+                        </button>
+                        <button class="task-btn task-btn-task" data-task="task">
+                            ✅ Taak Gedaan
+                        </button>
+                        <button class="task-btn task-btn-extra" data-task="extra">
+                            ⭐ Extra Stukje
+                        </button>
+                        <button class="task-btn task-btn-clap" data-task="clap">
+                            👏 Geklapt
+                        </button>
+                        <button class="task-btn task-btn-wave" data-task="wave">
+                            👋 Gezwaaid
+                        </button>
+                        <button class="task-btn task-btn-animal" data-task="animal">
+                            🐮 Diergeluid
+                        </button>
+                        <button class="task-btn task-btn-count" data-task="count">
+                            🔢 Geteld
+                        </button>
+                    </div>
                 </div>
 
                 <button id="more-tasks-btn" class="more-tasks-btn">
@@ -83,22 +102,59 @@
 
         <!-- Settings Modal -->
         <div id="settings-modal" class="modal" style="display:none;">
-            <div class="modal-content">
+            <div class="modal-content modal-settings">
                 <h2>Instellingen</h2>
+
                 <div class="setting-item">
-                    <label for="volume-slider">Volume:</label>
+                    <label for="volume-slider">🔊 Volume:</label>
                     <input type="range" id="volume-slider" min="0" max="100" value="50">
                 </div>
+
                 <div class="setting-item">
-                    <label for="timer-interval">Minuten per stukje:</label>
+                    <label for="timer-interval">⏱️ Minuten per stukje:</label>
                     <input type="number" id="timer-interval" min="1" max="60" value="15">
                 </div>
+
                 <div class="setting-item">
-                    <button id="reset-puzzle" class="setting-btn">🔄 Huidige puzzel resetten</button>
+                    <label for="piece-count">🧩 Aantal stukjes:</label>
+                    <select id="piece-count">
+                        <option value="12">12 stukjes (3x4)</option>
+                        <option value="20">20 stukjes (4x5)</option>
+                        <option value="30">30 stukjes (5x6)</option>
+                        <option value="40" selected>40 stukjes (5x8)</option>
+                        <option value="60">60 stukjes (6x10)</option>
+                    </select>
                 </div>
+
                 <div class="setting-item">
-                    <button id="choose-puzzle" class="setting-btn">🧩 Kies andere puzzel</button>
+                    <label for="vehicle-select">🚗 Voertuig voor timer:</label>
+                    <select id="vehicle-select">
+                        <option value="🚗">🚗 Auto</option>
+                        <option value="🚌">🚌 Bus</option>
+                        <option value="🚂">🚂 Trein</option>
+                        <option value="✈️">✈️ Vliegtuig</option>
+                        <option value="🚢">🚢 Boot</option>
+                        <option value="🚲">🚲 Fiets</option>
+                        <option value="🏎️">🏎️ Raceauto</option>
+                        <option value="🚀">🚀 Raket</option>
+                    </select>
                 </div>
+
+                <div class="setting-item">
+                    <label>📷 Eigen foto als puzzel:</label>
+                    <div class="file-row">
+                        <input type="file" id="custom-image" accept="image/*" class="file-input">
+                        <label for="custom-image" class="file-label">Kies foto...</label>
+                        <button id="clear-custom-image" class="clear-image-btn" style="display:none;">✕</button>
+                    </div>
+                    <span id="file-name" class="file-name"></span>
+                </div>
+
+                <div class="setting-buttons">
+                    <button id="reset-puzzle" class="setting-btn">🔄 Puzzel resetten</button>
+                    <button id="choose-puzzle" class="setting-btn">🧩 Andere puzzel</button>
+                </div>
+
                 <button id="close-settings" class="close-btn">✕ Sluiten</button>
             </div>
         </div>

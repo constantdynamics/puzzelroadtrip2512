@@ -24,14 +24,89 @@ html, body {
     flex-direction: column;
 }
 
+/* Visual Timer Bar - Voertuig animatie */
+.visual-timer-bar {
+    height: 50px;
+    background: linear-gradient(180deg, #87CEEB 0%, #B0E0E6 100%);
+    position: relative;
+    border-bottom: 4px solid #8B4513;
+}
+
+.timer-track {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: flex-end;
+    padding: 0 10px;
+}
+
+.timer-house {
+    font-size: 32px;
+    z-index: 10;
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3));
+}
+
+.timer-house-start {
+    position: absolute;
+    left: 15px;
+    bottom: 5px;
+}
+
+.timer-house-end {
+    position: absolute;
+    right: 15px;
+    bottom: 5px;
+}
+
+.timer-road {
+    position: absolute;
+    left: 60px;
+    right: 60px;
+    bottom: 0;
+    height: 12px;
+    background: #555;
+    border-radius: 2px;
+}
+
+.timer-road::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    right: 10px;
+    height: 2px;
+    background: repeating-linear-gradient(90deg, #FFD700 0px, #FFD700 20px, transparent 20px, transparent 40px);
+    transform: translateY(-50%);
+}
+
+.timer-vehicle {
+    position: absolute;
+    left: 60px;
+    bottom: 8px;
+    font-size: 28px;
+    transition: left 1s linear;
+    z-index: 20;
+    filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.4));
+}
+
+.timer-vehicle.paused {
+    animation: vehicle-bounce 0.5s ease-in-out infinite;
+}
+
+@keyframes vehicle-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
 /* Status Bar */
 .status-bar {
-    height: 50px;
+    height: 45px;
     background: rgba(255, 255, 255, 0.95);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 20px;
+    padding: 0 15px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     z-index: 100;
 }
@@ -39,22 +114,29 @@ html, body {
 .status-left, .status-right {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+}
+
+.status-right {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    font-size: 18px;
+    color: #4CAF50;
 }
 
 .status-center {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: bold;
     color: #333;
 }
 
 .icon-btn {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border: none;
     background: #f0f0f0;
     border-radius: 50%;
-    font-size: 20px;
+    font-size: 18px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -67,6 +149,10 @@ html, body {
     background: #e0e0e0;
 }
 
+.timer-pause-btn.paused {
+    background: #ffcccc;
+}
+
 /* Main Content */
 .main-content {
     flex: 1;
@@ -76,100 +162,62 @@ html, body {
 
 /* Left Panel */
 .left-panel {
-    width: 30%;
-    min-width: 280px;
-    max-width: 350px;
+    width: 28%;
+    min-width: 250px;
+    max-width: 320px;
     background: rgba(255, 255, 255, 0.95);
-    padding: 15px;
+    padding: 10px;
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    overflow-y: auto;
+    gap: 10px;
 }
 
 /* Saved Pieces Counter */
 .saved-pieces {
     background: linear-gradient(135deg, #FFD93D 0%, #FF6B6B 100%);
-    border-radius: 15px;
-    padding: 15px;
+    border-radius: 12px;
+    padding: 10px;
     text-align: center;
     box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
 }
 
 .saved-count {
-    font-size: 48px;
+    font-size: 42px;
     font-weight: bold;
     color: white;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    line-height: 1;
 }
 
 .saved-label {
-    font-size: 14px;
+    font-size: 11px;
     color: white;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
-/* Timer Display */
-.timer-display {
-    background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
-    border-radius: 15px;
-    padding: 15px;
-    text-align: center;
-    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
-}
-
-.timer-label {
-    font-size: 12px;
-    color: white;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 5px;
-}
-
-.timer-countdown {
-    font-size: 36px;
-    font-weight: bold;
-    color: white;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-    font-family: 'Courier New', monospace;
-}
-
-.timer-btn {
-    margin-top: 10px;
-    padding: 8px 20px;
-    font-size: 14px;
-    border: none;
-    background: rgba(255, 255, 255, 0.3);
-    color: white;
-    border-radius: 20px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background 0.2s;
-}
-
-.timer-btn:active {
-    background: rgba(255, 255, 255, 0.5);
-}
-
-.timer-btn.paused {
-    background: rgba(255, 0, 0, 0.3);
+/* Task Buttons Scroll Container */
+.task-buttons-scroll {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin: 0 -5px;
+    padding: 0 5px;
 }
 
 /* Task Buttons */
 .task-buttons {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    flex: 1;
+    gap: 8px;
 }
 
 .task-btn {
-    min-height: 65px;
+    min-height: 52px;
     border: none;
-    border-radius: 15px;
-    font-size: 18px;
+    border-radius: 12px;
+    font-size: 15px;
     font-weight: bold;
     color: white;
     cursor: pointer;
@@ -178,7 +226,8 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
+    padding: 8px 12px;
 }
 
 .task-btn:active {
@@ -187,34 +236,55 @@ html, body {
 
 .task-btn-song {
     background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
-    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+    box-shadow: 0 3px 10px rgba(255, 107, 107, 0.4);
 }
 
 .task-btn-book {
     background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
-    box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4);
+    box-shadow: 0 3px 10px rgba(78, 205, 196, 0.4);
 }
 
 .task-btn-task {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 3px 10px rgba(102, 126, 234, 0.4);
 }
 
 .task-btn-extra {
     background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
+    box-shadow: 0 3px 10px rgba(240, 147, 251, 0.4);
+}
+
+.task-btn-clap {
+    background: linear-gradient(135deg, #FFA726 0%, #FF7043 100%);
+    box-shadow: 0 3px 10px rgba(255, 167, 38, 0.4);
+}
+
+.task-btn-wave {
+    background: linear-gradient(135deg, #26C6DA 0%, #00ACC1 100%);
+    box-shadow: 0 3px 10px rgba(38, 198, 218, 0.4);
+}
+
+.task-btn-animal {
+    background: linear-gradient(135deg, #8BC34A 0%, #689F38 100%);
+    box-shadow: 0 3px 10px rgba(139, 195, 74, 0.4);
+}
+
+.task-btn-count {
+    background: linear-gradient(135deg, #AB47BC 0%, #7B1FA2 100%);
+    box-shadow: 0 3px 10px rgba(171, 71, 188, 0.4);
 }
 
 .more-tasks-btn {
-    padding: 12px;
+    padding: 10px;
     border: 2px dashed #aaa;
-    border-radius: 15px;
+    border-radius: 12px;
     background: transparent;
     color: #666;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
+    flex-shrink: 0;
 }
 
 .more-tasks-btn:active {
@@ -227,14 +297,14 @@ html, body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: 15px;
-    gap: 10px;
+    padding: 10px;
+    gap: 8px;
 }
 
 .puzzle-container {
     flex: 1;
     background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
+    border-radius: 15px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     display: flex;
     align-items: center;
@@ -251,24 +321,24 @@ html, body {
 /* Progress Bar */
 .progress-container {
     background: rgba(255, 255, 255, 0.95);
-    border-radius: 15px;
-    padding: 10px 20px;
+    border-radius: 12px;
+    padding: 8px 15px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .progress-bar {
-    height: 20px;
+    height: 16px;
     background: #e0e0e0;
-    border-radius: 10px;
+    border-radius: 8px;
     overflow: hidden;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
 }
 
 .progress-fill {
     height: 100%;
     width: 0%;
     background: linear-gradient(90deg, #4CAF50, #8BC34A, #CDDC39);
-    border-radius: 10px;
+    border-radius: 8px;
     transition: width 0.5s ease-out;
 }
 
@@ -276,7 +346,7 @@ html, body {
     text-align: center;
     font-weight: bold;
     color: #333;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 /* Modal Styles */
@@ -296,10 +366,10 @@ html, body {
 .modal-content {
     background: white;
     border-radius: 20px;
-    padding: 25px;
+    padding: 20px;
     max-width: 400px;
     width: 90%;
-    max-height: 80vh;
+    max-height: 85vh;
     overflow-y: auto;
     position: relative;
 }
@@ -308,26 +378,32 @@ html, body {
     max-width: 700px;
 }
 
+.modal-settings {
+    max-width: 450px;
+}
+
 .modal-content h2 {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     color: #333;
+    font-size: 20px;
 }
 
 .setting-item {
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .setting-item label {
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     font-weight: 600;
     color: #555;
+    font-size: 14px;
 }
 
 .setting-item input[type="range"] {
     width: 100%;
-    height: 30px;
+    height: 25px;
 }
 
 .setting-item input[type="number"] {
@@ -338,16 +414,84 @@ html, body {
     border-radius: 8px;
 }
 
-.setting-btn {
+.setting-item select {
     width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background: white;
+}
+
+/* File input styling */
+.file-input {
+    display: none;
+}
+
+.file-label {
+    display: inline-block;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.file-label:active {
+    transform: scale(0.98);
+}
+
+.file-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.file-name {
+    display: block;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #666;
+    word-break: break-all;
+}
+
+.clear-image-btn {
+    padding: 8px 12px;
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.clear-image-btn:active {
+    transform: scale(0.95);
+}
+
+.setting-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.setting-btn {
+    flex: 1;
     padding: 12px;
     border: none;
     border-radius: 10px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
+}
+
+.setting-btn:active {
+    transform: scale(0.98);
 }
 
 .close-btn {
@@ -367,17 +511,17 @@ html, body {
 .tasks-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    max-height: 50vh;
+    gap: 8px;
+    max-height: 55vh;
     overflow-y: auto;
-    padding: 10px;
+    padding: 5px;
 }
 
 .task-item {
-    padding: 12px;
+    padding: 10px;
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     border-radius: 10px;
-    font-size: 14px;
+    font-size: 13px;
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
     text-align: center;
@@ -391,31 +535,29 @@ html, body {
 /* Puzzle Selection Grid */
 .puzzle-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
     max-height: 60vh;
     overflow-y: auto;
-    padding: 10px;
+    padding: 5px;
 }
 
 .puzzle-item {
     aspect-ratio: 1;
-    border-radius: 15px;
+    border-radius: 12px;
     overflow: hidden;
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
     position: relative;
     background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
 }
 
 .puzzle-item:active {
     transform: scale(0.95);
-}
-
-.puzzle-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
 }
 
 .puzzle-item.completed::after {
@@ -423,8 +565,8 @@ html, body {
     position: absolute;
     top: 5px;
     right: 5px;
-    width: 25px;
-    height: 25px;
+    width: 22px;
+    height: 22px;
     background: #4CAF50;
     color: white;
     border-radius: 50%;
@@ -432,6 +574,7 @@ html, body {
     align-items: center;
     justify-content: center;
     font-weight: bold;
+    font-size: 12px;
 }
 
 .puzzle-item-name {
@@ -441,10 +584,20 @@ html, body {
     right: 0;
     background: rgba(0, 0, 0, 0.7);
     color: white;
-    padding: 5px;
+    padding: 4px;
     text-align: center;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
+}
+
+/* Custom image puzzle item */
+.puzzle-item.custom-image {
+    border: 3px dashed #667eea;
+    background: linear-gradient(135deg, #f0f0ff 0%, #e0e0ff 100%);
+}
+
+.puzzle-item.custom-image span {
+    font-size: 36px;
 }
 
 /* Celebration Overlay */
@@ -467,24 +620,24 @@ html, body {
 }
 
 .celebration-content h1 {
-    font-size: 48px;
+    font-size: 42px;
     color: white;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     animation: bounce 0.5s ease infinite alternate;
 }
 
 .celebration-content p {
-    font-size: 24px;
+    font-size: 20px;
     color: white;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
 }
 
 .next-puzzle-btn {
-    padding: 20px 40px;
-    font-size: 24px;
+    padding: 18px 35px;
+    font-size: 20px;
     font-weight: bold;
     border: none;
-    border-radius: 30px;
+    border-radius: 25px;
     background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
     color: white;
     cursor: pointer;
@@ -542,48 +695,60 @@ html, body {
 /* Responsive adjustments for smaller tablets */
 @media (max-width: 900px) {
     .left-panel {
-        width: 35%;
-        min-width: 220px;
+        width: 32%;
+        min-width: 200px;
     }
 
     .task-btn {
-        min-height: 55px;
-        font-size: 15px;
+        min-height: 48px;
+        font-size: 13px;
     }
 
     .saved-count {
         font-size: 36px;
     }
 
-    .timer-countdown {
-        font-size: 28px;
+    .puzzle-grid {
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 
 @media (max-height: 500px) {
-    .status-bar {
+    .visual-timer-bar {
         height: 40px;
     }
 
-    .left-panel {
-        padding: 10px;
-        gap: 10px;
+    .timer-house {
+        font-size: 26px;
     }
 
-    .saved-pieces, .timer-display {
-        padding: 10px;
+    .timer-vehicle {
+        font-size: 22px;
+    }
+
+    .status-bar {
+        height: 38px;
+    }
+
+    .left-panel {
+        padding: 8px;
+        gap: 8px;
+    }
+
+    .saved-pieces {
+        padding: 8px;
     }
 
     .saved-count {
         font-size: 32px;
     }
 
-    .timer-countdown {
-        font-size: 24px;
+    .task-btn {
+        min-height: 44px;
+        font-size: 12px;
     }
 
-    .task-btn {
-        min-height: 50px;
-        font-size: 14px;
+    .puzzle-grid {
+        grid-template-columns: repeat(4, 1fr);
     }
 }
