@@ -17,33 +17,572 @@ const PuzzleEngine = {
     offsetX: 0,
     offsetY: 0,
 
-    // Puzzle definitions with SVG-based images
+    // Kleurrijke scene puzzels - vol met leuke dingen voor 2-jarigen!
     puzzles: [
-        { name: 'Hond', emoji: '🐕', color: '#8B4513' },
-        { name: 'Kat', emoji: '🐱', color: '#FFA500' },
-        { name: 'Olifant', emoji: '🐘', color: '#808080' },
-        { name: 'Leeuw', emoji: '🦁', color: '#DAA520' },
-        { name: 'Giraffe', emoji: '🦒', color: '#F4A460' },
-        { name: 'Eend', emoji: '🦆', color: '#FFD700' },
-        { name: 'Konijn', emoji: '🐰', color: '#FFC0CB' },
-        { name: 'Beer', emoji: '🐻', color: '#8B4513' },
-        { name: 'Vis', emoji: '🐟', color: '#4169E1' },
-        { name: 'Vogel', emoji: '🐦', color: '#FF6347' },
-        { name: 'Koe', emoji: '🐄', color: '#000000' },
-        { name: 'Varken', emoji: '🐷', color: '#FFB6C1' },
-        { name: 'Paard', emoji: '🐴', color: '#8B4513' },
-        { name: 'Schaap', emoji: '🐑', color: '#F5F5DC' },
-        { name: 'Kikker', emoji: '🐸', color: '#32CD32' },
-        { name: 'Schildpad', emoji: '🐢', color: '#228B22' },
-        { name: 'Zebra', emoji: '🦓', color: '#000000' },
-        { name: 'Pinguïn', emoji: '🐧', color: '#000000' },
-        { name: 'Aap', emoji: '🐵', color: '#8B4513' },
-        { name: 'Tijger', emoji: '🐯', color: '#FF8C00' },
-        { name: 'Vlinder', emoji: '🦋', color: '#9370DB' },
-        { name: 'Lieveheersbeestje', emoji: '🐞', color: '#FF0000' },
-        { name: 'Bij', emoji: '🐝', color: '#FFD700' },
-        { name: 'Slang', emoji: '🐍', color: '#228B22' },
-        { name: 'Uil', emoji: '🦉', color: '#8B4513' }
+        {
+            name: 'Dierentuin',
+            emoji: '🦁',
+            theme: 'zoo',
+            bgColors: ['#87CEEB', '#90EE90'], // Lucht naar gras
+            elements: [
+                // Dieren
+                { emoji: '🦁', x: 0.15, y: 0.5, size: 0.18 },
+                { emoji: '🐘', x: 0.35, y: 0.55, size: 0.22 },
+                { emoji: '🦒', x: 0.55, y: 0.4, size: 0.25 },
+                { emoji: '🦓', x: 0.75, y: 0.55, size: 0.16 },
+                { emoji: '🐒', x: 0.85, y: 0.35, size: 0.12 },
+                { emoji: '🦜', x: 0.1, y: 0.25, size: 0.1 },
+                { emoji: '🦩', x: 0.25, y: 0.7, size: 0.12 },
+                { emoji: '🐧', x: 0.45, y: 0.75, size: 0.1 },
+                { emoji: '🦘', x: 0.65, y: 0.7, size: 0.14 },
+                { emoji: '🐻', x: 0.9, y: 0.6, size: 0.14 },
+                // Decoratie
+                { emoji: '🌳', x: 0.05, y: 0.4, size: 0.15 },
+                { emoji: '🌴', x: 0.95, y: 0.45, size: 0.15 },
+                { emoji: '🌺', x: 0.3, y: 0.85, size: 0.08 },
+                { emoji: '🦋', x: 0.5, y: 0.2, size: 0.08 },
+                { emoji: '☀️', x: 0.85, y: 0.1, size: 0.12 },
+                { emoji: '☁️', x: 0.2, y: 0.08, size: 0.1 },
+                { emoji: '☁️', x: 0.6, y: 0.12, size: 0.08 },
+            ]
+        },
+        {
+            name: 'Boerderij',
+            emoji: '🐄',
+            theme: 'farm',
+            bgColors: ['#87CEEB', '#8B4513'], // Lucht naar aarde
+            elements: [
+                { emoji: '🏠', x: 0.15, y: 0.35, size: 0.2 },
+                { emoji: '🐄', x: 0.4, y: 0.6, size: 0.16 },
+                { emoji: '🐷', x: 0.55, y: 0.65, size: 0.12 },
+                { emoji: '🐔', x: 0.7, y: 0.7, size: 0.1 },
+                { emoji: '🐑', x: 0.3, y: 0.7, size: 0.12 },
+                { emoji: '🐴', x: 0.8, y: 0.55, size: 0.18 },
+                { emoji: '🐕', x: 0.6, y: 0.8, size: 0.1 },
+                { emoji: '🐈', x: 0.25, y: 0.75, size: 0.08 },
+                { emoji: '🐓', x: 0.85, y: 0.75, size: 0.1 },
+                { emoji: '🦆', x: 0.45, y: 0.85, size: 0.08 },
+                { emoji: '🚜', x: 0.75, y: 0.4, size: 0.15 },
+                { emoji: '🌻', x: 0.1, y: 0.6, size: 0.1 },
+                { emoji: '🌻', x: 0.9, y: 0.65, size: 0.08 },
+                { emoji: '🌾', x: 0.5, y: 0.45, size: 0.1 },
+                { emoji: '☀️', x: 0.9, y: 0.1, size: 0.12 },
+                { emoji: '☁️', x: 0.3, y: 0.1, size: 0.1 },
+            ]
+        },
+        {
+            name: 'Kermis',
+            emoji: '🎡',
+            theme: 'fair',
+            bgColors: ['#FF69B4', '#FFD700'], // Roze naar goud
+            elements: [
+                { emoji: '🎡', x: 0.2, y: 0.4, size: 0.3 },
+                { emoji: '🎠', x: 0.6, y: 0.5, size: 0.2 },
+                { emoji: '🎪', x: 0.85, y: 0.35, size: 0.2 },
+                { emoji: '🎈', x: 0.1, y: 0.2, size: 0.1 },
+                { emoji: '🎈', x: 0.4, y: 0.15, size: 0.08 },
+                { emoji: '🎈', x: 0.7, y: 0.2, size: 0.1 },
+                { emoji: '🍭', x: 0.5, y: 0.75, size: 0.1 },
+                { emoji: '🍿', x: 0.3, y: 0.8, size: 0.08 },
+                { emoji: '🎁', x: 0.75, y: 0.8, size: 0.1 },
+                { emoji: '⭐', x: 0.15, y: 0.1, size: 0.08 },
+                { emoji: '⭐', x: 0.55, y: 0.08, size: 0.06 },
+                { emoji: '⭐', x: 0.9, y: 0.15, size: 0.07 },
+                { emoji: '🤡', x: 0.45, y: 0.6, size: 0.12 },
+                { emoji: '🎉', x: 0.65, y: 0.7, size: 0.1 },
+                { emoji: '🌈', x: 0.5, y: 0.05, size: 0.15 },
+            ]
+        },
+        {
+            name: 'Onderwaterwereld',
+            emoji: '🐠',
+            theme: 'ocean',
+            bgColors: ['#00CED1', '#000080'], // Lichtblauw naar donkerblauw
+            elements: [
+                { emoji: '🐋', x: 0.3, y: 0.25, size: 0.25 },
+                { emoji: '🐬', x: 0.7, y: 0.2, size: 0.15 },
+                { emoji: '🐠', x: 0.15, y: 0.5, size: 0.1 },
+                { emoji: '🐟', x: 0.5, y: 0.45, size: 0.1 },
+                { emoji: '🐡', x: 0.8, y: 0.5, size: 0.1 },
+                { emoji: '🦈', x: 0.6, y: 0.65, size: 0.15 },
+                { emoji: '🐙', x: 0.2, y: 0.7, size: 0.14 },
+                { emoji: '🦀', x: 0.85, y: 0.85, size: 0.1 },
+                { emoji: '🐚', x: 0.4, y: 0.9, size: 0.08 },
+                { emoji: '🦐', x: 0.6, y: 0.85, size: 0.08 },
+                { emoji: '🐢', x: 0.35, y: 0.6, size: 0.12 },
+                { emoji: '🦑', x: 0.9, y: 0.35, size: 0.12 },
+                { emoji: '🪸', x: 0.1, y: 0.85, size: 0.12 },
+                { emoji: '🪸', x: 0.75, y: 0.9, size: 0.1 },
+                { emoji: '🫧', x: 0.25, y: 0.35, size: 0.06 },
+                { emoji: '🫧', x: 0.55, y: 0.3, size: 0.05 },
+                { emoji: '🫧', x: 0.45, y: 0.15, size: 0.04 },
+            ]
+        },
+        {
+            name: 'Stad',
+            emoji: '🏙️',
+            theme: 'city',
+            bgColors: ['#87CEEB', '#808080'], // Lucht naar straat
+            elements: [
+                { emoji: '🏢', x: 0.15, y: 0.35, size: 0.25 },
+                { emoji: '🏠', x: 0.4, y: 0.45, size: 0.15 },
+                { emoji: '🏪', x: 0.6, y: 0.45, size: 0.15 },
+                { emoji: '🏥', x: 0.85, y: 0.35, size: 0.2 },
+                { emoji: '🚗', x: 0.2, y: 0.75, size: 0.12 },
+                { emoji: '🚌', x: 0.45, y: 0.7, size: 0.15 },
+                { emoji: '🚕', x: 0.7, y: 0.75, size: 0.1 },
+                { emoji: '🚲', x: 0.9, y: 0.8, size: 0.08 },
+                { emoji: '🚦', x: 0.55, y: 0.55, size: 0.08 },
+                { emoji: '🌳', x: 0.05, y: 0.55, size: 0.12 },
+                { emoji: '🌳', x: 0.95, y: 0.55, size: 0.1 },
+                { emoji: '☀️', x: 0.85, y: 0.08, size: 0.1 },
+                { emoji: '☁️', x: 0.2, y: 0.1, size: 0.1 },
+                { emoji: '🐕', x: 0.35, y: 0.85, size: 0.08 },
+                { emoji: '🐈', x: 0.8, y: 0.6, size: 0.06 },
+                { emoji: '🕊️', x: 0.5, y: 0.15, size: 0.08 },
+            ]
+        },
+        {
+            name: 'Supermarkt',
+            emoji: '🛒',
+            theme: 'shop',
+            bgColors: ['#FFE4B5', '#FFA500'], // Licht oranje
+            elements: [
+                { emoji: '🛒', x: 0.5, y: 0.5, size: 0.2 },
+                { emoji: '🍎', x: 0.1, y: 0.3, size: 0.1 },
+                { emoji: '🍌', x: 0.25, y: 0.25, size: 0.1 },
+                { emoji: '🍇', x: 0.15, y: 0.45, size: 0.08 },
+                { emoji: '🥕', x: 0.3, y: 0.4, size: 0.08 },
+                { emoji: '🥦', x: 0.1, y: 0.6, size: 0.08 },
+                { emoji: '🍞', x: 0.7, y: 0.25, size: 0.1 },
+                { emoji: '🧀', x: 0.85, y: 0.3, size: 0.08 },
+                { emoji: '🥛', x: 0.8, y: 0.45, size: 0.1 },
+                { emoji: '🍦', x: 0.9, y: 0.6, size: 0.1 },
+                { emoji: '🍪', x: 0.75, y: 0.7, size: 0.08 },
+                { emoji: '🧃', x: 0.2, y: 0.75, size: 0.1 },
+                { emoji: '🍬', x: 0.35, y: 0.8, size: 0.08 },
+                { emoji: '🛍️', x: 0.6, y: 0.75, size: 0.12 },
+                { emoji: '💰', x: 0.9, y: 0.85, size: 0.08 },
+                { emoji: '⭐', x: 0.5, y: 0.15, size: 0.08 },
+            ]
+        },
+        {
+            name: 'Speeltuin',
+            emoji: '🛝',
+            theme: 'playground',
+            bgColors: ['#87CEEB', '#90EE90'], // Lucht naar gras
+            elements: [
+                { emoji: '🛝', x: 0.2, y: 0.45, size: 0.2 },
+                { emoji: '🎢', x: 0.5, y: 0.4, size: 0.2 },
+                { emoji: '⚽', x: 0.75, y: 0.7, size: 0.12 },
+                { emoji: '🏀', x: 0.85, y: 0.6, size: 0.1 },
+                { emoji: '🪁', x: 0.15, y: 0.15, size: 0.12 },
+                { emoji: '🎈', x: 0.35, y: 0.2, size: 0.08 },
+                { emoji: '🎈', x: 0.8, y: 0.15, size: 0.1 },
+                { emoji: '🌳', x: 0.05, y: 0.5, size: 0.15 },
+                { emoji: '🌳', x: 0.95, y: 0.45, size: 0.12 },
+                { emoji: '🌸', x: 0.4, y: 0.8, size: 0.08 },
+                { emoji: '🌼', x: 0.6, y: 0.85, size: 0.08 },
+                { emoji: '🐕', x: 0.7, y: 0.8, size: 0.1 },
+                { emoji: '🦋', x: 0.3, y: 0.6, size: 0.06 },
+                { emoji: '🐿️', x: 0.9, y: 0.7, size: 0.08 },
+                { emoji: '☀️', x: 0.85, y: 0.08, size: 0.12 },
+                { emoji: '☁️', x: 0.25, y: 0.08, size: 0.1 },
+            ]
+        },
+        {
+            name: 'Bos',
+            emoji: '🌲',
+            theme: 'forest',
+            bgColors: ['#228B22', '#006400'], // Groen bos
+            elements: [
+                { emoji: '🌲', x: 0.1, y: 0.3, size: 0.2 },
+                { emoji: '🌳', x: 0.3, y: 0.35, size: 0.22 },
+                { emoji: '🌲', x: 0.5, y: 0.25, size: 0.25 },
+                { emoji: '🌳', x: 0.75, y: 0.3, size: 0.2 },
+                { emoji: '🌲', x: 0.9, y: 0.35, size: 0.18 },
+                { emoji: '🦊', x: 0.2, y: 0.65, size: 0.12 },
+                { emoji: '🐰', x: 0.4, y: 0.7, size: 0.1 },
+                { emoji: '🦌', x: 0.6, y: 0.55, size: 0.15 },
+                { emoji: '🐿️', x: 0.35, y: 0.45, size: 0.08 },
+                { emoji: '🦉', x: 0.55, y: 0.35, size: 0.1 },
+                { emoji: '🐻', x: 0.8, y: 0.6, size: 0.15 },
+                { emoji: '🍄', x: 0.15, y: 0.8, size: 0.08 },
+                { emoji: '🍄', x: 0.7, y: 0.8, size: 0.06 },
+                { emoji: '🌺', x: 0.45, y: 0.85, size: 0.08 },
+                { emoji: '🦋', x: 0.25, y: 0.5, size: 0.06 },
+                { emoji: '🐦', x: 0.65, y: 0.2, size: 0.08 },
+            ]
+        },
+        {
+            name: 'Strand',
+            emoji: '🏖️',
+            theme: 'beach',
+            bgColors: ['#87CEEB', '#F4A460'], // Lucht naar zand
+            elements: [
+                { emoji: '🌊', x: 0.5, y: 0.35, size: 0.9 },
+                { emoji: '🏖️', x: 0.2, y: 0.6, size: 0.15 },
+                { emoji: '🏄', x: 0.4, y: 0.3, size: 0.12 },
+                { emoji: '⛱️', x: 0.7, y: 0.55, size: 0.15 },
+                { emoji: '🦀', x: 0.85, y: 0.75, size: 0.1 },
+                { emoji: '🐚', x: 0.3, y: 0.8, size: 0.08 },
+                { emoji: '🐚', x: 0.6, y: 0.85, size: 0.06 },
+                { emoji: '⭐', x: 0.45, y: 0.75, size: 0.08 },
+                { emoji: '🪣', x: 0.15, y: 0.75, size: 0.1 },
+                { emoji: '🩴', x: 0.8, y: 0.85, size: 0.08 },
+                { emoji: '🐬', x: 0.25, y: 0.25, size: 0.12 },
+                { emoji: '🦅', x: 0.75, y: 0.15, size: 0.1 },
+                { emoji: '☀️', x: 0.9, y: 0.08, size: 0.12 },
+                { emoji: '☁️', x: 0.15, y: 0.1, size: 0.1 },
+                { emoji: '⛵', x: 0.6, y: 0.2, size: 0.1 },
+                { emoji: '🌴', x: 0.05, y: 0.5, size: 0.15 },
+            ]
+        },
+        {
+            name: 'Ruimte',
+            emoji: '🚀',
+            theme: 'space',
+            bgColors: ['#000033', '#000000'], // Donkere ruimte
+            elements: [
+                { emoji: '🚀', x: 0.3, y: 0.4, size: 0.2 },
+                { emoji: '🌍', x: 0.7, y: 0.6, size: 0.2 },
+                { emoji: '🌙', x: 0.15, y: 0.25, size: 0.15 },
+                { emoji: '⭐', x: 0.1, y: 0.1, size: 0.06 },
+                { emoji: '⭐', x: 0.25, y: 0.65, size: 0.05 },
+                { emoji: '⭐', x: 0.4, y: 0.15, size: 0.07 },
+                { emoji: '⭐', x: 0.55, y: 0.8, size: 0.05 },
+                { emoji: '⭐', x: 0.7, y: 0.2, size: 0.06 },
+                { emoji: '⭐', x: 0.85, y: 0.45, size: 0.05 },
+                { emoji: '⭐', x: 0.9, y: 0.75, size: 0.06 },
+                { emoji: '🛸', x: 0.5, y: 0.25, size: 0.12 },
+                { emoji: '🪐', x: 0.85, y: 0.15, size: 0.15 },
+                { emoji: '☄️', x: 0.2, y: 0.8, size: 0.1 },
+                { emoji: '👽', x: 0.6, y: 0.45, size: 0.1 },
+                { emoji: '🌟', x: 0.45, y: 0.7, size: 0.08 },
+            ]
+        },
+        {
+            name: 'Feestje',
+            emoji: '🎂',
+            theme: 'party',
+            bgColors: ['#FF69B4', '#9370DB'], // Roze naar paars
+            elements: [
+                { emoji: '🎂', x: 0.5, y: 0.5, size: 0.25 },
+                { emoji: '🎈', x: 0.15, y: 0.25, size: 0.12 },
+                { emoji: '🎈', x: 0.3, y: 0.2, size: 0.1 },
+                { emoji: '🎈', x: 0.7, y: 0.2, size: 0.1 },
+                { emoji: '🎈', x: 0.85, y: 0.25, size: 0.12 },
+                { emoji: '🎁', x: 0.2, y: 0.7, size: 0.15 },
+                { emoji: '🎁', x: 0.75, y: 0.65, size: 0.12 },
+                { emoji: '🎉', x: 0.1, y: 0.45, size: 0.1 },
+                { emoji: '🎊', x: 0.9, y: 0.45, size: 0.1 },
+                { emoji: '🧁', x: 0.35, y: 0.75, size: 0.1 },
+                { emoji: '🍭', x: 0.6, y: 0.8, size: 0.08 },
+                { emoji: '🍬', x: 0.45, y: 0.85, size: 0.06 },
+                { emoji: '⭐', x: 0.25, y: 0.1, size: 0.08 },
+                { emoji: '⭐', x: 0.5, y: 0.08, size: 0.06 },
+                { emoji: '⭐', x: 0.75, y: 0.1, size: 0.07 },
+                { emoji: '🎵', x: 0.4, y: 0.35, size: 0.08 },
+                { emoji: '🎶', x: 0.65, y: 0.35, size: 0.08 },
+            ]
+        },
+        {
+            name: 'Treinstation',
+            emoji: '🚂',
+            theme: 'train',
+            bgColors: ['#87CEEB', '#D3D3D3'], // Lucht naar perron
+            elements: [
+                { emoji: '🚂', x: 0.25, y: 0.5, size: 0.2 },
+                { emoji: '🚃', x: 0.45, y: 0.5, size: 0.15 },
+                { emoji: '🚃', x: 0.6, y: 0.5, size: 0.15 },
+                { emoji: '🚃', x: 0.75, y: 0.5, size: 0.15 },
+                { emoji: '🏠', x: 0.1, y: 0.3, size: 0.15 },
+                { emoji: '🏢', x: 0.85, y: 0.25, size: 0.18 },
+                { emoji: '🚦', x: 0.5, y: 0.3, size: 0.08 },
+                { emoji: '🌳', x: 0.05, y: 0.45, size: 0.12 },
+                { emoji: '🌳', x: 0.95, y: 0.45, size: 0.1 },
+                { emoji: '☀️', x: 0.85, y: 0.08, size: 0.1 },
+                { emoji: '☁️', x: 0.2, y: 0.1, size: 0.1 },
+                { emoji: '☁️', x: 0.5, y: 0.08, size: 0.08 },
+                { emoji: '🐕', x: 0.7, y: 0.75, size: 0.08 },
+                { emoji: '🧳', x: 0.3, y: 0.75, size: 0.1 },
+                { emoji: '🎒', x: 0.55, y: 0.8, size: 0.08 },
+            ]
+        },
+        {
+            name: 'Vliegveld',
+            emoji: '✈️',
+            theme: 'airport',
+            bgColors: ['#87CEEB', '#B0C4DE'], // Lucht
+            elements: [
+                { emoji: '✈️', x: 0.5, y: 0.25, size: 0.25 },
+                { emoji: '🛩️', x: 0.15, y: 0.4, size: 0.12 },
+                { emoji: '🚁', x: 0.85, y: 0.35, size: 0.15 },
+                { emoji: '🏢', x: 0.3, y: 0.6, size: 0.2 },
+                { emoji: '🗼', x: 0.7, y: 0.55, size: 0.18 },
+                { emoji: '🚌', x: 0.45, y: 0.8, size: 0.1 },
+                { emoji: '🚗', x: 0.6, y: 0.85, size: 0.08 },
+                { emoji: '🧳', x: 0.2, y: 0.8, size: 0.1 },
+                { emoji: '🎒', x: 0.8, y: 0.8, size: 0.08 },
+                { emoji: '☁️', x: 0.25, y: 0.15, size: 0.1 },
+                { emoji: '☁️', x: 0.7, y: 0.1, size: 0.08 },
+                { emoji: '☀️', x: 0.9, y: 0.08, size: 0.1 },
+                { emoji: '🕊️', x: 0.4, y: 0.45, size: 0.06 },
+            ]
+        },
+        {
+            name: 'Camping',
+            emoji: '⛺',
+            theme: 'camping',
+            bgColors: ['#228B22', '#90EE90'], // Groen
+            elements: [
+                { emoji: '⛺', x: 0.3, y: 0.5, size: 0.2 },
+                { emoji: '⛺', x: 0.7, y: 0.55, size: 0.15 },
+                { emoji: '🔥', x: 0.5, y: 0.65, size: 0.12 },
+                { emoji: '🌲', x: 0.1, y: 0.35, size: 0.2 },
+                { emoji: '🌲', x: 0.9, y: 0.4, size: 0.18 },
+                { emoji: '🌳', x: 0.2, y: 0.3, size: 0.15 },
+                { emoji: '🦊', x: 0.15, y: 0.7, size: 0.1 },
+                { emoji: '🐰', x: 0.85, y: 0.75, size: 0.08 },
+                { emoji: '🦉', x: 0.25, y: 0.25, size: 0.1 },
+                { emoji: '🌙', x: 0.85, y: 0.1, size: 0.12 },
+                { emoji: '⭐', x: 0.15, y: 0.1, size: 0.06 },
+                { emoji: '⭐', x: 0.4, y: 0.08, size: 0.05 },
+                { emoji: '⭐', x: 0.6, y: 0.12, size: 0.06 },
+                { emoji: '⭐', x: 0.75, y: 0.08, size: 0.05 },
+                { emoji: '🎒', x: 0.45, y: 0.8, size: 0.08 },
+                { emoji: '🔦', x: 0.6, y: 0.75, size: 0.06 },
+            ]
+        },
+        {
+            name: 'Sneeuwpret',
+            emoji: '⛷️',
+            theme: 'snow',
+            bgColors: ['#B0E0E6', '#FFFFFF'], // Lichtblauw naar wit
+            elements: [
+                { emoji: '⛷️', x: 0.3, y: 0.4, size: 0.15 },
+                { emoji: '🏂', x: 0.6, y: 0.35, size: 0.15 },
+                { emoji: '⛄', x: 0.15, y: 0.6, size: 0.18 },
+                { emoji: '🎿', x: 0.8, y: 0.55, size: 0.12 },
+                { emoji: '🛷', x: 0.5, y: 0.7, size: 0.12 },
+                { emoji: '🌲', x: 0.05, y: 0.4, size: 0.15 },
+                { emoji: '🌲', x: 0.9, y: 0.35, size: 0.18 },
+                { emoji: '🌲', x: 0.45, y: 0.25, size: 0.12 },
+                { emoji: '❄️', x: 0.2, y: 0.15, size: 0.08 },
+                { emoji: '❄️', x: 0.4, y: 0.1, size: 0.06 },
+                { emoji: '❄️', x: 0.7, y: 0.12, size: 0.07 },
+                { emoji: '❄️', x: 0.85, y: 0.2, size: 0.06 },
+                { emoji: '🏔️', x: 0.5, y: 0.15, size: 0.2 },
+                { emoji: '🐧', x: 0.75, y: 0.75, size: 0.1 },
+                { emoji: '🐻‍❄️', x: 0.35, y: 0.8, size: 0.1 },
+            ]
+        },
+        {
+            name: 'Jungle',
+            emoji: '🦜',
+            theme: 'jungle',
+            bgColors: ['#228B22', '#006400'], // Donkergroen
+            elements: [
+                { emoji: '🦁', x: 0.5, y: 0.55, size: 0.18 },
+                { emoji: '🐘', x: 0.2, y: 0.6, size: 0.2 },
+                { emoji: '🦒', x: 0.8, y: 0.45, size: 0.22 },
+                { emoji: '🐒', x: 0.35, y: 0.3, size: 0.12 },
+                { emoji: '🐒', x: 0.65, y: 0.25, size: 0.1 },
+                { emoji: '🦜', x: 0.15, y: 0.25, size: 0.1 },
+                { emoji: '🦜', x: 0.85, y: 0.2, size: 0.08 },
+                { emoji: '🐍', x: 0.4, y: 0.75, size: 0.12 },
+                { emoji: '🦎', x: 0.7, y: 0.8, size: 0.08 },
+                { emoji: '🌴', x: 0.05, y: 0.35, size: 0.2 },
+                { emoji: '🌴', x: 0.95, y: 0.35, size: 0.18 },
+                { emoji: '🌺', x: 0.25, y: 0.85, size: 0.1 },
+                { emoji: '🌺', x: 0.6, y: 0.9, size: 0.08 },
+                { emoji: '🦋', x: 0.45, y: 0.4, size: 0.08 },
+                { emoji: '🌿', x: 0.1, y: 0.7, size: 0.1 },
+            ]
+        },
+        {
+            name: 'Circus',
+            emoji: '🎪',
+            theme: 'circus',
+            bgColors: ['#FF4500', '#FFD700'], // Rood naar goud
+            elements: [
+                { emoji: '🎪', x: 0.5, y: 0.35, size: 0.35 },
+                { emoji: '🤡', x: 0.2, y: 0.6, size: 0.15 },
+                { emoji: '🎭', x: 0.75, y: 0.55, size: 0.12 },
+                { emoji: '🦁', x: 0.35, y: 0.7, size: 0.12 },
+                { emoji: '🐘', x: 0.65, y: 0.65, size: 0.15 },
+                { emoji: '🎈', x: 0.1, y: 0.25, size: 0.1 },
+                { emoji: '🎈', x: 0.9, y: 0.25, size: 0.1 },
+                { emoji: '🎈', x: 0.3, y: 0.15, size: 0.08 },
+                { emoji: '🎈', x: 0.7, y: 0.15, size: 0.08 },
+                { emoji: '⭐', x: 0.15, y: 0.1, size: 0.06 },
+                { emoji: '⭐', x: 0.5, y: 0.08, size: 0.07 },
+                { emoji: '⭐', x: 0.85, y: 0.1, size: 0.06 },
+                { emoji: '🍿', x: 0.15, y: 0.8, size: 0.1 },
+                { emoji: '🍭', x: 0.85, y: 0.8, size: 0.08 },
+                { emoji: '🎵', x: 0.4, y: 0.5, size: 0.06 },
+            ]
+        },
+        {
+            name: 'Restaurant',
+            emoji: '🍕',
+            theme: 'food',
+            bgColors: ['#FFDAB9', '#FFE4B5'], // Warm beige
+            elements: [
+                { emoji: '🍕', x: 0.3, y: 0.4, size: 0.18 },
+                { emoji: '🍔', x: 0.55, y: 0.35, size: 0.15 },
+                { emoji: '🍟', x: 0.75, y: 0.4, size: 0.12 },
+                { emoji: '🌭', x: 0.15, y: 0.55, size: 0.1 },
+                { emoji: '🍦', x: 0.45, y: 0.6, size: 0.12 },
+                { emoji: '🧁', x: 0.65, y: 0.55, size: 0.1 },
+                { emoji: '🍰', x: 0.85, y: 0.6, size: 0.12 },
+                { emoji: '🥤', x: 0.2, y: 0.75, size: 0.1 },
+                { emoji: '🧃', x: 0.4, y: 0.8, size: 0.08 },
+                { emoji: '🍩', x: 0.6, y: 0.75, size: 0.1 },
+                { emoji: '🍪', x: 0.8, y: 0.8, size: 0.08 },
+                { emoji: '⭐', x: 0.15, y: 0.15, size: 0.08 },
+                { emoji: '⭐', x: 0.5, y: 0.12, size: 0.06 },
+                { emoji: '⭐', x: 0.85, y: 0.15, size: 0.07 },
+                { emoji: '❤️', x: 0.35, y: 0.2, size: 0.08 },
+                { emoji: '❤️', x: 0.7, y: 0.18, size: 0.06 },
+            ]
+        },
+        {
+            name: 'Muziek',
+            emoji: '🎸',
+            theme: 'music',
+            bgColors: ['#9370DB', '#FF69B4'], // Paars naar roze
+            elements: [
+                { emoji: '🎸', x: 0.2, y: 0.45, size: 0.2 },
+                { emoji: '🎹', x: 0.5, y: 0.5, size: 0.25 },
+                { emoji: '🥁', x: 0.8, y: 0.55, size: 0.18 },
+                { emoji: '🎺', x: 0.15, y: 0.7, size: 0.12 },
+                { emoji: '🎻', x: 0.65, y: 0.7, size: 0.12 },
+                { emoji: '🎤', x: 0.4, y: 0.75, size: 0.1 },
+                { emoji: '🎵', x: 0.1, y: 0.25, size: 0.1 },
+                { emoji: '🎶', x: 0.3, y: 0.2, size: 0.08 },
+                { emoji: '🎵', x: 0.5, y: 0.15, size: 0.1 },
+                { emoji: '🎶', x: 0.7, y: 0.2, size: 0.08 },
+                { emoji: '🎵', x: 0.9, y: 0.25, size: 0.1 },
+                { emoji: '⭐', x: 0.15, y: 0.1, size: 0.06 },
+                { emoji: '⭐', x: 0.45, y: 0.08, size: 0.07 },
+                { emoji: '⭐', x: 0.75, y: 0.1, size: 0.06 },
+                { emoji: '⭐', x: 0.9, y: 0.08, size: 0.05 },
+            ]
+        },
+        {
+            name: 'Tuin',
+            emoji: '🌷',
+            theme: 'garden',
+            bgColors: ['#87CEEB', '#90EE90'], // Lucht naar groen
+            elements: [
+                { emoji: '🌷', x: 0.15, y: 0.5, size: 0.12 },
+                { emoji: '🌻', x: 0.3, y: 0.45, size: 0.15 },
+                { emoji: '🌹', x: 0.5, y: 0.5, size: 0.12 },
+                { emoji: '🌺', x: 0.7, y: 0.45, size: 0.12 },
+                { emoji: '🌸', x: 0.85, y: 0.5, size: 0.1 },
+                { emoji: '🌼', x: 0.2, y: 0.65, size: 0.1 },
+                { emoji: '💐', x: 0.45, y: 0.7, size: 0.12 },
+                { emoji: '🌼', x: 0.65, y: 0.65, size: 0.1 },
+                { emoji: '🦋', x: 0.25, y: 0.3, size: 0.1 },
+                { emoji: '🦋', x: 0.6, y: 0.25, size: 0.08 },
+                { emoji: '🐝', x: 0.4, y: 0.35, size: 0.08 },
+                { emoji: '🐞', x: 0.75, y: 0.7, size: 0.08 },
+                { emoji: '🐌', x: 0.1, y: 0.8, size: 0.08 },
+                { emoji: '☀️', x: 0.85, y: 0.1, size: 0.12 },
+                { emoji: '☁️', x: 0.2, y: 0.1, size: 0.1 },
+                { emoji: '🌈', x: 0.5, y: 0.08, size: 0.15 },
+            ]
+        },
+        {
+            name: 'Sportveld',
+            emoji: '⚽',
+            theme: 'sports',
+            bgColors: ['#228B22', '#32CD32'], // Groen gras
+            elements: [
+                { emoji: '⚽', x: 0.5, y: 0.5, size: 0.2 },
+                { emoji: '🏀', x: 0.2, y: 0.4, size: 0.15 },
+                { emoji: '🎾', x: 0.75, y: 0.35, size: 0.12 },
+                { emoji: '⚾', x: 0.35, y: 0.7, size: 0.1 },
+                { emoji: '🏈', x: 0.65, y: 0.65, size: 0.12 },
+                { emoji: '🥅', x: 0.1, y: 0.5, size: 0.15 },
+                { emoji: '🥅', x: 0.9, y: 0.5, size: 0.15 },
+                { emoji: '🏆', x: 0.5, y: 0.2, size: 0.15 },
+                { emoji: '🥇', x: 0.35, y: 0.25, size: 0.08 },
+                { emoji: '🥈', x: 0.65, y: 0.25, size: 0.08 },
+                { emoji: '⭐', x: 0.2, y: 0.15, size: 0.06 },
+                { emoji: '⭐', x: 0.8, y: 0.15, size: 0.06 },
+                { emoji: '🎉', x: 0.15, y: 0.8, size: 0.1 },
+                { emoji: '🎊', x: 0.85, y: 0.8, size: 0.1 },
+            ]
+        },
+        {
+            name: 'Kasteel',
+            emoji: '🏰',
+            theme: 'castle',
+            bgColors: ['#87CEEB', '#90EE90'], // Lucht naar gras
+            elements: [
+                { emoji: '🏰', x: 0.5, y: 0.4, size: 0.35 },
+                { emoji: '👑', x: 0.5, y: 0.15, size: 0.1 },
+                { emoji: '🦄', x: 0.15, y: 0.6, size: 0.15 },
+                { emoji: '🐉', x: 0.85, y: 0.5, size: 0.18 },
+                { emoji: '🧚', x: 0.25, y: 0.35, size: 0.1 },
+                { emoji: '🧙', x: 0.75, y: 0.35, size: 0.1 },
+                { emoji: '🌳', x: 0.05, y: 0.55, size: 0.15 },
+                { emoji: '🌳', x: 0.95, y: 0.6, size: 0.12 },
+                { emoji: '🌺', x: 0.3, y: 0.8, size: 0.08 },
+                { emoji: '🌷', x: 0.7, y: 0.8, size: 0.08 },
+                { emoji: '⭐', x: 0.2, y: 0.1, size: 0.06 },
+                { emoji: '⭐', x: 0.4, y: 0.08, size: 0.05 },
+                { emoji: '⭐', x: 0.6, y: 0.08, size: 0.05 },
+                { emoji: '⭐', x: 0.8, y: 0.1, size: 0.06 },
+                { emoji: '🦋', x: 0.4, y: 0.7, size: 0.06 },
+            ]
+        },
+        {
+            name: 'Piraten',
+            emoji: '🏴‍☠️',
+            theme: 'pirates',
+            bgColors: ['#87CEEB', '#4169E1'], // Lucht naar zee
+            elements: [
+                { emoji: '🚢', x: 0.5, y: 0.55, size: 0.3 },
+                { emoji: '🏴‍☠️', x: 0.5, y: 0.3, size: 0.12 },
+                { emoji: '🦜', x: 0.35, y: 0.4, size: 0.1 },
+                { emoji: '💰', x: 0.65, y: 0.65, size: 0.1 },
+                { emoji: '🗺️', x: 0.2, y: 0.7, size: 0.12 },
+                { emoji: '⚓', x: 0.8, y: 0.7, size: 0.1 },
+                { emoji: '🏝️', x: 0.1, y: 0.5, size: 0.15 },
+                { emoji: '🌴', x: 0.08, y: 0.4, size: 0.12 },
+                { emoji: '🐙', x: 0.85, y: 0.85, size: 0.1 },
+                { emoji: '🐬', x: 0.25, y: 0.85, size: 0.1 },
+                { emoji: '☀️', x: 0.9, y: 0.1, size: 0.12 },
+                { emoji: '☁️', x: 0.2, y: 0.1, size: 0.1 },
+                { emoji: '☁️', x: 0.55, y: 0.12, size: 0.08 },
+                { emoji: '🦈', x: 0.6, y: 0.85, size: 0.1 },
+            ]
+        },
+        {
+            name: 'Bouwplaats',
+            emoji: '🏗️',
+            theme: 'construction',
+            bgColors: ['#87CEEB', '#D2691E'], // Lucht naar zand
+            elements: [
+                { emoji: '🏗️', x: 0.5, y: 0.4, size: 0.25 },
+                { emoji: '🚜', x: 0.15, y: 0.6, size: 0.18 },
+                { emoji: '🚧', x: 0.35, y: 0.7, size: 0.1 },
+                { emoji: '🚧', x: 0.65, y: 0.7, size: 0.1 },
+                { emoji: '🏠', x: 0.8, y: 0.5, size: 0.15 },
+                { emoji: '🔨', x: 0.25, y: 0.45, size: 0.1 },
+                { emoji: '🪚', x: 0.7, y: 0.4, size: 0.08 },
+                { emoji: '🧱', x: 0.4, y: 0.8, size: 0.1 },
+                { emoji: '🪵', x: 0.55, y: 0.85, size: 0.08 },
+                { emoji: '👷', x: 0.3, y: 0.55, size: 0.1 },
+                { emoji: '☀️', x: 0.9, y: 0.1, size: 0.1 },
+                { emoji: '☁️', x: 0.15, y: 0.1, size: 0.1 },
+                { emoji: '☁️', x: 0.5, y: 0.08, size: 0.08 },
+                { emoji: '🐕', x: 0.85, y: 0.75, size: 0.08 },
+            ]
+        },
     ],
 
     currentPuzzleIndex: 0,
@@ -93,7 +632,7 @@ const PuzzleEngine = {
         this.redraw();
     },
 
-    // Generate puzzle image using canvas
+    // Generate puzzle image using canvas - nu met kleurrijke scenes!
     async createPuzzleImage(puzzle) {
         return new Promise((resolve) => {
             const img = document.createElement('canvas');
@@ -101,89 +640,28 @@ const PuzzleEngine = {
             img.height = this.puzzleHeight * 2;
             const ctx = img.getContext('2d');
 
-            // Background gradient
-            const gradient = ctx.createRadialGradient(
-                img.width / 2, img.height / 2, 0,
-                img.width / 2, img.height / 2, img.width / 2
-            );
-            gradient.addColorStop(0, this.lightenColor(puzzle.color, 60));
-            gradient.addColorStop(1, this.lightenColor(puzzle.color, 30));
+            // Draw gradient background
+            const gradient = ctx.createLinearGradient(0, 0, 0, img.height);
+            gradient.addColorStop(0, puzzle.bgColors[0]);
+            gradient.addColorStop(1, puzzle.bgColors[1]);
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, img.width, img.height);
 
-            // Draw decorative elements
-            this.drawDecorativeBackground(ctx, img.width, img.height, puzzle.color);
+            // Draw all elements (emoji's) from the scene
+            puzzle.elements.forEach(element => {
+                const x = element.x * img.width;
+                const y = element.y * img.height;
+                const size = element.size * img.height;
 
-            // Draw large emoji in center
-            ctx.font = `${Math.min(img.width, img.height) * 0.6}px Arial`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(puzzle.emoji, img.width / 2, img.height / 2);
-
-            // Draw animal name
-            ctx.font = `bold ${img.height * 0.08}px Arial`;
-            ctx.fillStyle = '#333';
-            ctx.fillText(puzzle.name.toUpperCase(), img.width / 2, img.height * 0.9);
+                ctx.font = `${size}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(element.emoji, x, y);
+            });
 
             this.puzzleImage = img;
             resolve();
         });
-    },
-
-    // Draw decorative background elements
-    drawDecorativeBackground(ctx, width, height, baseColor) {
-        ctx.save();
-
-        // Draw some circles/bubbles
-        for (let i = 0; i < 15; i++) {
-            const x = Math.random() * width;
-            const y = Math.random() * height;
-            const radius = 20 + Math.random() * 60;
-
-            ctx.beginPath();
-            ctx.arc(x, y, radius, 0, Math.PI * 2);
-            ctx.fillStyle = this.lightenColor(baseColor, 70 + Math.random() * 20);
-            ctx.globalAlpha = 0.3;
-            ctx.fill();
-        }
-
-        // Draw some stars
-        ctx.globalAlpha = 0.4;
-        for (let i = 0; i < 8; i++) {
-            const x = Math.random() * width;
-            const y = Math.random() * height;
-            const size = 10 + Math.random() * 20;
-            this.drawStar(ctx, x, y, size, '#FFD700');
-        }
-
-        ctx.restore();
-    },
-
-    // Draw a star
-    drawStar(ctx, x, y, size, color) {
-        ctx.save();
-        ctx.fillStyle = color;
-        ctx.beginPath();
-        for (let i = 0; i < 5; i++) {
-            const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
-            const px = x + Math.cos(angle) * size;
-            const py = y + Math.sin(angle) * size;
-            if (i === 0) ctx.moveTo(px, py);
-            else ctx.lineTo(px, py);
-        }
-        ctx.closePath();
-        ctx.fill();
-        ctx.restore();
-    },
-
-    // Lighten a color
-    lightenColor(color, percent) {
-        const num = parseInt(color.replace('#', ''), 16);
-        const amt = Math.round(2.55 * percent);
-        const R = Math.min(255, (num >> 16) + amt);
-        const G = Math.min(255, ((num >> 8) & 0x00FF) + amt);
-        const B = Math.min(255, (num & 0x0000FF) + amt);
-        return `rgb(${R}, ${G}, ${B})`;
     },
 
     // Generate random order for pieces
@@ -296,7 +774,6 @@ const PuzzleEngine = {
         // Top edge
         this.ctx.moveTo(x, y);
         if (row > 0) {
-            // Add notch at top
             this.ctx.lineTo(x + width * 0.35, y);
             this.ctx.arc(x + width * 0.5, y, width * 0.08, Math.PI, 0, pieceIndex % 2 === 0);
             this.ctx.lineTo(x + width, y);
@@ -503,7 +980,7 @@ const PuzzleEngine = {
             index,
             name: puzzle.name,
             emoji: puzzle.emoji,
-            color: puzzle.color
+            color: puzzle.bgColors[0]
         }));
     }
 };
