@@ -213,6 +213,100 @@
         .instructions strong {
             color: #333;
         }
+
+        /* Tasks Screen */
+        .tasks-screen {
+            display: none;
+        }
+
+        .show-tasks-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .show-tasks-btn:active {
+            transform: scale(0.98);
+        }
+
+        .task-categories {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .category {
+            margin-bottom: 15px;
+        }
+
+        .category-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .category-title:active {
+            background: #e0e0e0;
+        }
+
+        .category-tasks {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .category-tasks.open {
+            display: flex;
+        }
+
+        .task-item {
+            padding: 12px 15px;
+            font-size: 14px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
+            color: white;
+            cursor: pointer;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .task-item:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+
+        .task-item.success {
+            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+        }
+
+        .back-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            background: white;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .back-btn:active {
+            background: #f5f5f5;
+        }
     </style>
 </head>
 <body>
@@ -255,32 +349,180 @@
                 Stukje Geven!
             </button>
 
-            <div class="quick-buttons">
-                <button class="quick-btn song" id="btn-song">🎵 Liedje</button>
-                <button class="quick-btn book" id="btn-book">📖 Boek</button>
-                <button class="quick-btn task" id="btn-task">✅ Taak</button>
-                <button class="quick-btn extra" id="btn-extra">⭐ Extra</button>
-            </div>
+            <button class="show-tasks-btn" id="show-tasks-btn">📋 Kies een taak...</button>
 
             <button class="disconnect-btn" id="disconnect-btn">Verbinding verbreken</button>
+        </div>
+
+        <!-- Tasks Screen -->
+        <div class="card tasks-screen" id="tasks-screen">
+            <h1>📋 Kies een Taak</h1>
+            <p class="subtitle">Tik op een taak als je kind het heeft gedaan</p>
+
+            <div class="task-categories" id="task-categories">
+                <!-- Categories will be populated by JS -->
+            </div>
+
+            <button class="back-btn" id="back-btn">← Terug</button>
         </div>
     </div>
 
     <script src="src/js/remote.js"></script>
     <script>
+        // 50+ taken voor 2-jarigen tijdens een autorit
+        const remoteTasks = {
+            "🎵 Zingen & Geluid": [
+                "🎵 Een liedje gezongen",
+                "👏 In de handen geklapt",
+                "🐮 Koe-geluid gemaakt (boe!)",
+                "🐷 Varken-geluid gemaakt (knor!)",
+                "🐶 Hond-geluid gemaakt (waf!)",
+                "🐱 Kat-geluid gemaakt (miauw!)",
+                "🦁 Leeuw-geluid gemaakt (roar!)",
+                "🐸 Kikker-geluid gemaakt (kwaak!)",
+                "🐦 Vogel-geluid gemaakt (tjilp!)",
+                "🚗 Auto-geluid gemaakt (broem!)"
+            ],
+            "👀 Kijken & Zoeken": [
+                "🚗 Een rode auto gezien",
+                "🚙 Een blauwe auto gezien",
+                "🚕 Een gele auto gezien",
+                "🚚 Een vrachtwagen gezien",
+                "🚌 Een bus gezien",
+                "🚒 Een brandweerauto gezien",
+                "🚑 Een ambulance gezien",
+                "🚜 Een tractor gezien",
+                "🐄 Een koe gezien",
+                "🐑 Een schaap gezien",
+                "🐴 Een paard gezien",
+                "🦆 Een eend gezien",
+                "🐦 Een vogel gezien",
+                "🌳 Een grote boom gezien",
+                "💧 Water gezien (sloot/rivier)",
+                "🌈 Een regenboog gezien",
+                "☀️ De zon gezien",
+                "☁️ Een wolk aangewezen"
+            ],
+            "🤸 Beweging": [
+                "👋 Gezwaaid",
+                "👍 Duimpje omhoog gedaan",
+                "✋ High five gegeven",
+                "🦶 Met voetjes gestampt",
+                "🙆 Armen omhoog gedaan",
+                "👃 Neus aangeraakt",
+                "👂 Oren aangeraakt",
+                "👀 Ogen dichtgedaan",
+                "😛 Tong uitgestoken",
+                "🤗 Knuffel gegeven"
+            ],
+            "🔢 Tellen & Leren": [
+                "1️⃣ Tot 3 geteld",
+                "✌️ 2 vingers opgestoken",
+                "🖐️ 5 vingers laten zien",
+                "🔴 Iets roods aangewezen",
+                "🔵 Iets blauws aangewezen",
+                "🟢 Iets groens aangewezen",
+                "🟡 Iets geels aangewezen",
+                "⚫ Iets zwarts aangewezen",
+                "⚪ Iets wits aangewezen"
+            ],
+            "🍎 Eten & Drinken": [
+                "🧃 Wat gedronken",
+                "🍪 Een koekje gegeten",
+                "🍎 Fruit gegeten",
+                "🥪 Broodje gegeten",
+                "🍌 Banaan gegeten"
+            ],
+            "😊 Braaf Zijn": [
+                "😊 Lief gelachen",
+                "🤫 Even stil geweest",
+                "🪑 Rustig blijven zitten",
+                "👶 Lief geweest",
+                "😴 Even geslapen",
+                "📖 Naar een boekje gekeken",
+                "🧸 Met knuffel gespeeld",
+                "🎨 Getekend/gekleurd"
+            ]
+        };
+    </script>
+    <script>
         // Elements
         const connectScreen = document.getElementById('connect-screen');
         const connectedScreen = document.getElementById('connected-screen');
+        const tasksScreen = document.getElementById('tasks-screen');
         const connectBtn = document.getElementById('connect-btn');
         const errorMsg = document.getElementById('error-msg');
         const pieceBtn = document.getElementById('piece-btn');
         const disconnectBtn = document.getElementById('disconnect-btn');
+        const showTasksBtn = document.getElementById('show-tasks-btn');
+        const backBtn = document.getElementById('back-btn');
+        const taskCategoriesDiv = document.getElementById('task-categories');
         const digits = [
             document.getElementById('digit1'),
             document.getElementById('digit2'),
             document.getElementById('digit3'),
             document.getElementById('digit4')
         ];
+
+        // Populate task categories
+        function populateTaskCategories() {
+            taskCategoriesDiv.innerHTML = '';
+
+            for (const [categoryName, tasks] of Object.entries(remoteTasks)) {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category';
+
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'category-title';
+                titleDiv.textContent = categoryName;
+
+                const tasksDiv = document.createElement('div');
+                tasksDiv.className = 'category-tasks';
+
+                tasks.forEach(task => {
+                    const taskBtn = document.createElement('button');
+                    taskBtn.className = 'task-item';
+                    taskBtn.textContent = task;
+                    taskBtn.addEventListener('click', () => sendTaskPiece(taskBtn));
+                    tasksDiv.appendChild(taskBtn);
+                });
+
+                titleDiv.addEventListener('click', () => {
+                    tasksDiv.classList.toggle('open');
+                });
+
+                categoryDiv.appendChild(titleDiv);
+                categoryDiv.appendChild(tasksDiv);
+                taskCategoriesDiv.appendChild(categoryDiv);
+            }
+        }
+
+        // Send piece for a task
+        async function sendTaskPiece(btn) {
+            try {
+                btn.classList.add('success');
+                await RemoteControl.sendPiece();
+
+                setTimeout(() => {
+                    btn.classList.remove('success');
+                }, 500);
+            } catch (error) {
+                alert('Verzenden mislukt: ' + error.message);
+            }
+        }
+
+        // Show tasks screen
+        showTasksBtn.addEventListener('click', () => {
+            connectedScreen.style.display = 'none';
+            tasksScreen.style.display = 'block';
+            populateTaskCategories();
+        });
+
+        // Back to connected screen
+        backBtn.addEventListener('click', () => {
+            tasksScreen.style.display = 'none';
+            connectedScreen.style.display = 'block';
+        });
 
         // Auto-focus and move between digits
         digits.forEach((digit, index) => {
@@ -368,10 +610,6 @@
         }
 
         pieceBtn.addEventListener('click', () => sendPiece(pieceBtn));
-        document.getElementById('btn-song').addEventListener('click', (e) => sendPiece(e.target));
-        document.getElementById('btn-book').addEventListener('click', (e) => sendPiece(e.target));
-        document.getElementById('btn-task').addEventListener('click', (e) => sendPiece(e.target));
-        document.getElementById('btn-extra').addEventListener('click', (e) => sendPiece(e.target));
 
         // Disconnect
         disconnectBtn.addEventListener('click', () => {
