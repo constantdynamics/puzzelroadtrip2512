@@ -167,7 +167,14 @@
             width: 100%;
             aspect-ratio: 8/5;
             border-radius: 8px;
-            background: white;
+            background: #333;
+            object-fit: contain;
+        }
+
+        .puzzle-preview-img {
+            width: 100%;
+            border-radius: 8px;
+            background: #333;
         }
 
         .puzzle-progress-bar {
@@ -258,6 +265,47 @@
         .nav-btn.tasks { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         .nav-btn.settings { background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%); }
         .nav-btn.puzzles { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .nav-btn.photo { background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%); }
+
+        /* Photo Screen */
+        .photo-screen {
+            display: none;
+        }
+
+        .photo-preview-container {
+            margin-bottom: 15px;
+        }
+
+        .crop-area {
+            position: relative;
+            width: 100%;
+            background: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #photo-preview {
+            width: 100%;
+            display: block;
+        }
+
+        .crop-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 3px dashed #4CAF50;
+            box-sizing: border-box;
+            pointer-events: none;
+        }
+
+        .crop-hint {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            margin: 8px 0;
+        }
 
         .disconnect-btn {
             margin-top: 10px;
@@ -324,28 +372,110 @@
             background: white;
         }
 
-        .toggle-btn {
-            width: 100%;
+        /* Toggle Switch */
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 52px;
+            height: 28px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider-toggle {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 28px;
+        }
+
+        .slider-toggle:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider-toggle {
+            background-color: #4CAF50;
+        }
+
+        input:checked + .slider-toggle:before {
+            transform: translateX(24px);
+        }
+
+        /* Vehicle Grid */
+        .vehicle-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .vehicle-btn {
             padding: 12px;
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 24px;
             border: 2px solid #ddd;
             border-radius: 10px;
             background: white;
             cursor: pointer;
         }
 
-        .toggle-btn.active {
-            background: #4CAF50;
+        .vehicle-btn:active {
+            transform: scale(0.95);
+        }
+
+        .vehicle-btn.selected {
             border-color: #4CAF50;
+            background: #e8f5e9;
+        }
+
+        /* Settings Footer */
+        .settings-footer {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .save-btn {
+            padding: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
             color: white;
+            cursor: pointer;
+        }
+
+        .save-btn:active {
+            transform: scale(0.98);
         }
 
         .action-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
-            margin-top: 15px;
         }
 
         .action-btn {
@@ -541,7 +671,7 @@
                     <span class="puzzle-name" id="preview-puzzle-name">🦁 Dierentuin</span>
                     <span id="preview-progress-text">0/40</span>
                 </div>
-                <canvas class="puzzle-preview-canvas" id="preview-canvas"></canvas>
+                <img class="puzzle-preview-img" id="preview-img" src="" alt="Puzzel preview">
                 <div class="puzzle-progress-bar">
                     <div class="puzzle-progress-fill" id="preview-progress-fill" style="width: 0%"></div>
                 </div>
@@ -556,8 +686,32 @@
             <button class="nav-btn tasks" id="show-tasks-btn">📋 Taken Kiezen</button>
             <button class="nav-btn settings" id="show-settings-btn">⚙️ Instellingen</button>
             <button class="nav-btn puzzles" id="show-puzzles-btn">🧩 Andere Puzzel</button>
+            <button class="nav-btn photo" id="show-photo-btn">📷 Eigen Foto</button>
 
             <button class="disconnect-btn" id="disconnect-btn">Verbinding verbreken</button>
+        </div>
+
+        <!-- Photo Upload Screen -->
+        <div class="card photo-screen" id="photo-screen">
+            <h2>📷 Eigen Foto Puzzel</h2>
+            <p class="subtitle">Maak een puzzel van je eigen foto</p>
+
+            <input type="file" id="photo-input" accept="image/*" style="display:none">
+
+            <div class="photo-preview-container" id="photo-preview-container" style="display:none">
+                <div class="crop-area">
+                    <img id="photo-preview" src="">
+                    <div class="crop-overlay" id="crop-overlay"></div>
+                </div>
+                <p class="crop-hint">Sleep om bij te snijden (8:5 verhouding)</p>
+                <button class="save-btn" id="use-photo-btn">✓ Gebruik deze foto</button>
+            </div>
+
+            <button class="nav-btn photo" id="select-photo-btn">
+                <span>📁</span> Kies een foto
+            </button>
+
+            <button class="back-btn" id="photo-back-btn">← Terug</button>
         </div>
 
         <!-- Settings Screen -->
@@ -565,18 +719,23 @@
             <h2>⚙️ Instellingen</h2>
 
             <div class="setting-item">
-                <label>🔊 Volume: <span id="volume-value">50</span>%</label>
+                <div class="setting-row">
+                    <span>🔊 Geluid</span>
+                    <label class="switch">
+                        <input type="checkbox" id="sound-toggle-check" checked>
+                        <span class="slider-toggle"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="setting-item" id="volume-setting">
+                <label>🔈 Volume: <span id="volume-value">50</span>%</label>
                 <input type="range" id="volume-slider" min="0" max="100" value="50">
             </div>
 
             <div class="setting-item">
-                <label>🔇 Geluid</label>
-                <button class="toggle-btn active" id="sound-toggle">🔊 Aan</button>
-            </div>
-
-            <div class="setting-item">
-                <label>⏱️ Minuten per stukje:</label>
-                <input type="number" id="timer-interval" min="1" max="60" value="15">
+                <label>⏱️ Minuten per stukje: <span id="timer-value">15</span></label>
+                <input type="range" id="timer-slider" min="1" max="60" value="15">
             </div>
 
             <div class="setting-item">
@@ -592,24 +751,29 @@
 
             <div class="setting-item">
                 <label>🚗 Voertuig:</label>
-                <select id="vehicle-select">
-                    <option value="🚗">🚗 Auto</option>
-                    <option value="🚌">🚌 Bus</option>
-                    <option value="🚂">🚂 Trein</option>
-                    <option value="✈️">✈️ Vliegtuig</option>
-                    <option value="🚢">🚢 Boot</option>
-                    <option value="🚲">🚲 Fiets</option>
-                    <option value="🏎️">🏎️ Raceauto</option>
-                    <option value="🚀">🚀 Raket</option>
-                </select>
+                <div class="vehicle-grid" id="vehicle-grid">
+                    <button class="vehicle-btn selected" data-vehicle="🚗">🚗</button>
+                    <button class="vehicle-btn" data-vehicle="🚌">🚌</button>
+                    <button class="vehicle-btn" data-vehicle="🚂">🚂</button>
+                    <button class="vehicle-btn" data-vehicle="✈️">✈️</button>
+                    <button class="vehicle-btn" data-vehicle="🚢">🚢</button>
+                    <button class="vehicle-btn" data-vehicle="🚲">🚲</button>
+                    <button class="vehicle-btn" data-vehicle="🏎️">🏎️</button>
+                    <button class="vehicle-btn" data-vehicle="🚀">🚀</button>
+                </div>
             </div>
 
-            <div class="action-buttons">
-                <button class="action-btn pause" id="pause-btn">⏸️ Pauze</button>
-                <button class="action-btn reset" id="reset-btn">🔄 Reset</button>
+            <div class="setting-item">
+                <div class="action-buttons">
+                    <button class="action-btn pause" id="pause-btn">⏸️ Pauze</button>
+                    <button class="action-btn reset" id="reset-btn">🔄 Reset</button>
+                </div>
             </div>
 
-            <button class="back-btn" id="settings-back-btn">← Terug</button>
+            <div class="settings-footer">
+                <button class="back-btn" id="settings-back-btn">← Terug</button>
+                <button class="save-btn" id="settings-save-btn">✓ Opslaan</button>
+            </div>
         </div>
 
         <!-- Tasks Screen -->
@@ -635,7 +799,7 @@
             <button class="back-btn" id="puzzles-back-btn">← Terug</button>
         </div>
 
-        <div class="version-info">v2.2.0</div>
+        <div class="version-info">v2.3.0</div>
     </div>
 
     <script src="src/js/firebase-config.js"></script>
@@ -756,6 +920,7 @@
         const settingsScreen = document.getElementById('settings-screen');
         const tasksScreen = document.getElementById('tasks-screen');
         const puzzlesScreen = document.getElementById('puzzles-screen');
+        const photoScreen = document.getElementById('photo-screen');
 
         const connectBtn = document.getElementById('connect-btn');
         const errorMsg = document.getElementById('error-msg');
@@ -776,6 +941,7 @@
             settingsScreen.style.display = 'none';
             tasksScreen.style.display = 'none';
             puzzlesScreen.style.display = 'none';
+            photoScreen.style.display = 'none';
             screen.style.display = 'block';
         }
 
@@ -966,35 +1132,46 @@
             showScreen(connectedScreen);
         });
 
-        // Settings handlers
-        document.getElementById('volume-slider').addEventListener('input', async (e) => {
+        // === SETTINGS STATE (temporary until saved) ===
+        let pendingSettings = {};
+
+        // Sound toggle
+        document.getElementById('sound-toggle-check').addEventListener('change', (e) => {
+            soundEnabled = e.target.checked;
+            pendingSettings.soundEnabled = soundEnabled;
+            // Show/hide volume slider based on sound enabled
+            document.getElementById('volume-setting').style.opacity = soundEnabled ? '1' : '0.5';
+        });
+
+        // Volume slider
+        document.getElementById('volume-slider').addEventListener('input', (e) => {
             const value = e.target.value;
             document.getElementById('volume-value').textContent = value;
-            await sendSettings({ volume: parseInt(value) });
+            pendingSettings.volume = parseInt(value);
         });
 
-        document.getElementById('sound-toggle').addEventListener('click', async (e) => {
-            soundEnabled = !soundEnabled;
-            e.target.textContent = soundEnabled ? '🔊 Aan' : '🔇 Uit';
-            e.target.classList.toggle('active', soundEnabled);
-            await sendSettings({ soundEnabled });
+        // Timer slider
+        document.getElementById('timer-slider').addEventListener('input', (e) => {
+            const value = e.target.value;
+            document.getElementById('timer-value').textContent = value;
+            pendingSettings.timerInterval = parseInt(value);
         });
 
-        document.getElementById('timer-interval').addEventListener('change', async (e) => {
-            const value = parseInt(e.target.value);
-            if (value >= 1 && value <= 60) {
-                await sendSettings({ timerInterval: value });
-            }
+        // Piece count
+        document.getElementById('piece-count').addEventListener('change', (e) => {
+            pendingSettings.pieceCount = parseInt(e.target.value);
         });
 
-        document.getElementById('piece-count').addEventListener('change', async (e) => {
-            await sendSettings({ pieceCount: parseInt(e.target.value) });
+        // Vehicle grid
+        document.querySelectorAll('.vehicle-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.vehicle-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                pendingSettings.vehicle = btn.dataset.vehicle;
+            });
         });
 
-        document.getElementById('vehicle-select').addEventListener('change', async (e) => {
-            await sendSettings({ vehicle: e.target.value });
-        });
-
+        // Pause button
         document.getElementById('pause-btn').addEventListener('click', async (e) => {
             isPaused = !isPaused;
             e.target.textContent = isPaused ? '▶️ Doorgaan' : '⏸️ Pauze';
@@ -1002,10 +1179,26 @@
             await sendSettings({ timerPaused: isPaused });
         });
 
+        // Reset button
         document.getElementById('reset-btn').addEventListener('click', async () => {
             if (confirm('Weet je zeker dat je de puzzel wilt resetten?')) {
                 await sendSettings({ resetPuzzle: true });
             }
+        });
+
+        // Save button - saves all pending settings and goes back
+        document.getElementById('settings-save-btn').addEventListener('click', async () => {
+            if (Object.keys(pendingSettings).length > 0) {
+                await sendSettings(pendingSettings);
+                pendingSettings = {};
+            }
+            showScreen(connectedScreen);
+        });
+
+        // Back button - discards changes and goes back
+        document.getElementById('settings-back-btn').addEventListener('click', () => {
+            pendingSettings = {};
+            showScreen(connectedScreen);
         });
 
         // Disconnect
@@ -1046,7 +1239,7 @@
 
         // Update the preview display
         function updatePuzzlePreview(state) {
-            const { puzzleIndex, piecesPlaced, totalPieces, isComplete } = state;
+            const { puzzleIndex, piecesPlaced, totalPieces, isComplete, imageData } = state;
 
             // Update puzzle name
             const puzzle = puzzleList[puzzleIndex] || puzzleList[0];
@@ -1061,8 +1254,10 @@
             const percent = totalPieces > 0 ? (piecesPlaced / totalPieces) * 100 : 0;
             document.getElementById('preview-progress-fill').style.width = `${percent}%`;
 
-            // Draw preview canvas
-            drawPreviewCanvas(puzzleIndex, piecesPlaced, totalPieces);
+            // Update preview image
+            if (imageData) {
+                document.getElementById('preview-img').src = imageData;
+            }
 
             // Show/hide completion badge
             const badge = document.getElementById('puzzle-complete-badge');
@@ -1079,57 +1274,6 @@
             lastPuzzleState = state;
         }
 
-        // Draw a simple preview of the puzzle progress
-        function drawPreviewCanvas(puzzleIndex, placed, total) {
-            const canvas = document.getElementById('preview-canvas');
-            const ctx = canvas.getContext('2d');
-
-            // Set canvas size
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * 2;
-            canvas.height = rect.height * 2;
-            ctx.scale(2, 2);
-
-            const width = rect.width;
-            const height = rect.height;
-
-            // Background color based on puzzle
-            const puzzle = puzzleList[puzzleIndex] || puzzleList[0];
-            ctx.fillStyle = puzzle.color || '#87CEEB';
-            ctx.fillRect(0, 0, width, height);
-
-            // Draw grid
-            const cols = 8;
-            const rows = 5;
-            const cellW = width / cols;
-            const cellH = height / rows;
-
-            // Draw placed pieces (filled) and empty pieces (outlined)
-            for (let i = 0; i < total && i < cols * rows; i++) {
-                const col = i % cols;
-                const row = Math.floor(i / cols);
-                const x = col * cellW;
-                const y = row * cellH;
-
-                if (i < placed) {
-                    // Placed piece - slightly darker
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-                    ctx.fillRect(x + 1, y + 1, cellW - 2, cellH - 2);
-                }
-
-                // Grid lines
-                ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
-                ctx.lineWidth = 0.5;
-                ctx.strokeRect(x, y, cellW, cellH);
-            }
-
-            // Draw big emoji in center
-            ctx.font = `${Math.min(width, height) * 0.3}px Arial`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(puzzle.emoji, width / 2, height / 2);
-        }
-
         // Start preview when connected
         const originalConnectHandler = connectBtn.onclick;
         connectBtn.addEventListener('click', async () => {
@@ -1139,6 +1283,83 @@
                     startPuzzlePreview();
                 }
             }, 500);
+        });
+
+        // === PHOTO UPLOAD SYSTEM ===
+        let selectedPhotoData = null;
+
+        // Show photo screen
+        document.getElementById('show-photo-btn').addEventListener('click', () => {
+            showScreen(photoScreen);
+        });
+
+        // Back from photo screen
+        document.getElementById('photo-back-btn').addEventListener('click', () => {
+            showScreen(connectedScreen);
+        });
+
+        // Trigger file input
+        document.getElementById('select-photo-btn').addEventListener('click', () => {
+            document.getElementById('photo-input').click();
+        });
+
+        // Handle file selection
+        document.getElementById('photo-input').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    // Crop to 8:5 aspect ratio
+                    const targetRatio = 8 / 5;
+                    let cropWidth = img.width;
+                    let cropHeight = img.height;
+                    let offsetX = 0;
+                    let offsetY = 0;
+
+                    const imgRatio = img.width / img.height;
+                    if (imgRatio > targetRatio) {
+                        // Image is wider - crop sides
+                        cropWidth = img.height * targetRatio;
+                        offsetX = (img.width - cropWidth) / 2;
+                    } else {
+                        // Image is taller - crop top/bottom
+                        cropHeight = img.width / targetRatio;
+                        offsetY = (img.height - cropHeight) / 2;
+                    }
+
+                    // Create cropped canvas
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 800;
+                    canvas.height = 500;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, offsetX, offsetY, cropWidth, cropHeight, 0, 0, 800, 500);
+
+                    selectedPhotoData = canvas.toDataURL('image/jpeg', 0.85);
+
+                    // Show preview
+                    document.getElementById('photo-preview').src = selectedPhotoData;
+                    document.getElementById('photo-preview-container').style.display = 'block';
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Use photo button
+        document.getElementById('use-photo-btn').addEventListener('click', async () => {
+            if (!selectedPhotoData) return;
+
+            try {
+                // Send custom image to tablet
+                await sendSettings({ customImage: selectedPhotoData });
+                alert('Foto verzonden! De puzzel wordt nu geladen op de tablet.');
+                showScreen(connectedScreen);
+            } catch (error) {
+                alert('Fout bij verzenden: ' + error.message);
+            }
         });
 
         // Focus first digit on load

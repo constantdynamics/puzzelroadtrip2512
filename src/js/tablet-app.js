@@ -163,7 +163,21 @@ const TabletApp = {
             this.nextPuzzle();
         }
 
+        if (settings.customImage) {
+            this.loadCustomImage(settings.customImage);
+        }
+
         this.saveState();
+    },
+
+    // Load a custom image as puzzle
+    async loadCustomImage(imageData) {
+        console.log('Loading custom image...');
+        this.state.customImage = imageData;
+        PuzzleEngine.setCustomImage(imageData);
+        this.resetCurrentPuzzle();
+        // Update preview name
+        document.getElementById('preview-puzzle-name')?.textContent = '📷 Eigen Foto';
     },
 
     // Handle piece received from remote
@@ -450,11 +464,27 @@ const TabletApp = {
     syncPuzzleStateToRemote() {
         if (RemoteControl.roomRef) {
             const progress = PuzzleEngine.getProgress();
+
+            // Get canvas image as small thumbnail for preview
+            const canvas = document.getElementById('puzzle-canvas');
+            let imageData = null;
+            if (canvas) {
+                // Create small thumbnail (max 200px wide)
+                const thumbCanvas = document.createElement('canvas');
+                const scale = Math.min(200 / canvas.width, 200 / canvas.height);
+                thumbCanvas.width = canvas.width * scale;
+                thumbCanvas.height = canvas.height * scale;
+                const ctx = thumbCanvas.getContext('2d');
+                ctx.drawImage(canvas, 0, 0, thumbCanvas.width, thumbCanvas.height);
+                imageData = thumbCanvas.toDataURL('image/jpeg', 0.6);
+            }
+
             RemoteControl.roomRef.child('puzzleState').set({
                 puzzleIndex: this.state.currentPuzzleIndex,
                 piecesPlaced: progress.placed,
                 totalPieces: progress.total,
                 isComplete: PuzzleEngine.isComplete(),
+                imageData: imageData,
                 timestamp: Date.now()
             });
         }
