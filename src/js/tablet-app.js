@@ -441,6 +441,23 @@ const TabletApp = {
             timerPaused: timerState.isPaused,
             piecesPlaced: PuzzleEngine.placedPieces.length
         });
+
+        // Also sync puzzle state to Firebase for remote preview
+        this.syncPuzzleStateToRemote();
+    },
+
+    // Sync puzzle state to Firebase for remote to display
+    syncPuzzleStateToRemote() {
+        if (RemoteControl.roomRef) {
+            const progress = PuzzleEngine.getProgress();
+            RemoteControl.roomRef.child('puzzleState').set({
+                puzzleIndex: this.state.currentPuzzleIndex,
+                piecesPlaced: progress.placed,
+                totalPieces: progress.total,
+                isComplete: PuzzleEngine.isComplete(),
+                timestamp: Date.now()
+            });
+        }
     }
 };
 

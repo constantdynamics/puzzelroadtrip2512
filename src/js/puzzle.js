@@ -1267,9 +1267,6 @@ const PuzzleEngine = {
             this.animatingPiece = null;
             this.redraw();
 
-            // Flash effect
-            this.flashEffect();
-
             if (callback) callback(true);
         }
     },

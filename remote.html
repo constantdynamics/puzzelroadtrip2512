@@ -140,20 +140,90 @@
             50% { opacity: 0.7; transform: scale(1.1); }
         }
 
-        /* Main Piece Button */
+        /* Puzzle Preview */
+        .puzzle-preview {
+            background: #f0f0f0;
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .puzzle-preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .puzzle-preview-header .puzzle-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .puzzle-preview-canvas {
+            width: 100%;
+            aspect-ratio: 8/5;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .puzzle-progress-bar {
+            height: 6px;
+            background: #ddd;
+            border-radius: 3px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .puzzle-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            transition: width 0.3s ease;
+        }
+
+        /* Celebration overlay in remote */
+        .puzzle-complete-badge {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(76, 175, 80, 0.95);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            display: none;
+            animation: celebratePop 0.5s ease;
+        }
+
+        @keyframes celebratePop {
+            0% { transform: translate(-50%, -50%) scale(0); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        /* Main Piece Button - smaller now */
         .piece-btn {
             width: 100%;
-            padding: 30px 20px;
-            font-size: 22px;
+            padding: 18px 15px;
+            font-size: 18px;
             font-weight: bold;
             border: none;
-            border-radius: 20px;
+            border-radius: 15px;
             background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
             color: white;
             cursor: pointer;
-            box-shadow: 0 6px 25px rgba(255, 107, 107, 0.4);
-            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+            margin-bottom: 12px;
             transition: transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
         .piece-btn:active {
@@ -165,9 +235,7 @@
         }
 
         .piece-btn .emoji {
-            font-size: 40px;
-            display: block;
-            margin-bottom: 8px;
+            font-size: 28px;
         }
 
         /* Navigation Buttons */
@@ -455,18 +523,29 @@
             <div class="instructions">
                 <strong>Hoe werkt het?</strong><br>
                 1. Open de app op de tablet<br>
-                2. De code verschijnt automatisch in de console (F12)<br>
+                2. Lees de code linksonder op het tablet scherm<br>
                 3. Voer de 4-cijferige code hier in
             </div>
         </div>
 
         <!-- Connected Screen (Main Menu) -->
         <div class="card connected-screen" id="connected-screen">
-            <h1>🎮 Verbonden!</h1>
-
             <div class="status">
                 <div class="status-dot"></div>
                 <span>Verbonden met tablet</span>
+            </div>
+
+            <!-- Puzzle Preview -->
+            <div class="puzzle-preview" id="puzzle-preview">
+                <div class="puzzle-preview-header">
+                    <span class="puzzle-name" id="preview-puzzle-name">🦁 Dierentuin</span>
+                    <span id="preview-progress-text">0/40</span>
+                </div>
+                <canvas class="puzzle-preview-canvas" id="preview-canvas"></canvas>
+                <div class="puzzle-progress-bar">
+                    <div class="puzzle-progress-fill" id="preview-progress-fill" style="width: 0%"></div>
+                </div>
+                <div class="puzzle-complete-badge" id="puzzle-complete-badge">🎉 Puzzel Af!</div>
             </div>
 
             <button class="piece-btn" id="piece-btn">
@@ -556,7 +635,7 @@
             <button class="back-btn" id="puzzles-back-btn">← Terug</button>
         </div>
 
-        <div class="version-info">v2.1.0</div>
+        <div class="version-info">v2.2.0</div>
     </div>
 
     <script src="src/js/firebase-config.js"></script>
@@ -935,6 +1014,131 @@
             showScreen(connectScreen);
             digits.forEach(d => d.value = '');
             updateConnectButton();
+            stopPuzzlePreview();
+        });
+
+        // === PUZZLE PREVIEW SYSTEM ===
+        let previewInterval = null;
+        let lastPuzzleState = null;
+
+        // Start listening for puzzle state updates
+        function startPuzzlePreview() {
+            if (previewInterval) clearInterval(previewInterval);
+
+            previewInterval = setInterval(() => {
+                if (RemoteControl.roomRef) {
+                    RemoteControl.roomRef.child('puzzleState').once('value', (snapshot) => {
+                        const state = snapshot.val();
+                        if (state) {
+                            updatePuzzlePreview(state);
+                        }
+                    });
+                }
+            }, 1000);
+        }
+
+        function stopPuzzlePreview() {
+            if (previewInterval) {
+                clearInterval(previewInterval);
+                previewInterval = null;
+            }
+        }
+
+        // Update the preview display
+        function updatePuzzlePreview(state) {
+            const { puzzleIndex, piecesPlaced, totalPieces, isComplete } = state;
+
+            // Update puzzle name
+            const puzzle = puzzleList[puzzleIndex] || puzzleList[0];
+            document.getElementById('preview-puzzle-name').textContent =
+                `${puzzle.emoji} ${puzzle.name}`;
+
+            // Update progress text
+            document.getElementById('preview-progress-text').textContent =
+                `${piecesPlaced}/${totalPieces}`;
+
+            // Update progress bar
+            const percent = totalPieces > 0 ? (piecesPlaced / totalPieces) * 100 : 0;
+            document.getElementById('preview-progress-fill').style.width = `${percent}%`;
+
+            // Draw preview canvas
+            drawPreviewCanvas(puzzleIndex, piecesPlaced, totalPieces);
+
+            // Show/hide completion badge
+            const badge = document.getElementById('puzzle-complete-badge');
+            if (isComplete) {
+                badge.style.display = 'block';
+                // Vibrate if supported
+                if (navigator.vibrate && lastPuzzleState && !lastPuzzleState.isComplete) {
+                    navigator.vibrate([200, 100, 200]);
+                }
+            } else {
+                badge.style.display = 'none';
+            }
+
+            lastPuzzleState = state;
+        }
+
+        // Draw a simple preview of the puzzle progress
+        function drawPreviewCanvas(puzzleIndex, placed, total) {
+            const canvas = document.getElementById('preview-canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Set canvas size
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * 2;
+            canvas.height = rect.height * 2;
+            ctx.scale(2, 2);
+
+            const width = rect.width;
+            const height = rect.height;
+
+            // Background color based on puzzle
+            const puzzle = puzzleList[puzzleIndex] || puzzleList[0];
+            ctx.fillStyle = puzzle.color || '#87CEEB';
+            ctx.fillRect(0, 0, width, height);
+
+            // Draw grid
+            const cols = 8;
+            const rows = 5;
+            const cellW = width / cols;
+            const cellH = height / rows;
+
+            // Draw placed pieces (filled) and empty pieces (outlined)
+            for (let i = 0; i < total && i < cols * rows; i++) {
+                const col = i % cols;
+                const row = Math.floor(i / cols);
+                const x = col * cellW;
+                const y = row * cellH;
+
+                if (i < placed) {
+                    // Placed piece - slightly darker
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                    ctx.fillRect(x + 1, y + 1, cellW - 2, cellH - 2);
+                }
+
+                // Grid lines
+                ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+                ctx.lineWidth = 0.5;
+                ctx.strokeRect(x, y, cellW, cellH);
+            }
+
+            // Draw big emoji in center
+            ctx.font = `${Math.min(width, height) * 0.3}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(puzzle.emoji, width / 2, height / 2);
+        }
+
+        // Start preview when connected
+        const originalConnectHandler = connectBtn.onclick;
+        connectBtn.addEventListener('click', async () => {
+            // Start preview after successful connection
+            setTimeout(() => {
+                if (connectedScreen.style.display === 'block') {
+                    startPuzzlePreview();
+                }
+            }, 500);
         });
 
         // Focus first digit on load

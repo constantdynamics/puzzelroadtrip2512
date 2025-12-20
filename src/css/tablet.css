@@ -44,14 +44,22 @@ html, body {
 .timer-house {
     font-size: 32px;
     z-index: 2;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
 }
 
 .timer-house-start {
     margin-right: 10px;
+    background: #e74c3c;
 }
 
 .timer-house-end {
     margin-left: 10px;
+    background: #27ae60;
 }
 
 .timer-road {
