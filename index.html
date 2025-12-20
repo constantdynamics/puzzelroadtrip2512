@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="screen-orientation" content="landscape">
+    <title>Roadtrip Puzzel</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="src/assets/images/icon-192.svg">
+    <link rel="apple-touch-icon" href="src/assets/images/icon-192.svg">
+    <link rel="stylesheet" href="src/css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Status Bar -->
+        <header class="status-bar">
+            <div class="status-left">
+                <button id="sound-toggle" class="icon-btn" aria-label="Geluid aan/uit">
+                    <span class="sound-on">🔊</span>
+                    <span class="sound-off" style="display:none;">🔇</span>
+                </button>
+                <button id="settings-btn" class="icon-btn" aria-label="Instellingen">⚙️</button>
+            </div>
+            <div class="status-center">
+                <span id="puzzle-indicator">Puzzel 1 van 10</span>
+            </div>
+            <div class="status-right">
+                <span id="current-time"></span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Left Panel - Controls -->
+            <aside class="left-panel">
+                <div class="saved-pieces">
+                    <div class="saved-count" id="saved-count">0</div>
+                    <div class="saved-label">Gespaarde Stukjes</div>
+                </div>
+
+                <div class="timer-display">
+                    <div class="timer-label">Volgend stukje over:</div>
+                    <div class="timer-countdown" id="timer-countdown">15:00</div>
+                    <button id="timer-pause" class="timer-btn">⏸️ Pauze</button>
+                </div>
+
+                <div class="task-buttons">
+                    <button class="task-btn task-btn-song" data-task="song">
+                        🎵 Liedje Gezongen
+                    </button>
+                    <button class="task-btn task-btn-book" data-task="book">
+                        📖 Boek Gelezen
+                    </button>
+                    <button class="task-btn task-btn-task" data-task="task">
+                        ✅ Taak Gedaan
+                    </button>
+                    <button class="task-btn task-btn-extra" data-task="extra">
+                        ⭐ Extra Stukje
+                    </button>
+                </div>
+
+                <button id="more-tasks-btn" class="more-tasks-btn">
+                    📋 Meer Taken...
+                </button>
+            </aside>
+
+            <!-- Right Panel - Puzzle -->
+            <section class="right-panel">
+                <div class="puzzle-container">
+                    <canvas id="puzzle-canvas"></canvas>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="progress-text" id="progress-text">0/40 stukjes</div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Settings Modal -->
+        <div id="settings-modal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <h2>Instellingen</h2>
+                <div class="setting-item">
+                    <label for="volume-slider">Volume:</label>
+                    <input type="range" id="volume-slider" min="0" max="100" value="50">
+                </div>
+                <div class="setting-item">
+                    <label for="timer-interval">Minuten per stukje:</label>
+                    <input type="number" id="timer-interval" min="1" max="60" value="15">
+                </div>
+                <div class="setting-item">
+                    <button id="reset-puzzle" class="setting-btn">🔄 Huidige puzzel resetten</button>
+                </div>
+                <div class="setting-item">
+                    <button id="choose-puzzle" class="setting-btn">🧩 Kies andere puzzel</button>
+                </div>
+                <button id="close-settings" class="close-btn">✕ Sluiten</button>
+            </div>
+        </div>
+
+        <!-- Tasks Modal -->
+        <div id="tasks-modal" class="modal" style="display:none;">
+            <div class="modal-content modal-large">
+                <h2>Alle Taken</h2>
+                <div class="tasks-grid" id="tasks-grid">
+                    <!-- Tasks will be populated by JavaScript -->
+                </div>
+                <button id="close-tasks" class="close-btn">✕ Sluiten</button>
+            </div>
+        </div>
+
+        <!-- Puzzle Selection Modal -->
+        <div id="puzzle-select-modal" class="modal" style="display:none;">
+            <div class="modal-content modal-large">
+                <h2>Kies een Puzzel</h2>
+                <div class="puzzle-grid" id="puzzle-grid">
+                    <!-- Puzzles will be populated by JavaScript -->
+                </div>
+                <button id="close-puzzle-select" class="close-btn">✕ Sluiten</button>
+            </div>
+        </div>
+
+        <!-- Celebration Overlay -->
+        <div id="celebration" class="celebration" style="display:none;">
+            <div class="celebration-content">
+                <h1>🎉 Gefeliciteerd! 🎉</h1>
+                <p>Je hebt de puzzel af!</p>
+                <button id="next-puzzle-btn" class="next-puzzle-btn">Volgende Puzzel →</button>
+            </div>
+            <canvas id="confetti-canvas"></canvas>
+        </div>
+    </div>
+
+    <script src="src/js/audio.js"></script>
+    <script src="src/js/storage.js"></script>
+    <script src="src/js/puzzle.js"></script>
+    <script src="src/js/timer.js"></script>
+    <script src="src/js/tasks.js"></script>
+    <script src="src/js/app.js"></script>
+    <script>
+        // Register Service Worker for PWA/offline functionality
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registered:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker registration failed:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>

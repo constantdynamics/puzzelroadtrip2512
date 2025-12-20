@@ -1,0 +1,589 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+}
+
+#app {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Status Bar */
+.status-bar {
+    height: 50px;
+    background: rgba(255, 255, 255, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+}
+
+.status-left, .status-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-center {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+.icon-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: #f0f0f0;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.icon-btn:active {
+    transform: scale(0.95);
+    background: #e0e0e0;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+/* Left Panel */
+.left-panel {
+    width: 30%;
+    min-width: 280px;
+    max-width: 350px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    overflow-y: auto;
+}
+
+/* Saved Pieces Counter */
+.saved-pieces {
+    background: linear-gradient(135deg, #FFD93D 0%, #FF6B6B 100%);
+    border-radius: 15px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+.saved-count {
+    font-size: 48px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.saved-label {
+    font-size: 14px;
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Timer Display */
+.timer-display {
+    background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+    border-radius: 15px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.timer-label {
+    font-size: 12px;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+}
+
+.timer-countdown {
+    font-size: 36px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    font-family: 'Courier New', monospace;
+}
+
+.timer-btn {
+    margin-top: 10px;
+    padding: 8px 20px;
+    font-size: 14px;
+    border: none;
+    background: rgba(255, 255, 255, 0.3);
+    color: white;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.timer-btn:active {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.timer-btn.paused {
+    background: rgba(255, 0, 0, 0.3);
+}
+
+/* Task Buttons */
+.task-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+}
+
+.task-btn {
+    min-height: 65px;
+    border: none;
+    border-radius: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.task-btn:active {
+    transform: scale(0.98);
+}
+
+.task-btn-song {
+    background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+}
+
+.task-btn-book {
+    background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
+    box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4);
+}
+
+.task-btn-task {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.task-btn-extra {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
+}
+
+.more-tasks-btn {
+    padding: 12px;
+    border: 2px dashed #aaa;
+    border-radius: 15px;
+    background: transparent;
+    color: #666;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.more-tasks-btn:active {
+    background: #f0f0f0;
+    border-color: #888;
+}
+
+/* Right Panel - Puzzle Area */
+.right-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    gap: 10px;
+}
+
+.puzzle-container {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+
+#puzzle-canvas {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+/* Progress Bar */
+.progress-container {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 10px 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.progress-bar {
+    height: 20px;
+    background: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 5px;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #4CAF50, #8BC34A, #CDDC39);
+    border-radius: 10px;
+    transition: width 0.5s ease-out;
+}
+
+.progress-text {
+    text-align: center;
+    font-weight: bold;
+    color: #333;
+    font-size: 16px;
+}
+
+/* Modal Styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    max-width: 400px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.modal-large {
+    max-width: 700px;
+}
+
+.modal-content h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.setting-item {
+    margin-bottom: 20px;
+}
+
+.setting-item label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #555;
+}
+
+.setting-item input[type="range"] {
+    width: 100%;
+    height: 30px;
+}
+
+.setting-item input[type="number"] {
+    width: 80px;
+    padding: 8px;
+    font-size: 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+}
+
+.setting-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.close-btn {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background: white;
+    color: #666;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Tasks Grid */
+.tasks-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    max-height: 50vh;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.task-item {
+    padding: 12px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-align: center;
+}
+
+.task-item:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Puzzle Selection Grid */
+.puzzle-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.puzzle-item {
+    aspect-ratio: 1;
+    border-radius: 15px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    background: #f0f0f0;
+}
+
+.puzzle-item:active {
+    transform: scale(0.95);
+}
+
+.puzzle-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.puzzle-item.completed::after {
+    content: '✓';
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 25px;
+    height: 25px;
+    background: #4CAF50;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.puzzle-item-name {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Celebration Overlay */
+.celebration {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.celebration-content {
+    text-align: center;
+    z-index: 2001;
+}
+
+.celebration-content h1 {
+    font-size: 48px;
+    color: white;
+    margin-bottom: 20px;
+    animation: bounce 0.5s ease infinite alternate;
+}
+
+.celebration-content p {
+    font-size: 24px;
+    color: white;
+    margin-bottom: 30px;
+}
+
+.next-puzzle-btn {
+    padding: 20px 40px;
+    font-size: 24px;
+    font-weight: bold;
+    border: none;
+    border-radius: 30px;
+    background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(76, 175, 80, 0.5);
+    transition: transform 0.2s;
+}
+
+.next-puzzle-btn:active {
+    transform: scale(0.95);
+}
+
+#confetti-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* Animations */
+@keyframes bounce {
+    from { transform: translateY(0); }
+    to { transform: translateY(-10px); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes flash {
+    0% { opacity: 0; }
+    50% { opacity: 0.5; }
+    100% { opacity: 0; }
+}
+
+.piece-flash {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: white;
+    pointer-events: none;
+    animation: flash 0.3s ease-out;
+}
+
+/* Button press animation */
+.task-btn.pressed {
+    animation: pulse 0.3s ease;
+}
+
+/* Responsive adjustments for smaller tablets */
+@media (max-width: 900px) {
+    .left-panel {
+        width: 35%;
+        min-width: 220px;
+    }
+
+    .task-btn {
+        min-height: 55px;
+        font-size: 15px;
+    }
+
+    .saved-count {
+        font-size: 36px;
+    }
+
+    .timer-countdown {
+        font-size: 28px;
+    }
+}
+
+@media (max-height: 500px) {
+    .status-bar {
+        height: 40px;
+    }
+
+    .left-panel {
+        padding: 10px;
+        gap: 10px;
+    }
+
+    .saved-pieces, .timer-display {
+        padding: 10px;
+    }
+
+    .saved-count {
+        font-size: 32px;
+    }
+
+    .timer-countdown {
+        font-size: 24px;
+    }
+
+    .task-btn {
+        min-height: 50px;
+        font-size: 14px;
+    }
+}
