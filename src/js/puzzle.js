@@ -1256,14 +1256,50 @@ const PuzzleEngine = {
         this.createPiecePath(pos.x, pos.y, this.pieceWidth, this.pieceHeight, edges);
         this.ctx.clip();
 
-        // Draw the piece image with extra margin for tabs
+        // Calculate source and destination with margin for tabs
+        // Ensure source coordinates stay within bounds
         const margin = tabSize;
+        let srcX = Math.max(0, (pos.x - margin) * sourceScale);
+        let srcY = Math.max(0, (pos.y - margin) * sourceScale);
+        let srcW = (this.pieceWidth + margin * 2) * sourceScale;
+        let srcH = (this.pieceHeight + margin * 2) * sourceScale;
+
+        // Adjust destination to match clipped source
+        let dstX = pos.x - margin;
+        let dstY = pos.y - margin;
+        let dstW = this.pieceWidth + margin * 2;
+        let dstH = this.pieceHeight + margin * 2;
+
+        // If source was clipped, adjust destination accordingly
+        if ((pos.x - margin) * sourceScale < 0) {
+            const clipAmount = margin - pos.x;
+            dstX = pos.x - margin + clipAmount;
+            dstW -= clipAmount;
+            srcW -= clipAmount * sourceScale;
+        }
+        if ((pos.y - margin) * sourceScale < 0) {
+            const clipAmount = margin - pos.y;
+            dstY = pos.y - margin + clipAmount;
+            dstH -= clipAmount;
+            srcH -= clipAmount * sourceScale;
+        }
+
+        // Ensure source doesn't exceed image bounds
+        const maxSrcW = this.puzzleImage.width - srcX;
+        const maxSrcH = this.puzzleImage.height - srcY;
+        if (srcW > maxSrcW) {
+            dstW = dstW * (maxSrcW / srcW);
+            srcW = maxSrcW;
+        }
+        if (srcH > maxSrcH) {
+            dstH = dstH * (maxSrcH / srcH);
+            srcH = maxSrcH;
+        }
+
         this.ctx.drawImage(
             this.puzzleImage,
-            (pos.x - margin) * sourceScale, (pos.y - margin) * sourceScale,
-            (this.pieceWidth + margin * 2) * sourceScale, (this.pieceHeight + margin * 2) * sourceScale,
-            pos.x - margin, pos.y - margin,
-            this.pieceWidth + margin * 2, this.pieceHeight + margin * 2
+            srcX, srcY, srcW, srcH,
+            dstX, dstY, dstW, dstH
         );
 
         this.ctx.restore();
@@ -1327,12 +1363,23 @@ const PuzzleEngine = {
         this.createPiecePath(drawX, drawY, drawWidth, drawHeight, scaledEdges);
         this.ctx.clip();
 
-        // Draw the piece image
+        // Draw the piece image with bounds checking
         const margin = tabSize;
+        const srcMargin = margin / scale;
+
+        // Calculate source coordinates with bounds checking
+        let srcX = Math.max(0, (pos.x - srcMargin) * sourceScale);
+        let srcY = Math.max(0, (pos.y - srcMargin) * sourceScale);
+        let srcW = (this.pieceWidth + srcMargin * 2) * sourceScale;
+        let srcH = (this.pieceHeight + srcMargin * 2) * sourceScale;
+
+        // Ensure source doesn't exceed image bounds
+        srcW = Math.min(srcW, this.puzzleImage.width - srcX);
+        srcH = Math.min(srcH, this.puzzleImage.height - srcY);
+
         this.ctx.drawImage(
             this.puzzleImage,
-            (pos.x - margin / scale) * sourceScale, (pos.y - margin / scale) * sourceScale,
-            (this.pieceWidth + margin * 2 / scale) * sourceScale, (this.pieceHeight + margin * 2 / scale) * sourceScale,
+            srcX, srcY, srcW, srcH,
             drawX - margin, drawY - margin,
             drawWidth + margin * 2, drawHeight + margin * 2
         );
