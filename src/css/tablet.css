@@ -1,0 +1,286 @@
+/* Tablet CSS - Simplified view for children */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+#app {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Visual Timer Bar */
+.visual-timer-bar {
+    width: 100%;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+}
+
+.timer-track {
+    position: relative;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 25px;
+    padding: 0 10px;
+}
+
+.timer-house {
+    font-size: 32px;
+    z-index: 2;
+}
+
+.timer-house-start {
+    margin-right: 10px;
+}
+
+.timer-house-end {
+    margin-left: 10px;
+}
+
+.timer-road {
+    flex: 1;
+    height: 8px;
+    background: repeating-linear-gradient(
+        90deg,
+        #555 0px,
+        #555 20px,
+        #FFD700 20px,
+        #FFD700 40px
+    );
+    border-radius: 4px;
+}
+
+.timer-vehicle {
+    position: absolute;
+    font-size: 40px;
+    left: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 3;
+    transition: left 0.5s ease-out;
+    filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.3));
+}
+
+.timer-vehicle.paused {
+    animation: bounce 0.5s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(-50%); }
+    50% { transform: translateY(-60%); }
+}
+
+.timer-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 15px 0;
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.timer-info span {
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+#timer-countdown {
+    font-size: 24px;
+    font-family: 'Courier New', monospace;
+}
+
+#saved-count-display {
+    font-size: 22px;
+}
+
+/* Puzzle Area */
+.puzzle-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+}
+
+.puzzle-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-height: calc(100% - 50px);
+}
+
+#puzzle-canvas {
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    background: white;
+}
+
+/* Progress Bar */
+.progress-container {
+    width: 100%;
+    max-width: 600px;
+    padding: 10px 0;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50, #8BC34A);
+    border-radius: 10px;
+    transition: width 0.5s ease;
+    width: 0%;
+}
+
+.progress-text {
+    text-align: center;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 5px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+/* Celebration Overlay */
+.celebration {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.celebration-content {
+    text-align: center;
+    color: white;
+    z-index: 1001;
+}
+
+.celebration-content h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+    animation: celebratePulse 0.5s ease-in-out infinite alternate;
+}
+
+.celebration-content p {
+    font-size: 24px;
+    margin-bottom: 30px;
+}
+
+@keyframes celebratePulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.1); }
+}
+
+.next-puzzle-btn {
+    padding: 20px 50px;
+    font-size: 24px;
+    font-weight: bold;
+    border: none;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 6px 25px rgba(76, 175, 80, 0.4);
+}
+
+.next-puzzle-btn:active {
+    transform: scale(0.95);
+}
+
+#confetti-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* Piece flash effect */
+.piece-flash {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 70%);
+    pointer-events: none;
+    animation: flashFade 0.3s ease-out forwards;
+}
+
+@keyframes flashFade {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* Responsive */
+@media (max-height: 500px) {
+    .visual-timer-bar {
+        padding: 5px 15px;
+    }
+
+    .timer-track {
+        height: 40px;
+    }
+
+    .timer-house {
+        font-size: 24px;
+    }
+
+    .timer-vehicle {
+        font-size: 30px;
+    }
+
+    .timer-info {
+        font-size: 14px;
+        padding-top: 5px;
+    }
+
+    #timer-countdown {
+        font-size: 18px;
+    }
+
+    .puzzle-area {
+        padding: 10px;
+    }
+
+    .progress-bar {
+        height: 15px;
+    }
+
+    .progress-text {
+        font-size: 14px;
+    }
+}

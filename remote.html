@@ -15,7 +15,7 @@
 
         html, body {
             width: 100%;
-            height: 100%;
+            min-height: 100%;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
             user-select: none;
@@ -23,34 +23,40 @@
         }
 
         .container {
-            min-height: 100%;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 20px;
+            padding: 15px;
         }
 
         .card {
             background: white;
             border-radius: 20px;
-            padding: 30px;
+            padding: 25px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
             text-align: center;
-            max-width: 350px;
+            max-width: 400px;
             width: 100%;
+            margin-bottom: 15px;
         }
 
         h1 {
-            font-size: 24px;
+            font-size: 22px;
             color: #333;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+        }
+
+        h2 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
         }
 
         .subtitle {
             color: #666;
             font-size: 14px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         /* Connect Screen */
@@ -116,7 +122,7 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             color: #4CAF50;
             font-weight: 600;
         }
@@ -134,10 +140,11 @@
             50% { opacity: 0.7; transform: scale(1.1); }
         }
 
+        /* Main Piece Button */
         .piece-btn {
             width: 100%;
-            padding: 40px 20px;
-            font-size: 24px;
+            padding: 30px 20px;
+            font-size: 22px;
             font-weight: bold;
             border: none;
             border-radius: 20px;
@@ -158,39 +165,34 @@
         }
 
         .piece-btn .emoji {
-            font-size: 48px;
+            font-size: 40px;
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
-        .quick-buttons {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .quick-btn {
-            padding: 20px 10px;
-            font-size: 14px;
+        /* Navigation Buttons */
+        .nav-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
             font-weight: 600;
             border: none;
             border-radius: 12px;
             color: white;
             cursor: pointer;
+            margin-bottom: 10px;
         }
 
-        .quick-btn:active {
-            transform: scale(0.95);
+        .nav-btn:active {
+            transform: scale(0.98);
         }
 
-        .quick-btn.song { background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%); }
-        .quick-btn.book { background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%); }
-        .quick-btn.task { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .quick-btn.extra { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .nav-btn.tasks { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .nav-btn.settings { background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%); }
+        .nav-btn.puzzles { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
 
         .disconnect-btn {
-            margin-top: 25px;
+            margin-top: 10px;
             padding: 12px 25px;
             font-size: 14px;
             border: 2px solid #ddd;
@@ -200,60 +202,126 @@
             cursor: pointer;
         }
 
-        .instructions {
-            margin-top: 20px;
-            padding: 15px;
-            background: #f5f5f5;
-            border-radius: 10px;
-            font-size: 13px;
-            color: #666;
-            line-height: 1.5;
+        /* Settings Screen */
+        .settings-screen {
+            display: none;
         }
 
-        .instructions strong {
-            color: #333;
+        .setting-item {
+            margin-bottom: 20px;
+            text-align: left;
         }
+
+        .setting-item label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .setting-item input[type="range"] {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            background: #ddd;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        .setting-item input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            background: #4CAF50;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .setting-item input[type="number"] {
+            width: 80px;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .setting-item select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .toggle-btn {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .toggle-btn.active {
+            background: #4CAF50;
+            border-color: #4CAF50;
+            color: white;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .action-btn {
+            padding: 15px 10px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+
+        .action-btn.reset { background: #f44336; }
+        .action-btn.next { background: #2196F3; }
+        .action-btn.pause { background: #FF9800; }
+        .action-btn.resume { background: #4CAF50; }
 
         /* Tasks Screen */
         .tasks-screen {
             display: none;
         }
 
-        .show-tasks-btn {
-            width: 100%;
-            padding: 15px;
-            font-size: 16px;
-            font-weight: 600;
-            border: none;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            cursor: pointer;
-            margin-bottom: 10px;
-        }
-
-        .show-tasks-btn:active {
-            transform: scale(0.98);
-        }
-
         .task-categories {
-            max-height: 400px;
+            max-height: 50vh;
             overflow-y: auto;
             margin-bottom: 15px;
         }
 
         .category {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
         .category-title {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             color: #333;
-            padding: 10px;
+            padding: 12px;
             background: #f5f5f5;
             border-radius: 10px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             cursor: pointer;
         }
 
@@ -292,6 +360,42 @@
             background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
         }
 
+        /* Puzzles Screen */
+        .puzzles-screen {
+            display: none;
+        }
+
+        .puzzle-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-height: 50vh;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .puzzle-item {
+            padding: 15px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .puzzle-item:active {
+            transform: scale(0.95);
+        }
+
+        .puzzle-item .emoji {
+            font-size: 28px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* Back Button */
         .back-btn {
             width: 100%;
             padding: 15px;
@@ -306,6 +410,27 @@
 
         .back-btn:active {
             background: #f5f5f5;
+        }
+
+        .instructions {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .instructions strong {
+            color: #333;
+        }
+
+        .version-info {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
         }
     </style>
 </head>
@@ -329,13 +454,13 @@
 
             <div class="instructions">
                 <strong>Hoe werkt het?</strong><br>
-                1. Open instellingen op de tablet<br>
-                2. Tik op "📱 Remote Control"<br>
+                1. Open de app op de tablet<br>
+                2. De code verschijnt automatisch in de console (F12)<br>
                 3. Voer de 4-cijferige code hier in
             </div>
         </div>
 
-        <!-- Connected Screen -->
+        <!-- Connected Screen (Main Menu) -->
         <div class="card connected-screen" id="connected-screen">
             <h1>🎮 Verbonden!</h1>
 
@@ -349,27 +474,95 @@
                 Stukje Geven!
             </button>
 
-            <button class="show-tasks-btn" id="show-tasks-btn">📋 Kies een taak...</button>
+            <button class="nav-btn tasks" id="show-tasks-btn">📋 Taken Kiezen</button>
+            <button class="nav-btn settings" id="show-settings-btn">⚙️ Instellingen</button>
+            <button class="nav-btn puzzles" id="show-puzzles-btn">🧩 Andere Puzzel</button>
 
             <button class="disconnect-btn" id="disconnect-btn">Verbinding verbreken</button>
         </div>
 
+        <!-- Settings Screen -->
+        <div class="card settings-screen" id="settings-screen">
+            <h2>⚙️ Instellingen</h2>
+
+            <div class="setting-item">
+                <label>🔊 Volume: <span id="volume-value">50</span>%</label>
+                <input type="range" id="volume-slider" min="0" max="100" value="50">
+            </div>
+
+            <div class="setting-item">
+                <label>🔇 Geluid</label>
+                <button class="toggle-btn active" id="sound-toggle">🔊 Aan</button>
+            </div>
+
+            <div class="setting-item">
+                <label>⏱️ Minuten per stukje:</label>
+                <input type="number" id="timer-interval" min="1" max="60" value="15">
+            </div>
+
+            <div class="setting-item">
+                <label>🧩 Aantal stukjes:</label>
+                <select id="piece-count">
+                    <option value="12">12 stukjes (3x4)</option>
+                    <option value="20">20 stukjes (4x5)</option>
+                    <option value="30">30 stukjes (5x6)</option>
+                    <option value="40" selected>40 stukjes (5x8)</option>
+                    <option value="60">60 stukjes (6x10)</option>
+                </select>
+            </div>
+
+            <div class="setting-item">
+                <label>🚗 Voertuig:</label>
+                <select id="vehicle-select">
+                    <option value="🚗">🚗 Auto</option>
+                    <option value="🚌">🚌 Bus</option>
+                    <option value="🚂">🚂 Trein</option>
+                    <option value="✈️">✈️ Vliegtuig</option>
+                    <option value="🚢">🚢 Boot</option>
+                    <option value="🚲">🚲 Fiets</option>
+                    <option value="🏎️">🏎️ Raceauto</option>
+                    <option value="🚀">🚀 Raket</option>
+                </select>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-btn pause" id="pause-btn">⏸️ Pauze</button>
+                <button class="action-btn reset" id="reset-btn">🔄 Reset</button>
+            </div>
+
+            <button class="back-btn" id="settings-back-btn">← Terug</button>
+        </div>
+
         <!-- Tasks Screen -->
         <div class="card tasks-screen" id="tasks-screen">
-            <h1>📋 Kies een Taak</h1>
+            <h2>📋 Kies een Taak</h2>
             <p class="subtitle">Tik op een taak als je kind het heeft gedaan</p>
 
             <div class="task-categories" id="task-categories">
                 <!-- Categories will be populated by JS -->
             </div>
 
-            <button class="back-btn" id="back-btn">← Terug</button>
+            <button class="back-btn" id="tasks-back-btn">← Terug</button>
         </div>
+
+        <!-- Puzzles Screen -->
+        <div class="card puzzles-screen" id="puzzles-screen">
+            <h2>🧩 Kies een Puzzel</h2>
+
+            <div class="puzzle-grid" id="puzzle-grid">
+                <!-- Puzzles will be populated by JS -->
+            </div>
+
+            <button class="back-btn" id="puzzles-back-btn">← Terug</button>
+        </div>
+
+        <div class="version-info">Versie 2.0.0</div>
     </div>
 
+    <script src="src/js/firebase-config.js"></script>
     <script src="src/js/remote.js"></script>
     <script>
-        // 50+ taken voor 2-jarigen tijdens een autorit
+        // 60+ taken voor 2-jarigen tijdens een autorit
         const remoteTasks = {
             "🎵 Zingen & Geluid": [
                 "🎵 Een liedje gezongen",
@@ -444,19 +637,52 @@
                 "🎨 Getekend/gekleurd"
             ]
         };
+
+        // Puzzle list (matching tablet)
+        const puzzleList = [
+            { name: 'Dierentuin', emoji: '🦁', color: '#87CEEB' },
+            { name: 'Boerderij', emoji: '🐄', color: '#87CEEB' },
+            { name: 'Kermis', emoji: '🎡', color: '#FF69B4' },
+            { name: 'Onderwaterwereld', emoji: '🐠', color: '#00CED1' },
+            { name: 'Stad', emoji: '🏙️', color: '#87CEEB' },
+            { name: 'Supermarkt', emoji: '🛒', color: '#FFE4B5' },
+            { name: 'Speeltuin', emoji: '🛝', color: '#87CEEB' },
+            { name: 'Bos', emoji: '🌲', color: '#228B22' },
+            { name: 'Strand', emoji: '🏖️', color: '#87CEEB' },
+            { name: 'Ruimte', emoji: '🚀', color: '#000033' },
+            { name: 'Feestje', emoji: '🎂', color: '#FF69B4' },
+            { name: 'Treinstation', emoji: '🚂', color: '#87CEEB' },
+            { name: 'Vliegveld', emoji: '✈️', color: '#87CEEB' },
+            { name: 'Camping', emoji: '⛺', color: '#228B22' },
+            { name: 'Sneeuwpret', emoji: '⛷️', color: '#B0E0E6' },
+            { name: 'Jungle', emoji: '🦜', color: '#228B22' },
+            { name: 'Circus', emoji: '🎪', color: '#FF4500' },
+            { name: 'Restaurant', emoji: '🍕', color: '#FFDAB9' },
+            { name: 'Muziek', emoji: '🎸', color: '#9370DB' },
+            { name: 'Tuin', emoji: '🌷', color: '#87CEEB' },
+            { name: 'Sportveld', emoji: '⚽', color: '#228B22' },
+            { name: 'Kasteel', emoji: '🏰', color: '#87CEEB' },
+            { name: 'Piraten', emoji: '🏴‍☠️', color: '#87CEEB' },
+            { name: 'Bouwplaats', emoji: '🏗️', color: '#87CEEB' }
+        ];
     </script>
     <script>
+        // State
+        let isPaused = false;
+        let soundEnabled = true;
+
         // Elements
         const connectScreen = document.getElementById('connect-screen');
         const connectedScreen = document.getElementById('connected-screen');
+        const settingsScreen = document.getElementById('settings-screen');
         const tasksScreen = document.getElementById('tasks-screen');
+        const puzzlesScreen = document.getElementById('puzzles-screen');
+
         const connectBtn = document.getElementById('connect-btn');
         const errorMsg = document.getElementById('error-msg');
         const pieceBtn = document.getElementById('piece-btn');
         const disconnectBtn = document.getElementById('disconnect-btn');
-        const showTasksBtn = document.getElementById('show-tasks-btn');
-        const backBtn = document.getElementById('back-btn');
-        const taskCategoriesDiv = document.getElementById('task-categories');
+
         const digits = [
             document.getElementById('digit1'),
             document.getElementById('digit2'),
@@ -464,9 +690,20 @@
             document.getElementById('digit4')
         ];
 
+        // Screen navigation
+        function showScreen(screen) {
+            connectScreen.style.display = 'none';
+            connectedScreen.style.display = 'none';
+            settingsScreen.style.display = 'none';
+            tasksScreen.style.display = 'none';
+            puzzlesScreen.style.display = 'none';
+            screen.style.display = 'block';
+        }
+
         // Populate task categories
         function populateTaskCategories() {
-            taskCategoriesDiv.innerHTML = '';
+            const container = document.getElementById('task-categories');
+            container.innerHTML = '';
 
             for (const [categoryName, tasks] of Object.entries(remoteTasks)) {
                 const categoryDiv = document.createElement('div');
@@ -493,8 +730,23 @@
 
                 categoryDiv.appendChild(titleDiv);
                 categoryDiv.appendChild(tasksDiv);
-                taskCategoriesDiv.appendChild(categoryDiv);
+                container.appendChild(categoryDiv);
             }
+        }
+
+        // Populate puzzle grid
+        function populatePuzzleGrid() {
+            const container = document.getElementById('puzzle-grid');
+            container.innerHTML = '';
+
+            puzzleList.forEach((puzzle, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'puzzle-item';
+                btn.style.background = puzzle.color;
+                btn.innerHTML = `<span class="emoji">${puzzle.emoji}</span>${puzzle.name}`;
+                btn.addEventListener('click', () => selectPuzzle(index));
+                container.appendChild(btn);
+            });
         }
 
         // Send piece for a task
@@ -511,18 +763,27 @@
             }
         }
 
-        // Show tasks screen
-        showTasksBtn.addEventListener('click', () => {
-            connectedScreen.style.display = 'none';
-            tasksScreen.style.display = 'block';
-            populateTaskCategories();
-        });
+        // Select a puzzle
+        async function selectPuzzle(index) {
+            try {
+                await sendSettings({ changePuzzle: index });
+                showScreen(connectedScreen);
+            } catch (error) {
+                alert('Fout: ' + error.message);
+            }
+        }
 
-        // Back to connected screen
-        backBtn.addEventListener('click', () => {
-            tasksScreen.style.display = 'none';
-            connectedScreen.style.display = 'block';
-        });
+        // Send settings to tablet
+        async function sendSettings(settings) {
+            if (!RemoteControl.roomRef) {
+                throw new Error('Niet verbonden');
+            }
+
+            await RemoteControl.roomRef.child('settings').update({
+                ...settings,
+                timestamp: Date.now()
+            });
+        }
 
         // Auto-focus and move between digits
         digits.forEach((digit, index) => {
@@ -573,7 +834,9 @@
 
             try {
                 await RemoteControl.joinRoom(code);
-                showConnectedScreen();
+                showScreen(connectedScreen);
+                populateTaskCategories();
+                populatePuzzleGrid();
             } catch (error) {
                 errorMsg.textContent = error.message || 'Verbinding mislukt';
                 errorMsg.style.display = 'block';
@@ -582,25 +845,12 @@
             }
         });
 
-        function showConnectedScreen() {
-            connectScreen.style.display = 'none';
-            connectedScreen.style.display = 'block';
-        }
-
-        function showConnectScreen() {
-            connectScreen.style.display = 'block';
-            connectedScreen.style.display = 'none';
-            digits.forEach(d => d.value = '');
-            updateConnectButton();
-        }
-
         // Send piece
         async function sendPiece(btn) {
             try {
                 btn.classList.add('success');
                 await RemoteControl.sendPiece();
 
-                // Visual feedback
                 setTimeout(() => {
                     btn.classList.remove('success');
                 }, 500);
@@ -611,10 +861,80 @@
 
         pieceBtn.addEventListener('click', () => sendPiece(pieceBtn));
 
+        // Navigation buttons
+        document.getElementById('show-tasks-btn').addEventListener('click', () => {
+            showScreen(tasksScreen);
+        });
+
+        document.getElementById('show-settings-btn').addEventListener('click', () => {
+            showScreen(settingsScreen);
+        });
+
+        document.getElementById('show-puzzles-btn').addEventListener('click', () => {
+            showScreen(puzzlesScreen);
+        });
+
+        // Back buttons
+        document.getElementById('tasks-back-btn').addEventListener('click', () => {
+            showScreen(connectedScreen);
+        });
+
+        document.getElementById('settings-back-btn').addEventListener('click', () => {
+            showScreen(connectedScreen);
+        });
+
+        document.getElementById('puzzles-back-btn').addEventListener('click', () => {
+            showScreen(connectedScreen);
+        });
+
+        // Settings handlers
+        document.getElementById('volume-slider').addEventListener('input', async (e) => {
+            const value = e.target.value;
+            document.getElementById('volume-value').textContent = value;
+            await sendSettings({ volume: parseInt(value) });
+        });
+
+        document.getElementById('sound-toggle').addEventListener('click', async (e) => {
+            soundEnabled = !soundEnabled;
+            e.target.textContent = soundEnabled ? '🔊 Aan' : '🔇 Uit';
+            e.target.classList.toggle('active', soundEnabled);
+            await sendSettings({ soundEnabled });
+        });
+
+        document.getElementById('timer-interval').addEventListener('change', async (e) => {
+            const value = parseInt(e.target.value);
+            if (value >= 1 && value <= 60) {
+                await sendSettings({ timerInterval: value });
+            }
+        });
+
+        document.getElementById('piece-count').addEventListener('change', async (e) => {
+            await sendSettings({ pieceCount: parseInt(e.target.value) });
+        });
+
+        document.getElementById('vehicle-select').addEventListener('change', async (e) => {
+            await sendSettings({ vehicle: e.target.value });
+        });
+
+        document.getElementById('pause-btn').addEventListener('click', async (e) => {
+            isPaused = !isPaused;
+            e.target.textContent = isPaused ? '▶️ Doorgaan' : '⏸️ Pauze';
+            e.target.className = isPaused ? 'action-btn resume' : 'action-btn pause';
+            await sendSettings({ timerPaused: isPaused });
+        });
+
+        document.getElementById('reset-btn').addEventListener('click', async () => {
+            if (confirm('Weet je zeker dat je de puzzel wilt resetten?')) {
+                await sendSettings({ resetPuzzle: true });
+            }
+        });
+
         // Disconnect
         disconnectBtn.addEventListener('click', () => {
             RemoteControl.disconnect();
-            showConnectScreen();
+            showScreen(connectScreen);
+            digits.forEach(d => d.value = '');
+            updateConnectButton();
         });
 
         // Focus first digit on load
