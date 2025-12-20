@@ -2,9 +2,17 @@
 // Allows parents to control the puzzle from another device
 
 const RemoteControl = {
-    // Firebase configuration - loaded from firebase-config.js
-    // Create your own firebase-config.js file (see firebase-config.example.js)
-    firebaseConfig: typeof FIREBASE_CONFIG !== 'undefined' ? FIREBASE_CONFIG : null,
+    // Firebase configuration
+    // Falls back to hosted config if firebase-config.js is not present
+    firebaseConfig: typeof FIREBASE_CONFIG !== 'undefined' ? FIREBASE_CONFIG : {
+        apiKey: "AIzaSyA1wG9GHJBwVPlLw-E00aVhoN5cIb4wqrg",
+        authDomain: "roadtrip-puzzel.firebaseapp.com",
+        databaseURL: "https://roadtrip-puzzel-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "roadtrip-puzzel",
+        storageBucket: "roadtrip-puzzel.firebasestorage.app",
+        messagingSenderId: "314636515478",
+        appId: "1:314636515478:web:456718ddc2fe41437f2ab7"
+    },
 
     database: null,
     roomCode: null,
