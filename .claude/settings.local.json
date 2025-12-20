@@ -2,7 +2,14 @@
   "permissions": {
     "allow": [
       "Bash(git init:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nInitial commit: Roadtrip Puzzel PWA\n\nComplete puzzle app for toddlers during road trips:\n- 25 animal puzzles with 40 pieces each\n- Automatic timer rewards (configurable 1-60 min)\n- 100 tasks across 10 categories\n- Audio effects (Web Audio API)\n- Offline support (Service Worker)\n- LocalStorage persistence\n- Touch-optimized tablet interface\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git branch:*)",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)",
+      "Bash(gh api:*)",
+      "Bash(gh repo view:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
