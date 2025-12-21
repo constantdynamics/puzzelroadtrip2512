@@ -172,18 +172,34 @@ const TabletApp = {
 
         if (settings.resetPuzzle) {
             this.resetCurrentPuzzle();
+            // Clear one-time action
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings/resetPuzzle').remove();
+            }
         }
 
-        if (settings.changePuzzle !== undefined) {
+        if (settings.changePuzzle !== undefined && settings.changePuzzle !== null) {
             this.changePuzzle(settings.changePuzzle);
+            // Clear the setting so it doesn't trigger again
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings/changePuzzle').remove();
+            }
         }
 
         if (settings.nextPuzzle) {
             this.nextPuzzle();
+            // Clear one-time action
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings/nextPuzzle').remove();
+            }
         }
 
         if (settings.customImage) {
             this.loadCustomImage(settings.customImage);
+            // Clear to avoid re-processing large image data
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings/customImage').remove();
+            }
         }
 
         if (settings.bgColor) {
