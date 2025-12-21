@@ -9,7 +9,9 @@
       "Bash(git push:*)",
       "Bash(gh api:*)",
       "Bash(gh repo view:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(node -e:*)",
+      "Bash(cat:*)"
     ]
   }
 }

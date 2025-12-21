@@ -307,6 +307,142 @@
             margin: 8px 0;
         }
 
+        /* Photo Library */
+        .photo-library {
+            margin: 15px 0;
+        }
+
+        .library-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .library-header h3 {
+            margin: 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .library-count {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            max-height: 250px;
+            overflow-y: auto;
+            padding: 5px;
+        }
+
+        .photo-item {
+            position: relative;
+            aspect-ratio: 8/5;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .photo-item:hover {
+            border-color: #4CAF50;
+            transform: scale(1.02);
+        }
+
+        .photo-item.selected {
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.3);
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-item .photo-name {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            font-size: 10px;
+            padding: 3px 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .photo-item .delete-photo {
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(244, 67, 54, 0.9);
+            color: white;
+            border: none;
+            font-size: 12px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .photo-item:hover .delete-photo {
+            display: flex;
+        }
+
+        .empty-library {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+        }
+
+        .empty-library-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .photo-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .photo-actions button {
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .add-photo-btn {
+            background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+            color: white;
+            border: none;
+        }
+
+        .use-selected-btn {
+            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+            color: white;
+            border: none;
+        }
+
+        .use-selected-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
         .disconnect-btn {
             margin-top: 10px;
             padding: 12px 25px;
@@ -765,25 +901,45 @@
 
         <!-- Photo Upload Screen -->
         <div class="card photo-screen" id="photo-screen">
-            <h2>📷 Eigen Foto Puzzel</h2>
-            <p class="subtitle">Maak een puzzel van je eigen foto</p>
+            <h2>📷 Fotobibliotheek</h2>
+            <p class="subtitle">Upload en beheer je eigen puzzelfoto's</p>
 
             <input type="file" id="photo-input" accept="image/*" style="display:none">
 
+            <!-- Photo preview when adding new photo -->
             <div class="photo-preview-container" id="photo-preview-container" style="display:none">
                 <div class="crop-area">
                     <img id="photo-preview" src="">
                     <div class="crop-overlay" id="crop-overlay"></div>
                 </div>
-                <p class="crop-hint">Sleep om bij te snijden (8:5 verhouding)</p>
-                <button class="save-btn" id="use-photo-btn">✓ Gebruik deze foto</button>
+                <p class="crop-hint">Foto wordt automatisch geschaald naar puzzelformaat</p>
+                <div class="photo-actions">
+                    <button class="back-btn" id="cancel-photo-btn">✕ Annuleren</button>
+                    <button class="save-btn" id="save-to-library-btn">💾 Opslaan in bibliotheek</button>
+                </div>
             </div>
 
-            <button class="nav-btn photo" id="select-photo-btn">
-                <span>📁</span> Kies een foto
-            </button>
+            <!-- Photo Library Grid -->
+            <div class="photo-library" id="photo-library-container">
+                <div class="library-header">
+                    <h3>📚 Mijn Foto's</h3>
+                    <span class="library-count" id="library-count">0 foto's</span>
+                </div>
+                <div id="photo-grid" class="photo-grid">
+                    <!-- Photos will be inserted here -->
+                </div>
+                <div class="empty-library" id="empty-library">
+                    <div class="empty-library-icon">📷</div>
+                    <p>Nog geen foto's.<br>Voeg je eerste foto toe!</p>
+                </div>
+            </div>
 
-            <button class="back-btn" id="photo-back-btn">← Terug</button>
+            <div class="photo-actions">
+                <button class="add-photo-btn" id="add-photo-btn">➕ Foto toevoegen</button>
+                <button class="use-selected-btn" id="use-selected-btn" disabled>▶️ Gebruik foto</button>
+            </div>
+
+            <button class="back-btn" id="photo-back-btn" style="margin-top: 10px;">← Terug</button>
         </div>
 
         <!-- Settings Screen -->
@@ -871,9 +1027,10 @@
             <button class="back-btn" id="puzzles-back-btn">← Terug</button>
         </div>
 
-        <div class="version-info">v2.4.5</div>
+        <div class="version-info">v2.5.0</div>
     </div>
 
+    <script src="src/js/storage.js"></script>
     <script src="src/js/firebase-config.js"></script>
     <script src="src/js/remote.js"></script>
     <script>
@@ -1401,34 +1558,72 @@
             }, 500);
         });
 
-        // === PHOTO UPLOAD SYSTEM ===
-        let selectedPhotoData = null;
+        // === PHOTO LIBRARY SYSTEM ===
+        let pendingPhotoData = null;
+        let selectedLibraryPhotoId = null;
 
-        // Show photo screen
-        document.getElementById('show-photo-btn').addEventListener('click', () => {
-            showScreen(photoScreen);
-        });
+        // Render photo library grid
+        function renderPhotoLibrary() {
+            const library = StorageManager.getPhotoLibrary();
+            const grid = document.getElementById('photo-grid');
+            const emptyMsg = document.getElementById('empty-library');
+            const countEl = document.getElementById('library-count');
+            const useBtn = document.getElementById('use-selected-btn');
 
-        // Back from photo screen
-        document.getElementById('photo-back-btn').addEventListener('click', () => {
-            showScreen(connectedScreen);
-        });
+            countEl.textContent = `${library.length} foto's`;
 
-        // Trigger file input
-        document.getElementById('select-photo-btn').addEventListener('click', () => {
-            document.getElementById('photo-input').click();
-        });
+            if (library.length === 0) {
+                grid.style.display = 'none';
+                emptyMsg.style.display = 'block';
+                useBtn.disabled = true;
+                return;
+            }
 
-        // Handle file selection
-        document.getElementById('photo-input').addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
+            grid.style.display = 'grid';
+            emptyMsg.style.display = 'none';
 
+            grid.innerHTML = library.map(photo => `
+                <div class="photo-item ${selectedLibraryPhotoId === photo.id ? 'selected' : ''}" data-id="${photo.id}">
+                    <img src="${photo.data}" alt="${photo.name}">
+                    <div class="photo-name">${photo.name}</div>
+                    <button class="delete-photo" data-id="${photo.id}">✕</button>
+                </div>
+            `).join('');
+
+            // Add click handlers for selection
+            grid.querySelectorAll('.photo-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('delete-photo')) return;
+                    const id = item.dataset.id;
+                    selectedLibraryPhotoId = (selectedLibraryPhotoId === id) ? null : id;
+                    renderPhotoLibrary();
+                });
+            });
+
+            // Add click handlers for delete buttons
+            grid.querySelectorAll('.delete-photo').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = btn.dataset.id;
+                    if (confirm('Weet je zeker dat je deze foto wilt verwijderen?')) {
+                        StorageManager.removePhoto(id);
+                        if (selectedLibraryPhotoId === id) {
+                            selectedLibraryPhotoId = null;
+                        }
+                        renderPhotoLibrary();
+                    }
+                });
+            });
+
+            useBtn.disabled = !selectedLibraryPhotoId;
+        }
+
+        // Process image to correct aspect ratio
+        function processImage(file, callback) {
             const reader = new FileReader();
             reader.onload = (event) => {
                 const img = new Image();
                 img.onload = () => {
-                    // Crop to 8:5 aspect ratio
                     const targetRatio = 8 / 5;
                     let cropWidth = img.width;
                     let cropHeight = img.height;
@@ -1437,41 +1632,94 @@
 
                     const imgRatio = img.width / img.height;
                     if (imgRatio > targetRatio) {
-                        // Image is wider - crop sides
                         cropWidth = img.height * targetRatio;
                         offsetX = (img.width - cropWidth) / 2;
                     } else {
-                        // Image is taller - crop top/bottom
                         cropHeight = img.width / targetRatio;
                         offsetY = (img.height - cropHeight) / 2;
                     }
 
-                    // Create cropped canvas
                     const canvas = document.createElement('canvas');
                     canvas.width = 800;
                     canvas.height = 500;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, offsetX, offsetY, cropWidth, cropHeight, 0, 0, 800, 500);
 
-                    selectedPhotoData = canvas.toDataURL('image/jpeg', 0.85);
-
-                    // Show preview
-                    document.getElementById('photo-preview').src = selectedPhotoData;
-                    document.getElementById('photo-preview-container').style.display = 'block';
+                    callback(canvas.toDataURL('image/jpeg', 0.85));
                 };
                 img.src = event.target.result;
             };
             reader.readAsDataURL(file);
+        }
+
+        // Show photo screen
+        document.getElementById('show-photo-btn').addEventListener('click', () => {
+            showScreen(photoScreen);
+            renderPhotoLibrary();
         });
 
-        // Use photo button
-        document.getElementById('use-photo-btn').addEventListener('click', async () => {
-            if (!selectedPhotoData) return;
+        // Back from photo screen
+        document.getElementById('photo-back-btn').addEventListener('click', () => {
+            document.getElementById('photo-preview-container').style.display = 'none';
+            document.getElementById('photo-library-container').style.display = 'block';
+            showScreen(connectedScreen);
+        });
+
+        // Add photo button - trigger file input
+        document.getElementById('add-photo-btn').addEventListener('click', () => {
+            document.getElementById('photo-input').click();
+        });
+
+        // Handle file selection
+        document.getElementById('photo-input').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            processImage(file, (imageData) => {
+                pendingPhotoData = imageData;
+                document.getElementById('photo-preview').src = imageData;
+                document.getElementById('photo-preview-container').style.display = 'block';
+                document.getElementById('photo-library-container').style.display = 'none';
+            });
+
+            // Reset input so same file can be selected again
+            e.target.value = '';
+        });
+
+        // Cancel adding photo
+        document.getElementById('cancel-photo-btn').addEventListener('click', () => {
+            pendingPhotoData = null;
+            document.getElementById('photo-preview-container').style.display = 'none';
+            document.getElementById('photo-library-container').style.display = 'block';
+        });
+
+        // Save photo to library
+        document.getElementById('save-to-library-btn').addEventListener('click', () => {
+            if (!pendingPhotoData) return;
+
+            const name = prompt('Naam voor deze foto:', `Foto ${StorageManager.getPhotoLibrary().length + 1}`);
+            if (name === null) return; // User cancelled
+
+            const photo = StorageManager.addPhoto(pendingPhotoData, name || undefined);
+            if (photo) {
+                pendingPhotoData = null;
+                document.getElementById('photo-preview-container').style.display = 'none';
+                document.getElementById('photo-library-container').style.display = 'block';
+                selectedLibraryPhotoId = photo.id; // Auto-select new photo
+                renderPhotoLibrary();
+            }
+        });
+
+        // Use selected photo as puzzle
+        document.getElementById('use-selected-btn').addEventListener('click', async () => {
+            if (!selectedLibraryPhotoId) return;
+
+            const photo = StorageManager.getPhoto(selectedLibraryPhotoId);
+            if (!photo) return;
 
             try {
-                // Send custom image to tablet
-                await sendSettings({ customImage: selectedPhotoData });
-                alert('Foto verzonden! De puzzel wordt nu geladen op de tablet.');
+                await sendSettings({ customImage: photo.data });
+                alert(`Foto "${photo.name}" wordt nu als puzzel geladen!`);
                 showScreen(connectedScreen);
             } catch (error) {
                 alert('Fout bij verzenden: ' + error.message);

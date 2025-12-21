@@ -2,6 +2,7 @@
 
 const StorageManager = {
     STORAGE_KEY: 'roadtrip_puzzle_data',
+    PHOTO_LIBRARY_KEY: 'roadtrip_photo_library',
 
     // Default state
     defaultState: {
@@ -129,6 +130,90 @@ const StorageManager = {
         } catch (e) {
             // Last resort: clear everything
             localStorage.clear();
+        }
+    },
+
+    // ============ Photo Library Functions ============
+
+    // Get all photos from library
+    getPhotoLibrary() {
+        try {
+            const saved = localStorage.getItem(this.PHOTO_LIBRARY_KEY);
+            if (saved) {
+                return JSON.parse(saved);
+            }
+        } catch (e) {
+            console.error('Error loading photo library:', e);
+        }
+        return [];
+    },
+
+    // Add photo to library
+    addPhoto(photoData, name = null) {
+        try {
+            const library = this.getPhotoLibrary();
+            const photo = {
+                id: Date.now().toString(),
+                name: name || `Foto ${library.length + 1}`,
+                data: photoData,
+                addedAt: Date.now()
+            };
+            library.push(photo);
+            localStorage.setItem(this.PHOTO_LIBRARY_KEY, JSON.stringify(library));
+            return photo;
+        } catch (e) {
+            console.error('Error adding photo:', e);
+            if (e.name === 'QuotaExceededError') {
+                alert('Opslag vol! Verwijder eerst enkele foto\'s.');
+            }
+            return null;
+        }
+    },
+
+    // Remove photo from library
+    removePhoto(photoId) {
+        try {
+            let library = this.getPhotoLibrary();
+            library = library.filter(p => p.id !== photoId);
+            localStorage.setItem(this.PHOTO_LIBRARY_KEY, JSON.stringify(library));
+            return true;
+        } catch (e) {
+            console.error('Error removing photo:', e);
+            return false;
+        }
+    },
+
+    // Rename photo in library
+    renamePhoto(photoId, newName) {
+        try {
+            const library = this.getPhotoLibrary();
+            const photo = library.find(p => p.id === photoId);
+            if (photo) {
+                photo.name = newName;
+                localStorage.setItem(this.PHOTO_LIBRARY_KEY, JSON.stringify(library));
+                return true;
+            }
+            return false;
+        } catch (e) {
+            console.error('Error renaming photo:', e);
+            return false;
+        }
+    },
+
+    // Get photo by ID
+    getPhoto(photoId) {
+        const library = this.getPhotoLibrary();
+        return library.find(p => p.id === photoId) || null;
+    },
+
+    // Clear entire photo library
+    clearPhotoLibrary() {
+        try {
+            localStorage.removeItem(this.PHOTO_LIBRARY_KEY);
+            return true;
+        } catch (e) {
+            console.error('Error clearing photo library:', e);
+            return false;
         }
     }
 };
