@@ -279,25 +279,39 @@
         .crop-area {
             position: relative;
             width: 100%;
-            background: #f0f0f0;
+            background: #000;
             border-radius: 10px;
             overflow: hidden;
+            touch-action: none;
         }
 
         #photo-preview {
             width: 100%;
             display: block;
+            opacity: 0.4;
         }
 
-        .crop-overlay {
+        .crop-box {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border: 3px dashed #4CAF50;
+            border: 3px solid #4CAF50;
             box-sizing: border-box;
-            pointer-events: none;
+            cursor: move;
+            background: transparent;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+        }
+
+        .crop-box::after {
+            content: '↔️ Sleep om te verplaatsen';
+            position: absolute;
+            bottom: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: white;
+            background: rgba(0,0,0,0.7);
+            padding: 4px 10px;
+            border-radius: 10px;
+            white-space: nowrap;
         }
 
         .crop-hint {
@@ -1103,11 +1117,11 @@
 
             <!-- Photo preview when adding new photo -->
             <div class="photo-preview-container" id="photo-preview-container" style="display:none">
-                <div class="crop-area">
+                <div class="crop-area" id="crop-area">
                     <img id="photo-preview" src="">
-                    <div class="crop-overlay" id="crop-overlay"></div>
+                    <div class="crop-box" id="crop-box"></div>
                 </div>
-                <p class="crop-hint">Foto wordt automatisch geschaald naar puzzelformaat</p>
+                <p class="crop-hint">Sleep het groene kader naar het gewenste deel</p>
                 <div class="photo-actions">
                     <button class="back-btn" id="cancel-photo-btn">✕ Annuleren</button>
                     <button class="save-btn" id="save-to-library-btn">💾 Opslaan in bibliotheek</button>
@@ -1805,39 +1819,139 @@
             useBtn.disabled = !selectedLibraryPhotoId;
         }
 
-        // Process image to correct aspect ratio
-        function processImage(file, callback) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const img = new Image();
-                img.onload = () => {
-                    const targetRatio = 8 / 5;
-                    let cropWidth = img.width;
-                    let cropHeight = img.height;
-                    let offsetX = 0;
-                    let offsetY = 0;
+        // === INTERACTIVE CROP SYSTEM ===
+        let originalImage = null;  // Original image element
+        let cropState = {
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0,
+            isDragging: false,
+            startX: 0,
+            startY: 0
+        };
 
-                    const imgRatio = img.width / img.height;
-                    if (imgRatio > targetRatio) {
-                        cropWidth = img.height * targetRatio;
-                        offsetX = (img.width - cropWidth) / 2;
-                    } else {
-                        cropHeight = img.width / targetRatio;
-                        offsetY = (img.height - cropHeight) / 2;
-                    }
+        const TARGET_RATIO = 8 / 5;  // Puzzle aspect ratio
 
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 800;
-                    canvas.height = 500;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, offsetX, offsetY, cropWidth, cropHeight, 0, 0, 800, 500);
+        // Initialize crop box based on image dimensions
+        function initCropBox() {
+            const cropArea = document.getElementById('crop-area');
+            const cropBox = document.getElementById('crop-box');
+            const preview = document.getElementById('photo-preview');
 
-                    callback(canvas.toDataURL('image/jpeg', 0.85));
-                };
-                img.src = event.target.result;
-            };
-            reader.readAsDataURL(file);
+            const areaWidth = cropArea.offsetWidth;
+            const areaHeight = cropArea.offsetHeight;
+            const areaRatio = areaWidth / areaHeight;
+
+            // Calculate crop box size (as large as possible with 8:5 ratio)
+            let boxWidth, boxHeight;
+            if (areaRatio > TARGET_RATIO) {
+                // Area is wider than target - height is limiting factor
+                boxHeight = areaHeight * 0.9;
+                boxWidth = boxHeight * TARGET_RATIO;
+            } else {
+                // Area is taller than target - width is limiting factor
+                boxWidth = areaWidth * 0.9;
+                boxHeight = boxWidth / TARGET_RATIO;
+            }
+
+            // Center the crop box
+            cropState.width = boxWidth;
+            cropState.height = boxHeight;
+            cropState.x = (areaWidth - boxWidth) / 2;
+            cropState.y = (areaHeight - boxHeight) / 2;
+
+            updateCropBox();
         }
+
+        // Update crop box position/size
+        function updateCropBox() {
+            const cropBox = document.getElementById('crop-box');
+            cropBox.style.left = cropState.x + 'px';
+            cropBox.style.top = cropState.y + 'px';
+            cropBox.style.width = cropState.width + 'px';
+            cropBox.style.height = cropState.height + 'px';
+        }
+
+        // Constrain crop box to image bounds
+        function constrainCropBox() {
+            const cropArea = document.getElementById('crop-area');
+            const maxX = cropArea.offsetWidth - cropState.width;
+            const maxY = cropArea.offsetHeight - cropState.height;
+
+            cropState.x = Math.max(0, Math.min(cropState.x, maxX));
+            cropState.y = Math.max(0, Math.min(cropState.y, maxY));
+        }
+
+        // Handle drag start
+        function onCropDragStart(e) {
+            e.preventDefault();
+            cropState.isDragging = true;
+            const touch = e.touches ? e.touches[0] : e;
+            cropState.startX = touch.clientX - cropState.x;
+            cropState.startY = touch.clientY - cropState.y;
+        }
+
+        // Handle drag move
+        function onCropDragMove(e) {
+            if (!cropState.isDragging) return;
+            e.preventDefault();
+            const touch = e.touches ? e.touches[0] : e;
+            cropState.x = touch.clientX - cropState.startX;
+            cropState.y = touch.clientY - cropState.startY;
+            constrainCropBox();
+            updateCropBox();
+        }
+
+        // Handle drag end
+        function onCropDragEnd() {
+            cropState.isDragging = false;
+        }
+
+        // Setup crop box event listeners
+        function setupCropEvents() {
+            const cropBox = document.getElementById('crop-box');
+
+            // Mouse events
+            cropBox.addEventListener('mousedown', onCropDragStart);
+            document.addEventListener('mousemove', onCropDragMove);
+            document.addEventListener('mouseup', onCropDragEnd);
+
+            // Touch events
+            cropBox.addEventListener('touchstart', onCropDragStart, { passive: false });
+            document.addEventListener('touchmove', onCropDragMove, { passive: false });
+            document.addEventListener('touchend', onCropDragEnd);
+        }
+
+        // Get cropped image data
+        function getCroppedImage() {
+            if (!originalImage) return null;
+
+            const cropArea = document.getElementById('crop-area');
+            const preview = document.getElementById('photo-preview');
+
+            // Calculate scale between display size and original image
+            const scaleX = originalImage.width / preview.offsetWidth;
+            const scaleY = originalImage.height / preview.offsetHeight;
+
+            // Calculate crop coordinates in original image space
+            const srcX = cropState.x * scaleX;
+            const srcY = cropState.y * scaleY;
+            const srcWidth = cropState.width * scaleX;
+            const srcHeight = cropState.height * scaleY;
+
+            // Create canvas and draw cropped region
+            const canvas = document.createElement('canvas');
+            canvas.width = 800;
+            canvas.height = 500;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(originalImage, srcX, srcY, srcWidth, srcHeight, 0, 0, 800, 500);
+
+            return canvas.toDataURL('image/jpeg', 0.85);
+        }
+
+        // Setup crop events once
+        setupCropEvents();
 
         // Show photo screen
         document.getElementById('show-photo-btn').addEventListener('click', () => {
@@ -1862,12 +1976,24 @@
             const file = e.target.files[0];
             if (!file) return;
 
-            processImage(file, (imageData) => {
-                pendingPhotoData = imageData;
-                document.getElementById('photo-preview').src = imageData;
-                document.getElementById('photo-preview-container').style.display = 'block';
-                document.getElementById('photo-library-container').style.display = 'none';
-            });
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                // Load original image
+                originalImage = new Image();
+                originalImage.onload = () => {
+                    // Show preview
+                    document.getElementById('photo-preview').src = event.target.result;
+                    document.getElementById('photo-preview-container').style.display = 'block';
+                    document.getElementById('photo-library-container').style.display = 'none';
+
+                    // Initialize crop box after image is displayed
+                    setTimeout(() => {
+                        initCropBox();
+                    }, 100);
+                };
+                originalImage.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
 
             // Reset input so same file can be selected again
             e.target.value = '';
@@ -1876,20 +2002,22 @@
         // Cancel adding photo
         document.getElementById('cancel-photo-btn').addEventListener('click', () => {
             pendingPhotoData = null;
+            originalImage = null;
             document.getElementById('photo-preview-container').style.display = 'none';
             document.getElementById('photo-library-container').style.display = 'block';
         });
 
         // Save photo to library
         document.getElementById('save-to-library-btn').addEventListener('click', () => {
-            if (!pendingPhotoData) return;
+            const croppedData = getCroppedImage();
+            if (!croppedData) return;
 
             const name = prompt('Naam voor deze foto:', `Foto ${StorageManager.getPhotoLibrary().length + 1}`);
             if (name === null) return; // User cancelled
 
-            const photo = StorageManager.addPhoto(pendingPhotoData, name || undefined);
+            const photo = StorageManager.addPhoto(croppedData, name || undefined);
             if (photo) {
-                pendingPhotoData = null;
+                originalImage = null;
                 document.getElementById('photo-preview-container').style.display = 'none';
                 document.getElementById('photo-library-container').style.display = 'block';
                 selectedLibraryPhotoId = photo.id; // Auto-select new photo
