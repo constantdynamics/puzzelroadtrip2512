@@ -369,26 +369,29 @@ const TabletApp = {
         });
     },
 
-    // Draw a piece preview on a mini canvas with jigsaw shape
+    // Draw a piece preview on a mini canvas with shape based on style
     drawPiecePreview(canvas, pieceIndex) {
         const ctx = canvas.getContext('2d');
         const pos = PuzzleEngine.getPiecePosition(pieceIndex);
         const edges = PuzzleEngine.getEdgePattern(pieceIndex);
+        const style = PuzzleEngine.pieceStyle || 'simple';
 
         // Clear canvas first
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         // Draw the piece from the puzzle image
         if (PuzzleEngine.puzzleImage) {
-            const sourceScale = 2; // Puzzle image is 2x resolution
+            const sourceScale = 2;
             const pieceW = PuzzleEngine.pieceWidth;
             const pieceH = PuzzleEngine.pieceHeight;
-            const tabSize = Math.min(pieceW, pieceH) * 0.18;
 
-            // Calculate scale to fit piece with tabs in canvas
-            const totalW = pieceW + tabSize * 2;
-            const totalH = pieceH + tabSize * 2;
-            const scale = Math.min(canvas.width / totalW, canvas.height / totalH) * 0.85;
+            // Calculate margin based on style (same as PuzzleEngine)
+            const margin = (style === 'simple') ? 0 : Math.min(pieceW, pieceH) * 0.15;
+
+            // Calculate scale to fit piece in canvas
+            const totalW = pieceW + margin * 2;
+            const totalH = pieceH + margin * 2;
+            const scale = Math.min(canvas.width / totalW, canvas.height / totalH) * 0.9;
 
             // Center the piece in canvas
             const offsetX = canvas.width / 2;
@@ -398,23 +401,22 @@ const TabletApp = {
             ctx.translate(offsetX, offsetY);
             ctx.scale(scale, scale);
 
-            // Create jigsaw clipping path centered at origin
+            // Create clipping path centered at origin
             this.createPiecePathForPreview(ctx, -pieceW/2, -pieceH/2, pieceW, pieceH, edges);
             ctx.clip();
 
             // Draw the piece image - source from puzzle image at correct position
-            const margin = tabSize;
             ctx.drawImage(
                 PuzzleEngine.puzzleImage,
-                pos.x * sourceScale, pos.y * sourceScale,
-                pieceW * sourceScale, pieceH * sourceScale,
-                -pieceW/2, -pieceH/2,
-                pieceW, pieceH
+                (pos.x - margin) * sourceScale, (pos.y - margin) * sourceScale,
+                (pieceW + margin * 2) * sourceScale, (pieceH + margin * 2) * sourceScale,
+                -pieceW/2 - margin, -pieceH/2 - margin,
+                pieceW + margin * 2, pieceH + margin * 2
             );
 
             ctx.restore();
 
-            // Draw border with jigsaw shape
+            // Draw border
             ctx.save();
             ctx.translate(offsetX, offsetY);
             ctx.scale(scale, scale);
@@ -435,9 +437,81 @@ const TabletApp = {
             ctx.rect(x, y, width, height);
         } else if (style === 'geometric') {
             this.createGeometricPathForPreview(ctx, x, y, width, height, edges);
+        } else if (style === 'shapes') {
+            this.createUniqueShapePathForPreview(ctx, x, y, width, height, edges);
         } else {
             this.createJigsawPathForPreview(ctx, x, y, width, height, edges);
         }
+    },
+
+    // Unique shapes path for preview
+    createUniqueShapePathForPreview(ctx, x, y, width, height, edges) {
+        const pieceIndex = edges.pieceIndex || 0;
+        const shapes = ['circle', 'rounded', 'hexagon', 'diamond', 'oval', 'squircle'];
+        const shapeType = shapes[pieceIndex % shapes.length];
+
+        const cx = x + width / 2;
+        const cy = y + height / 2;
+        const radius = Math.min(width, height) * 0.45;
+
+        ctx.beginPath();
+
+        switch (shapeType) {
+            case 'circle':
+                ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+                break;
+
+            case 'rounded':
+                const r = Math.min(width, height) * 0.2;
+                ctx.moveTo(x + r, y);
+                ctx.lineTo(x + width - r, y);
+                ctx.arcTo(x + width, y, x + width, y + r, r);
+                ctx.lineTo(x + width, y + height - r);
+                ctx.arcTo(x + width, y + height, x + width - r, y + height, r);
+                ctx.lineTo(x + r, y + height);
+                ctx.arcTo(x, y + height, x, y + height - r, r);
+                ctx.lineTo(x, y + r);
+                ctx.arcTo(x, y, x + r, y, r);
+                break;
+
+            case 'hexagon':
+                for (let i = 0; i < 6; i++) {
+                    const angle = (i * Math.PI / 3) - Math.PI / 2;
+                    const px = cx + radius * Math.cos(angle);
+                    const py = cy + radius * Math.sin(angle);
+                    if (i === 0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+                break;
+
+            case 'diamond':
+                ctx.moveTo(cx, y + height * 0.05);
+                ctx.lineTo(x + width * 0.95, cy);
+                ctx.lineTo(cx, y + height * 0.95);
+                ctx.lineTo(x + width * 0.05, cy);
+                break;
+
+            case 'oval':
+                ctx.ellipse(cx, cy, width * 0.45, height * 0.35, 0, 0, Math.PI * 2);
+                break;
+
+            case 'squircle':
+                const n = 4;
+                const a = width * 0.45;
+                const b = height * 0.45;
+                for (let i = 0; i <= 100; i++) {
+                    const t = (i / 100) * Math.PI * 2;
+                    const cosT = Math.cos(t);
+                    const sinT = Math.sin(t);
+                    const px = cx + a * Math.sign(cosT) * Math.pow(Math.abs(cosT), 2/n);
+                    const py = cy + b * Math.sign(sinT) * Math.pow(Math.abs(sinT), 2/n);
+                    if (i === 0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+                break;
+        }
+
+        ctx.closePath();
     },
 
     // Geometric style path for preview

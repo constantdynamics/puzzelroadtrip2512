@@ -1135,42 +1135,21 @@ const PuzzleEngine = {
         const col = pieceIndex % this.cols;
         const row = Math.floor(pieceIndex / this.cols);
 
-        // Simple style: all edges are flat (rectangles)
-        if (this.pieceStyle === 'simple') {
-            return { top: 0, right: 0, bottom: 0, left: 0 };
+        // Simple style or shapes style: all edges are flat
+        if (this.pieceStyle === 'simple' || this.pieceStyle === 'shapes') {
+            return { top: 0, right: 0, bottom: 0, left: 0, pieceIndex: pieceIndex };
         }
 
         // For jigsaw/geometric: generate consistent interlocking edges
-        // We store the "right" and "bottom" edge direction for each piece
-        // The neighboring piece's "left" and "top" are the opposite
-
-        // Use deterministic pattern based on position
-        // Horizontal edges (between rows): determined by the piece above
-        // Vertical edges (between cols): determined by the piece to the left
-
-        // For horizontal edge at row boundary: use (col + row) to determine direction
-        // For vertical edge at col boundary: use (col + row + 1) to determine direction
-
-        const getHorizontalEdge = (r, c) => {
-            // Edge between row r-1 and row r at column c
-            // Returns 1 if piece above has tab going down, -1 if slot going up
-            return ((r + c) % 2 === 0) ? 1 : -1;
-        };
-
-        const getVerticalEdge = (r, c) => {
-            // Edge between col c-1 and col c at row r
-            return ((r + c) % 2 === 0) ? 1 : -1;
-        };
+        const getHorizontalEdge = (r, c) => ((r + c) % 2 === 0) ? 1 : -1;
+        const getVerticalEdge = (r, c) => ((r + c) % 2 === 0) ? 1 : -1;
 
         return {
-            // Top edge: if not first row, opposite of what piece above has as bottom
             top: row === 0 ? 0 : -getHorizontalEdge(row, col),
-            // Right edge: if not last col, we decide the direction
             right: col === this.cols - 1 ? 0 : getVerticalEdge(row, col + 1),
-            // Bottom edge: if not last row, we decide the direction
             bottom: row === this.rows - 1 ? 0 : getHorizontalEdge(row + 1, col),
-            // Left edge: if not first col, opposite of what piece to left has as right
-            left: col === 0 ? 0 : -getVerticalEdge(row, col)
+            left: col === 0 ? 0 : -getVerticalEdge(row, col),
+            pieceIndex: pieceIndex
         };
     },
 
@@ -1183,10 +1162,85 @@ const PuzzleEngine = {
         } else if (this.pieceStyle === 'geometric') {
             // Geometric style with rounded corners and simple bumps
             this.createGeometricPath(x, y, width, height, edges);
+        } else if (this.pieceStyle === 'shapes') {
+            // Unique shapes per piece
+            this.createUniqueShapePath(x, y, width, height, edges);
         } else {
             // Classic jigsaw with bezier curves
             this.createJigsawPath(x, y, width, height, edges);
         }
+    },
+
+    // Unique shapes: each piece has a different shape based on its index
+    createUniqueShapePath(x, y, width, height, edges) {
+        const pieceIndex = edges.pieceIndex || 0;
+        const shapes = ['circle', 'rounded', 'hexagon', 'diamond', 'oval', 'squircle'];
+        const shapeType = shapes[pieceIndex % shapes.length];
+
+        const cx = x + width / 2;
+        const cy = y + height / 2;
+        const radius = Math.min(width, height) * 0.45;
+
+        this.ctx.beginPath();
+
+        switch (shapeType) {
+            case 'circle':
+                this.ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+                break;
+
+            case 'rounded':
+                // Rounded rectangle
+                const r = Math.min(width, height) * 0.2;
+                this.ctx.moveTo(x + r, y);
+                this.ctx.lineTo(x + width - r, y);
+                this.ctx.arcTo(x + width, y, x + width, y + r, r);
+                this.ctx.lineTo(x + width, y + height - r);
+                this.ctx.arcTo(x + width, y + height, x + width - r, y + height, r);
+                this.ctx.lineTo(x + r, y + height);
+                this.ctx.arcTo(x, y + height, x, y + height - r, r);
+                this.ctx.lineTo(x, y + r);
+                this.ctx.arcTo(x, y, x + r, y, r);
+                break;
+
+            case 'hexagon':
+                for (let i = 0; i < 6; i++) {
+                    const angle = (i * Math.PI / 3) - Math.PI / 2;
+                    const px = cx + radius * Math.cos(angle);
+                    const py = cy + radius * Math.sin(angle);
+                    if (i === 0) this.ctx.moveTo(px, py);
+                    else this.ctx.lineTo(px, py);
+                }
+                break;
+
+            case 'diamond':
+                this.ctx.moveTo(cx, y + height * 0.05);
+                this.ctx.lineTo(x + width * 0.95, cy);
+                this.ctx.lineTo(cx, y + height * 0.95);
+                this.ctx.lineTo(x + width * 0.05, cy);
+                break;
+
+            case 'oval':
+                this.ctx.ellipse(cx, cy, width * 0.45, height * 0.35, 0, 0, Math.PI * 2);
+                break;
+
+            case 'squircle':
+                // Superellipse / squircle shape
+                const n = 4; // roundness
+                const a = width * 0.45;
+                const b = height * 0.45;
+                for (let i = 0; i <= 100; i++) {
+                    const t = (i / 100) * Math.PI * 2;
+                    const cosT = Math.cos(t);
+                    const sinT = Math.sin(t);
+                    const px = cx + a * Math.sign(cosT) * Math.pow(Math.abs(cosT), 2/n);
+                    const py = cy + b * Math.sign(sinT) * Math.pow(Math.abs(sinT), 2/n);
+                    if (i === 0) this.ctx.moveTo(px, py);
+                    else this.ctx.lineTo(px, py);
+                }
+                break;
+        }
+
+        this.ctx.closePath();
     },
 
     // Geometric style: rounded rectangles with semicircle bumps
@@ -1365,23 +1419,24 @@ const PuzzleEngine = {
         this.ctx.closePath();
     },
 
-    // Draw a single piece with jigsaw shape clipping
+    // Draw a single piece with shape clipping based on style
     drawPiece(pieceIndex) {
         if (!this.puzzleImage) return;
 
         const pos = this.getPiecePosition(pieceIndex);
-        const sourceScale = 2; // Because we create image at 2x resolution
+        const sourceScale = 2;
         const edges = this.getEdgePattern(pieceIndex);
-        const tabSize = Math.min(this.pieceWidth, this.pieceHeight) * 0.18;
 
         this.ctx.save();
 
-        // Create clipping path with jigsaw shape
+        // Create clipping path based on style
         this.createPiecePath(pos.x, pos.y, this.pieceWidth, this.pieceHeight, edges);
         this.ctx.clip();
 
-        // Draw the piece from the puzzle image (slightly larger to account for tabs)
-        const margin = tabSize;
+        // Calculate margin based on style (only jigsaw/geometric need extra margin for tabs)
+        const margin = (this.pieceStyle === 'simple') ? 0 : Math.min(this.pieceWidth, this.pieceHeight) * 0.15;
+
+        // Draw the piece from the puzzle image
         this.ctx.drawImage(
             this.puzzleImage,
             (pos.x - margin) * sourceScale, (pos.y - margin) * sourceScale,
@@ -1392,24 +1447,23 @@ const PuzzleEngine = {
 
         this.ctx.restore();
 
-        // Draw jigsaw-style border for visual effect
+        // Draw border
         this.drawPieceBorder(pos.x, pos.y, this.pieceWidth, this.pieceHeight, edges);
     },
 
-    // Draw jigsaw piece border using edge pattern
+    // Draw piece border using edge pattern
     drawPieceBorder(x, y, width, height, edges) {
         this.ctx.save();
         this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
         this.ctx.lineWidth = 2;
 
-        // Use the same path as clipping for border
         this.createPiecePath(x, y, width, height, edges);
         this.ctx.stroke();
 
         this.ctx.restore();
     },
 
-    // Draw the animating piece with jigsaw shape
+    // Draw the animating piece with shape based on style
     drawAnimatingPiece() {
         if (!this.animatingPiece || !this.puzzleImage) return;
 
@@ -1417,7 +1471,9 @@ const PuzzleEngine = {
         const sourceScale = 2;
         const pos = this.getPiecePosition(pieceIndex);
         const edges = this.getEdgePattern(pieceIndex);
-        const tabSize = Math.min(this.pieceWidth, this.pieceHeight) * 0.18;
+
+        // Calculate margin based on style
+        const margin = (this.pieceStyle === 'simple') ? 0 : Math.min(this.pieceWidth, this.pieceHeight) * 0.15;
 
         // Calculate scaled dimensions and position
         const drawWidth = this.pieceWidth * scale;
@@ -1438,12 +1494,11 @@ const PuzzleEngine = {
         this.ctx.scale(scale, scale);
         this.ctx.translate(-pos.x, -pos.y);
 
-        // Create jigsaw clipping path
+        // Create clipping path
         this.createPiecePath(pos.x, pos.y, this.pieceWidth, this.pieceHeight, edges);
         this.ctx.clip();
 
         // Draw the piece from the puzzle image
-        const margin = tabSize;
         this.ctx.drawImage(
             this.puzzleImage,
             (pos.x - margin) * sourceScale, (pos.y - margin) * sourceScale,
@@ -1454,7 +1509,7 @@ const PuzzleEngine = {
 
         this.ctx.restore();
 
-        // Draw border with jigsaw shape
+        // Draw border
         this.ctx.save();
         this.ctx.globalAlpha = opacity;
         this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
