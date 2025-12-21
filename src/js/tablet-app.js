@@ -654,8 +654,18 @@ const TabletApp = {
     async changePuzzle(index) {
         this.hideCelebration();
 
+        // Clear custom image when switching to preset puzzle
+        this.state.customImage = null;
+        PuzzleEngine.clearCustomImage();
+
         this.state.currentPuzzleIndex = index;
         this.state.piecesPlaced = 0;
+
+        // Clear collected pieces in manual mode
+        this.collectedPieces = [];
+        if (this.state.puzzleMode === 'manual') {
+            this.renderPieceTray();
+        }
 
         await PuzzleEngine.loadPuzzle(index);
         PuzzleEngine.reset();
