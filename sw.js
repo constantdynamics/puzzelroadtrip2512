@@ -1,7 +1,7 @@
 // Service Worker for Roadtrip Puzzel App
 // Enables offline functionality
 
-const CACHE_NAME = 'roadtrip-puzzel-v2.4.3';
+const CACHE_NAME = 'roadtrip-puzzel-v2.4.4';
 
 // Files to cache for offline use
 const CACHE_FILES = [

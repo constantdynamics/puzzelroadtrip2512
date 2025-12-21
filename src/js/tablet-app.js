@@ -177,7 +177,8 @@ const TabletApp = {
         PuzzleEngine.setCustomImage(imageData);
         this.resetCurrentPuzzle();
         // Update preview name
-        document.getElementById('preview-puzzle-name')?.textContent = '📷 Eigen Foto';
+        const previewName = document.getElementById('preview-puzzle-name');
+        if (previewName) previewName.textContent = '📷 Eigen Foto';
     },
 
     // Handle piece received from remote

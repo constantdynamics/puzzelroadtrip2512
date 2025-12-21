@@ -1,6 +1,3 @@
-# Firebase config with secrets
-src/js/firebase-config.js
-
 # Environment files
 .env
 .env.local
