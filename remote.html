@@ -3291,9 +3291,8 @@
             }
         }
 
-        // Hook into connect success
-        const originalConnectHandler = connectBtn.onclick;
-        connectBtn.addEventListener('click', async () => {
+        // Hook into connect success - show tutorial after first connection
+        connectBtn.addEventListener('click', () => {
             // Wait a bit for connection, then check if we should show tutorial
             setTimeout(() => {
                 if (connectedScreen.style.display !== 'none') {
