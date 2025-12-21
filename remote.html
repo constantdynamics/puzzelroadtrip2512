@@ -213,98 +213,139 @@
             100% { transform: translate(-50%, -50%) scale(1); }
         }
 
-        /* Main Piece Button - smaller now */
-        .piece-btn {
-            width: 100%;
-            padding: 18px 15px;
-            font-size: 18px;
-            font-weight: bold;
-            border: none;
-            border-radius: 15px;
-            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
-            color: white;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
-            margin-bottom: 12px;
-            transition: transform 0.1s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
 
-        .piece-btn:active {
-            transform: scale(0.95);
-        }
-
-        .piece-btn.success {
-            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
-        }
-
-        .piece-btn .emoji {
-            font-size: 28px;
-        }
-
-        /* Navigation Buttons - Clean unified style */
+        /* Navigation Buttons - Clean tile style */
         .nav-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            gap: 10px;
             margin-bottom: 10px;
         }
 
         .nav-btn {
             width: 100%;
-            padding: 14px 8px;
+            padding: 16px 10px;
             font-size: 13px;
             font-weight: 500;
             border: none;
-            border-radius: 12px;
-            background: #f5f5f5;
+            border-radius: 14px;
+            background: white;
             color: #333;
             cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             transition: all 0.15s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
         .nav-btn .icon {
-            font-size: 22px;
+            font-size: 26px;
         }
 
         .nav-btn .label {
-            font-size: 11px;
-            opacity: 0.8;
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
         }
 
         .nav-btn:active {
             transform: scale(0.97);
-            background: #e8e8e8;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
         }
 
-        /* Subtle accent colors - just left border */
+        /* Primary action button */
         .nav-btn.primary {
-            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+        }
+
+        .nav-btn.primary .label {
             color: white;
         }
 
-        .nav-btn.secondary {
-            border-left: 3px solid #4CAF50;
+        .nav-btn.primary.success {
+            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
         }
 
+        /* Secondary buttons */
+        .nav-btn.secondary {
+            background: white;
+        }
+
+        .nav-btn.secondary:hover {
+            background: #fafafa;
+        }
+
+        /* Control buttons */
         .nav-btn.control {
-            background: #fff;
-            border: 1px solid #ddd;
+            background: #f8f8f8;
         }
 
         .nav-btn.control.active {
             background: #fff3e0;
-            border-color: #FF9800;
+            border: 2px solid #FF9800;
         }
 
-        /* Photo Screen */
+        .nav-btn.control.active .label {
+            color: #E65100;
+        }
+
+        /* Library Screen (Puzzelbieb) */
+        .library-screen {
+            display: none;
+        }
+
+        .library-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 15px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            padding: 4px;
+        }
+
+        .library-tab {
+            flex: 1;
+            padding: 10px 12px;
+            border: none;
+            background: transparent;
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .library-tab.active {
+            background: white;
+            color: #333;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .library-content {
+            min-height: 200px;
+        }
+
+        /* Photo crop modal */
+        .photo-crop-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Photo Screen (legacy, now part of library) */
         .photo-screen {
             display: none;
         }
@@ -1461,24 +1502,23 @@
                 <div class="puzzle-complete-badge" id="puzzle-complete-badge">🎉 Puzzel Af!</div>
             </div>
 
-            <button class="piece-btn" id="piece-btn">
-                <span class="emoji">🧩</span>
-                Geef een stukje
-            </button>
-
-            <!-- Main navigation - clean grid -->
+            <!-- Row 1: Piece + Bucketlist -->
             <div class="nav-grid">
+                <button class="nav-btn primary" id="piece-btn">
+                    <span class="icon">🧩</span>
+                    <span class="label">Stukje geven</span>
+                </button>
                 <button class="nav-btn secondary" id="show-tasks-btn">
                     <span class="icon">📋</span>
                     <span class="label">Bucketlist</span>
                 </button>
-                <button class="nav-btn secondary" id="show-puzzles-btn">
-                    <span class="icon">🧩</span>
-                    <span class="label">Andere puzzel</span>
-                </button>
-                <button class="nav-btn secondary" id="show-photo-btn">
-                    <span class="icon">📷</span>
-                    <span class="label">Eigen foto</span>
+            </div>
+
+            <!-- Row 2: Puzzelbieb + Wachtrij -->
+            <div class="nav-grid">
+                <button class="nav-btn secondary" id="show-library-btn">
+                    <span class="icon">🖼️</span>
+                    <span class="label">Puzzelbieb</span>
                 </button>
                 <button class="nav-btn secondary" id="show-queue-btn">
                     <span class="icon">📋</span>
@@ -1486,24 +1526,17 @@
                 </button>
             </div>
 
-            <!-- Control buttons -->
+            <!-- Row 3: Pause + Settings -->
             <div class="nav-grid">
                 <button class="nav-btn control" id="pause-btn">
                     <span class="icon">⏸️</span>
-                    <span class="label">Pauze</span>
+                    <span class="label">Pauzeer</span>
                 </button>
-                <button class="nav-btn control" id="reset-btn">
-                    <span class="icon">🔄</span>
-                    <span class="label">Opnieuw</span>
+                <button class="nav-btn control" id="show-settings-btn">
+                    <span class="icon">⚙️</span>
+                    <span class="label">Instellingen</span>
                 </button>
             </div>
-
-            <button class="nav-btn control" id="show-settings-btn" style="width:100%;flex-direction:row;justify-content:center;gap:8px;padding:12px;">
-                <span class="icon" style="font-size:18px;">⚙️</span>
-                <span class="label" style="font-size:13px;opacity:1;">Instellingen</span>
-            </button>
-
-            <button class="disconnect-btn" id="disconnect-btn">Verbinding verbreken</button>
         </div>
 
         <!-- Queue Screen -->
@@ -1534,48 +1567,6 @@
             <button class="back-btn" id="queue-back-btn" style="margin-top: 10px;">← Terug</button>
         </div>
 
-        <!-- Photo Upload Screen -->
-        <div class="card photo-screen" id="photo-screen">
-            <h2>📷 Fotobibliotheek</h2>
-            <p class="subtitle">Upload en beheer je eigen puzzelfoto's</p>
-
-            <input type="file" id="photo-input" accept="image/*" style="display:none">
-
-            <!-- Photo preview when adding new photo -->
-            <div class="photo-preview-container" id="photo-preview-container" style="display:none">
-                <div class="crop-area" id="crop-area">
-                    <img id="photo-preview" src="">
-                    <div class="crop-box" id="crop-box"></div>
-                </div>
-                <p class="crop-hint">Sleep het groene kader naar het gewenste deel</p>
-                <div class="photo-actions">
-                    <button class="back-btn" id="cancel-photo-btn">✕ Annuleren</button>
-                    <button class="save-btn" id="save-to-library-btn">💾 Opslaan in bibliotheek</button>
-                </div>
-            </div>
-
-            <!-- Photo Library Grid -->
-            <div class="photo-library" id="photo-library-container">
-                <div class="library-header">
-                    <h3>📚 Mijn Foto's</h3>
-                    <span class="library-count" id="library-count">0 foto's</span>
-                </div>
-                <div id="photo-grid" class="photo-grid">
-                    <!-- Photos will be inserted here -->
-                </div>
-                <div class="empty-library" id="empty-library">
-                    <div class="empty-library-icon">📷</div>
-                    <p>Nog geen foto's.<br>Voeg je eerste foto toe!</p>
-                </div>
-            </div>
-
-            <div class="photo-actions">
-                <button class="add-photo-btn" id="add-photo-btn">➕ Foto toevoegen</button>
-                <button class="use-selected-btn" id="use-selected-btn" disabled>▶️ Gebruik foto</button>
-            </div>
-
-            <button class="back-btn" id="photo-back-btn" style="margin-top: 10px;">← Terug</button>
-        </div>
 
         <!-- Settings Screen -->
         <div class="card settings-screen" id="settings-screen">
@@ -1710,15 +1701,58 @@
             </div>
         </div>
 
-        <!-- Puzzles Screen -->
-        <div class="card puzzles-screen" id="puzzles-screen">
-            <h2>🧩 Kies een Puzzel</h2>
+        <!-- Puzzelbieb Screen (combined puzzles + photos) -->
+        <div class="card library-screen" id="library-screen">
+            <h2>🖼️ Puzzelbieb</h2>
 
-            <div class="puzzle-grid" id="puzzle-grid">
-                <!-- Puzzles will be populated by JS -->
+            <!-- Tab selector -->
+            <div class="library-tabs">
+                <button class="library-tab active" data-tab="presets">🧩 Dieren</button>
+                <button class="library-tab" data-tab="photos">📷 Mijn foto's</button>
             </div>
 
-            <button class="back-btn" id="puzzles-back-btn">← Terug</button>
+            <!-- Preset puzzles tab -->
+            <div class="library-content" id="presets-tab">
+                <div class="puzzle-grid" id="puzzle-grid">
+                    <!-- Puzzles will be populated by JS -->
+                </div>
+            </div>
+
+            <!-- My photos tab -->
+            <div class="library-content" id="photos-tab" style="display:none;">
+                <input type="file" id="photo-input" accept="image/*" style="display:none">
+
+                <div id="photo-grid" class="photo-grid">
+                    <!-- Photos will be inserted here -->
+                </div>
+                <div class="empty-library" id="empty-library">
+                    <div class="empty-library-icon">📷</div>
+                    <p>Nog geen foto's.<br>Tik op + om een foto toe te voegen</p>
+                </div>
+
+                <div class="photo-actions" style="margin-top:10px;">
+                    <button class="add-photo-btn" id="add-photo-btn">➕ Foto toevoegen</button>
+                    <button class="use-selected-btn" id="use-selected-btn" disabled>▶️ Gebruik</button>
+                </div>
+            </div>
+
+            <button class="back-btn" id="library-back-btn" style="margin-top: 10px;">← Terug</button>
+        </div>
+
+        <!-- Photo crop modal -->
+        <div class="photo-crop-modal" id="photo-crop-modal" style="display:none;">
+            <div class="card" style="margin:20px;max-width:400px;">
+                <h2>📷 Foto bijsnijden</h2>
+                <div class="crop-area" id="crop-area">
+                    <img id="photo-preview" src="">
+                    <div class="crop-box" id="crop-box"></div>
+                </div>
+                <p class="crop-hint">Sleep het groene kader naar het gewenste deel</p>
+                <div class="photo-actions">
+                    <button class="back-btn" id="cancel-photo-btn">✕ Annuleren</button>
+                    <button class="save-btn" id="save-to-library-btn">💾 Opslaan</button>
+                </div>
+            </div>
         </div>
 
         <!-- Tutorial Overlay -->
@@ -1737,7 +1771,7 @@
             </div>
         </div>
 
-        <div class="version-info">v2.9.0</div>
+        <div class="version-info">v2.10.0</div>
     </div>
 
     <script src="src/js/storage.js"></script>
@@ -1911,15 +1945,13 @@
         const connectedScreen = document.getElementById('connected-screen');
         const settingsScreen = document.getElementById('settings-screen');
         const tasksScreen = document.getElementById('tasks-screen');
-        const puzzlesScreen = document.getElementById('puzzles-screen');
-        const photoScreen = document.getElementById('photo-screen');
+        const libraryScreen = document.getElementById('library-screen');
         const queueScreen = document.getElementById('queue-screen');
         const taskManageScreen = document.getElementById('task-manage-screen');
 
         const connectBtn = document.getElementById('connect-btn');
         const errorMsg = document.getElementById('error-msg');
         const pieceBtn = document.getElementById('piece-btn');
-        const disconnectBtn = document.getElementById('disconnect-btn');
 
         const digits = [
             document.getElementById('digit1'),
@@ -1934,8 +1966,7 @@
             connectedScreen.style.display = 'none';
             settingsScreen.style.display = 'none';
             tasksScreen.style.display = 'none';
-            puzzlesScreen.style.display = 'none';
-            photoScreen.style.display = 'none';
+            libraryScreen.style.display = 'none';
             queueScreen.style.display = 'none';
             taskManageScreen.style.display = 'none';
             screen.style.display = 'block';
@@ -2151,8 +2182,9 @@
             showScreen(settingsScreen);
         });
 
-        document.getElementById('show-puzzles-btn').addEventListener('click', () => {
-            showScreen(puzzlesScreen);
+        document.getElementById('show-library-btn').addEventListener('click', () => {
+            showScreen(libraryScreen);
+            renderPhotoLibrary();
         });
 
         // Back buttons
@@ -2164,8 +2196,19 @@
             showScreen(connectedScreen);
         });
 
-        document.getElementById('puzzles-back-btn').addEventListener('click', () => {
+        document.getElementById('library-back-btn').addEventListener('click', () => {
             showScreen(connectedScreen);
+        });
+
+        // Library tabs
+        document.querySelectorAll('.library-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.library-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                const tabName = tab.dataset.tab;
+                document.getElementById('presets-tab').style.display = tabName === 'presets' ? 'block' : 'none';
+                document.getElementById('photos-tab').style.display = tabName === 'photos' ? 'block' : 'none';
+            });
         });
 
         // === SETTINGS STATE (temporary until saved) ===
@@ -2221,13 +2264,6 @@
             await sendSettings({ timerPaused: isPaused });
         });
 
-        // Reset button (now on main screen)
-        document.getElementById('reset-btn').addEventListener('click', async () => {
-            if (confirm('Deze puzzel opnieuw starten?')) {
-                await sendSettings({ resetPuzzle: true });
-            }
-        });
-
         // Save button - saves all pending settings and goes back
         document.getElementById('settings-save-btn').addEventListener('click', async () => {
             if (Object.keys(pendingSettings).length > 0) {
@@ -2241,15 +2277,6 @@
         document.getElementById('settings-back-btn').addEventListener('click', () => {
             pendingSettings = {};
             showScreen(connectedScreen);
-        });
-
-        // Disconnect
-        disconnectBtn.addEventListener('click', () => {
-            RemoteControl.disconnect();
-            showScreen(connectScreen);
-            digits.forEach(d => d.value = '');
-            updateConnectButton();
-            stopPuzzlePreview();
         });
 
         // === PUZZLE PREVIEW SYSTEM ===
@@ -2516,19 +2543,6 @@
         // Setup crop events once
         setupCropEvents();
 
-        // Show photo screen
-        document.getElementById('show-photo-btn').addEventListener('click', () => {
-            showScreen(photoScreen);
-            renderPhotoLibrary();
-        });
-
-        // Back from photo screen
-        document.getElementById('photo-back-btn').addEventListener('click', () => {
-            document.getElementById('photo-preview-container').style.display = 'none';
-            document.getElementById('photo-library-container').style.display = 'block';
-            showScreen(connectedScreen);
-        });
-
         // Add photo button - trigger file input
         document.getElementById('add-photo-btn').addEventListener('click', () => {
             document.getElementById('photo-input').click();
@@ -2544,10 +2558,9 @@
                 // Load original image
                 originalImage = new Image();
                 originalImage.onload = () => {
-                    // Show preview
+                    // Show crop modal
                     document.getElementById('photo-preview').src = event.target.result;
-                    document.getElementById('photo-preview-container').style.display = 'block';
-                    document.getElementById('photo-library-container').style.display = 'none';
+                    document.getElementById('photo-crop-modal').style.display = 'flex';
 
                     // Initialize crop box after image is displayed
                     setTimeout(() => {
@@ -2566,8 +2579,7 @@
         document.getElementById('cancel-photo-btn').addEventListener('click', () => {
             pendingPhotoData = null;
             originalImage = null;
-            document.getElementById('photo-preview-container').style.display = 'none';
-            document.getElementById('photo-library-container').style.display = 'block';
+            document.getElementById('photo-crop-modal').style.display = 'none';
         });
 
         // Save photo to library
@@ -2581,8 +2593,7 @@
             const photo = StorageManager.addPhoto(croppedData, name || undefined);
             if (photo) {
                 originalImage = null;
-                document.getElementById('photo-preview-container').style.display = 'none';
-                document.getElementById('photo-library-container').style.display = 'block';
+                document.getElementById('photo-crop-modal').style.display = 'none';
                 selectedLibraryPhotoId = photo.id; // Auto-select new photo
                 renderPhotoLibrary();
             }
