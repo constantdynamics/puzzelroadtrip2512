@@ -443,6 +443,172 @@
             cursor: not-allowed;
         }
 
+        /* Queue styles */
+        .nav-btn.queue { background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%); }
+
+        .queue-screen {
+            display: none;
+        }
+
+        .queue-info {
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .queue-info .current-puzzle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .queue-info .queue-status {
+            font-size: 18px;
+            font-weight: bold;
+            color: #9C27B0;
+        }
+
+        .queue-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .queue-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: white;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+
+        .queue-item.current {
+            border-color: #4CAF50;
+            background: #e8f5e9;
+        }
+
+        .queue-item-number {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #9C27B0;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .queue-item.current .queue-item-number {
+            background: #4CAF50;
+        }
+
+        .queue-item-thumb {
+            width: 64px;
+            height: 40px;
+            border-radius: 6px;
+            object-fit: cover;
+            background: #ddd;
+            flex-shrink: 0;
+        }
+
+        .queue-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .queue-item-name {
+            font-weight: 600;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .queue-item-type {
+            font-size: 11px;
+            color: #999;
+        }
+
+        .queue-item-remove {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #ffebee;
+            color: #f44336;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .queue-empty {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+        }
+
+        .queue-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .queue-actions button {
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+        }
+
+        .add-to-queue-btn {
+            background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
+            color: white;
+        }
+
+        .add-photo-queue-btn {
+            background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+            color: white;
+        }
+
+        .next-puzzle-btn {
+            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+            color: white;
+            padding: 15px;
+            font-size: 16px;
+        }
+
+        .next-puzzle-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .auto-next-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 15px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .auto-next-toggle span {
+            font-size: 14px;
+        }
+
         .disconnect-btn {
             margin-top: 10px;
             padding: 12px 25px;
@@ -895,8 +1061,37 @@
             <button class="nav-btn settings" id="show-settings-btn">⚙️ Instellingen</button>
             <button class="nav-btn puzzles" id="show-puzzles-btn">🧩 Andere Puzzel</button>
             <button class="nav-btn photo" id="show-photo-btn">📷 Eigen Foto</button>
+            <button class="nav-btn queue" id="show-queue-btn">📋 Wachtrij</button>
 
             <button class="disconnect-btn" id="disconnect-btn">Verbinding verbreken</button>
+        </div>
+
+        <!-- Queue Screen -->
+        <div class="card queue-screen" id="queue-screen">
+            <h2>📋 Puzzel Wachtrij</h2>
+            <p class="subtitle">Beheer de volgorde van puzzels</p>
+
+            <div class="queue-info">
+                <div class="current-puzzle">Huidige puzzel: <span id="queue-current-name">-</span></div>
+                <div class="queue-status"><span id="queue-count">0</span> puzzels in wachtrij</div>
+            </div>
+
+            <div class="queue-list" id="queue-list">
+                <!-- Queue items will be inserted here -->
+            </div>
+            <div class="queue-empty" id="queue-empty">
+                <div style="font-size: 40px; margin-bottom: 10px;">📭</div>
+                <p>Wachtrij is leeg.<br>Voeg puzzels toe!</p>
+            </div>
+
+            <div class="queue-actions">
+                <button class="add-to-queue-btn" id="add-puzzle-to-queue-btn">🧩 Standaard puzzel</button>
+                <button class="add-photo-queue-btn" id="add-photo-to-queue-btn">📷 Eigen foto</button>
+            </div>
+
+            <button class="next-puzzle-btn" id="load-next-btn" disabled>▶️ Volgende puzzel laden</button>
+
+            <button class="back-btn" id="queue-back-btn" style="margin-top: 10px;">← Terug</button>
         </div>
 
         <!-- Photo Upload Screen -->
@@ -1150,6 +1345,7 @@
         const tasksScreen = document.getElementById('tasks-screen');
         const puzzlesScreen = document.getElementById('puzzles-screen');
         const photoScreen = document.getElementById('photo-screen');
+        const queueScreen = document.getElementById('queue-screen');
 
         const connectBtn = document.getElementById('connect-btn');
         const errorMsg = document.getElementById('error-msg');
@@ -1171,6 +1367,7 @@
             tasksScreen.style.display = 'none';
             puzzlesScreen.style.display = 'none';
             photoScreen.style.display = 'none';
+            queueScreen.style.display = 'none';
             screen.style.display = 'block';
         }
 
@@ -1279,16 +1476,6 @@
                 btn.addEventListener('click', () => selectPuzzle(index));
                 container.appendChild(btn);
             });
-        }
-
-        // Select a puzzle
-        async function selectPuzzle(index) {
-            try {
-                await sendSettings({ changePuzzle: index });
-                showScreen(connectedScreen);
-            } catch (error) {
-                alert('Fout: ' + error.message);
-            }
         }
 
         // Send settings to tablet
@@ -1725,6 +1912,200 @@
                 alert('Fout bij verzenden: ' + error.message);
             }
         });
+
+        // === PUZZLE QUEUE SYSTEM ===
+        const QUEUE_STORAGE_KEY = 'roadtrip_puzzle_queue';
+        let puzzleQueue = [];
+        let addingPuzzleMode = null; // 'standard' or 'photo'
+
+        // Load queue from storage
+        function loadQueue() {
+            try {
+                const saved = localStorage.getItem(QUEUE_STORAGE_KEY);
+                puzzleQueue = saved ? JSON.parse(saved) : [];
+            } catch (e) {
+                puzzleQueue = [];
+            }
+        }
+
+        // Save queue to storage
+        function saveQueue() {
+            localStorage.setItem(QUEUE_STORAGE_KEY, JSON.stringify(puzzleQueue));
+        }
+
+        // Add item to queue
+        function addToQueue(item) {
+            puzzleQueue.push(item);
+            saveQueue();
+            renderQueue();
+        }
+
+        // Remove item from queue by index
+        function removeFromQueue(index) {
+            puzzleQueue.splice(index, 1);
+            saveQueue();
+            renderQueue();
+        }
+
+        // Render the queue list
+        function renderQueue() {
+            const list = document.getElementById('queue-list');
+            const emptyMsg = document.getElementById('queue-empty');
+            const countEl = document.getElementById('queue-count');
+            const loadNextBtn = document.getElementById('load-next-btn');
+
+            countEl.textContent = puzzleQueue.length;
+            loadNextBtn.disabled = puzzleQueue.length === 0;
+
+            if (puzzleQueue.length === 0) {
+                list.style.display = 'none';
+                emptyMsg.style.display = 'block';
+                return;
+            }
+
+            list.style.display = 'block';
+            emptyMsg.style.display = 'none';
+
+            list.innerHTML = puzzleQueue.map((item, index) => {
+                const isPhoto = item.type === 'photo';
+                const thumbSrc = isPhoto ? item.data : '';
+                const emoji = isPhoto ? '📷' : (puzzleList[item.index]?.emoji || '🧩');
+                const name = isPhoto ? item.name : (puzzleList[item.index]?.name || 'Puzzel');
+                const typeLabel = isPhoto ? 'Eigen foto' : 'Standaard puzzel';
+
+                return `
+                    <div class="queue-item">
+                        <div class="queue-item-number">${index + 1}</div>
+                        ${isPhoto
+                            ? `<img class="queue-item-thumb" src="${thumbSrc}" alt="${name}">`
+                            : `<div class="queue-item-thumb" style="display:flex;align-items:center;justify-content:center;font-size:24px;background:${puzzleList[item.index]?.color || '#ddd'}">${emoji}</div>`
+                        }
+                        <div class="queue-item-info">
+                            <div class="queue-item-name">${emoji} ${name}</div>
+                            <div class="queue-item-type">${typeLabel}</div>
+                        </div>
+                        <button class="queue-item-remove" data-index="${index}">✕</button>
+                    </div>
+                `;
+            }).join('');
+
+            // Add remove handlers
+            list.querySelectorAll('.queue-item-remove').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const idx = parseInt(btn.dataset.index);
+                    removeFromQueue(idx);
+                });
+            });
+        }
+
+        // Update current puzzle name display
+        function updateQueueCurrentPuzzle(state) {
+            const el = document.getElementById('queue-current-name');
+            if (state && state.puzzleIndex !== undefined) {
+                const puzzle = puzzleList[state.puzzleIndex];
+                if (state.customImage) {
+                    el.textContent = '📷 Eigen Foto';
+                } else if (puzzle) {
+                    el.textContent = `${puzzle.emoji} ${puzzle.name}`;
+                } else {
+                    el.textContent = '-';
+                }
+            }
+        }
+
+        // Show queue screen
+        document.getElementById('show-queue-btn').addEventListener('click', () => {
+            loadQueue();
+            renderQueue();
+            // Update current puzzle from latest state
+            if (lastPuzzleState) {
+                updateQueueCurrentPuzzle(lastPuzzleState);
+            }
+            showScreen(queueScreen);
+        });
+
+        // Back from queue screen
+        document.getElementById('queue-back-btn').addEventListener('click', () => {
+            showScreen(connectedScreen);
+        });
+
+        // Add standard puzzle to queue - show puzzle selection
+        document.getElementById('add-puzzle-to-queue-btn').addEventListener('click', () => {
+            addingPuzzleMode = 'queue';
+            showScreen(puzzlesScreen);
+        });
+
+        // Add photo to queue - show photo library
+        document.getElementById('add-photo-to-queue-btn').addEventListener('click', () => {
+            addingPuzzleMode = 'queue-photo';
+            showScreen(photoScreen);
+            renderPhotoLibrary();
+        });
+
+        // Load next puzzle from queue
+        document.getElementById('load-next-btn').addEventListener('click', async () => {
+            if (puzzleQueue.length === 0) return;
+
+            const nextItem = puzzleQueue.shift();
+            saveQueue();
+            renderQueue();
+
+            try {
+                if (nextItem.type === 'photo') {
+                    await sendSettings({ customImage: nextItem.data });
+                } else {
+                    await sendSettings({ changePuzzle: nextItem.index });
+                }
+            } catch (error) {
+                alert('Fout bij laden: ' + error.message);
+            }
+        });
+
+        // Select puzzle - handles both direct load and queue mode
+        async function selectPuzzle(index) {
+            if (addingPuzzleMode === 'queue') {
+                // Add to queue instead of loading directly
+                const puzzle = puzzleList[index];
+                addToQueue({
+                    type: 'standard',
+                    index: index,
+                    name: puzzle.name
+                });
+                addingPuzzleMode = null;
+                showScreen(queueScreen);
+            } else {
+                // Normal behavior - load puzzle directly
+                try {
+                    await sendSettings({ changePuzzle: index });
+                    showScreen(connectedScreen);
+                } catch (error) {
+                    alert('Fout: ' + error.message);
+                }
+            }
+        }
+
+        // Modify use-selected-btn to handle queue mode
+        const useSelectedBtn = document.getElementById('use-selected-btn');
+        const originalUseHandler = useSelectedBtn.onclick;
+        useSelectedBtn.addEventListener('click', async (e) => {
+            if (addingPuzzleMode === 'queue-photo') {
+                e.stopImmediatePropagation();
+                if (!selectedLibraryPhotoId) return;
+
+                const photo = StorageManager.getPhoto(selectedLibraryPhotoId);
+                if (!photo) return;
+
+                addToQueue({
+                    type: 'photo',
+                    data: photo.data,
+                    name: photo.name,
+                    photoId: photo.id
+                });
+                addingPuzzleMode = null;
+                showScreen(queueScreen);
+                return false;
+            }
+        }, true); // Use capture to intercept first
 
         // Focus first digit on load
         digits[0].focus();
