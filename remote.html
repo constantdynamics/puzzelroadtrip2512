@@ -1609,6 +1609,15 @@
             </div>
 
             <div class="setting-row">
+                <span class="setting-label">🧩 Stukjes</span>
+                <select class="setting-select" id="piece-style">
+                    <option value="simple">Vierkant</option>
+                    <option value="geometric">Ronde hoekjes</option>
+                    <option value="jigsaw">Klassiek jigsaw</option>
+                </select>
+            </div>
+
+            <div class="setting-row">
                 <span class="setting-label">📐 Puzzellijnen</span>
                 <select class="setting-select" id="puzzle-lines">
                     <option value="on">Aan</option>
@@ -1784,7 +1793,7 @@
             </div>
         </div>
 
-        <div class="version-info">v2.12.1</div>
+        <div class="version-info">v2.13.0</div>
     </div>
 
     <script src="src/js/storage.js"></script>
@@ -2236,6 +2245,11 @@
         // Puzzle mode (auto/manual)
         document.getElementById('puzzle-mode').addEventListener('change', (e) => {
             pendingSettings.puzzleMode = e.target.value;
+        });
+
+        // Piece style (simple/geometric/jigsaw)
+        document.getElementById('piece-style').addEventListener('change', (e) => {
+            pendingSettings.pieceStyle = e.target.value;
         });
 
         // Puzzle lines (on/off)

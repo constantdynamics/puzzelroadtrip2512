@@ -19,6 +19,9 @@ const PuzzleEngine = {
     customImageData: null, // Voor eigen afbeelding
     showPuzzleLines: true, // Show jigsaw lines overlay on puzzle
 
+    // Puzzle piece style: 'simple' (rectangles), 'geometric' (basic shapes), 'jigsaw' (classic)
+    pieceStyle: 'simple',
+
     // Piece configurations: pieceCount -> {rows, cols}
     pieceConfigs: {
         4: { rows: 2, cols: 2 },
@@ -937,6 +940,12 @@ const PuzzleEngine = {
         this.redraw();
     },
 
+    // Set puzzle piece style
+    setPieceStyle(style) {
+        this.pieceStyle = style;
+        this.redraw();
+    },
+
     // Resize canvas to fit container
     resizeCanvas() {
         const container = this.canvas.parentElement;
@@ -1120,29 +1129,137 @@ const PuzzleEngine = {
         }
     },
 
-    // Generate edge pattern for a piece (determines tab direction)
-    // Uses seeded random based on piece position for consistency
+    // Generate edge pattern for a piece based on style
+    // For jigsaw: edges must match neighbors (if piece A has right=1, piece B to its right has left=-1)
     getEdgePattern(pieceIndex) {
         const col = pieceIndex % this.cols;
         const row = Math.floor(pieceIndex / this.cols);
 
-        // Each edge: 1 = tab (outward), -1 = blank (inward), 0 = flat (border)
+        // Simple style: all edges are flat (rectangles)
+        if (this.pieceStyle === 'simple') {
+            return { top: 0, right: 0, bottom: 0, left: 0 };
+        }
+
+        // For jigsaw/geometric: generate consistent interlocking edges
+        // We store the "right" and "bottom" edge direction for each piece
+        // The neighboring piece's "left" and "top" are the opposite
+
+        // Use deterministic pattern based on position
+        // Horizontal edges (between rows): determined by the piece above
+        // Vertical edges (between cols): determined by the piece to the left
+
+        // For horizontal edge at row boundary: use (col + row) to determine direction
+        // For vertical edge at col boundary: use (col + row + 1) to determine direction
+
+        const getHorizontalEdge = (r, c) => {
+            // Edge between row r-1 and row r at column c
+            // Returns 1 if piece above has tab going down, -1 if slot going up
+            return ((r + c) % 2 === 0) ? 1 : -1;
+        };
+
+        const getVerticalEdge = (r, c) => {
+            // Edge between col c-1 and col c at row r
+            return ((r + c) % 2 === 0) ? 1 : -1;
+        };
+
         return {
-            top: row === 0 ? 0 : ((row + col) % 2 === 0 ? 1 : -1),
-            right: col === this.cols - 1 ? 0 : ((row + col + 1) % 2 === 0 ? 1 : -1),
-            bottom: row === this.rows - 1 ? 0 : ((row + col) % 2 === 0 ? -1 : 1),
-            left: col === 0 ? 0 : ((row + col + 1) % 2 === 0 ? -1 : 1)
+            // Top edge: if not first row, opposite of what piece above has as bottom
+            top: row === 0 ? 0 : -getHorizontalEdge(row, col),
+            // Right edge: if not last col, we decide the direction
+            right: col === this.cols - 1 ? 0 : getVerticalEdge(row, col + 1),
+            // Bottom edge: if not last row, we decide the direction
+            bottom: row === this.rows - 1 ? 0 : getHorizontalEdge(row + 1, col),
+            // Left edge: if not first col, opposite of what piece to left has as right
+            left: col === 0 ? 0 : -getVerticalEdge(row, col)
         };
     },
 
-    // Create jigsaw piece path with bezier curves for smooth tabs
+    // Create piece path based on current style
     createPiecePath(x, y, width, height, edges) {
-        const tabSize = Math.min(width, height) * 0.18; // Tab size relative to piece
-        const neckWidth = tabSize * 0.5;
+        if (this.pieceStyle === 'simple') {
+            // Simple rectangles
+            this.ctx.beginPath();
+            this.ctx.rect(x, y, width, height);
+        } else if (this.pieceStyle === 'geometric') {
+            // Geometric style with rounded corners and simple bumps
+            this.createGeometricPath(x, y, width, height, edges);
+        } else {
+            // Classic jigsaw with bezier curves
+            this.createJigsawPath(x, y, width, height, edges);
+        }
+    },
+
+    // Geometric style: rounded rectangles with semicircle bumps
+    createGeometricPath(x, y, width, height, edges) {
+        const bumpSize = Math.min(width, height) * 0.12;
+        const cornerRadius = Math.min(width, height) * 0.05;
 
         this.ctx.beginPath();
 
-        // Start at top-left
+        // Start at top-left (after corner)
+        this.ctx.moveTo(x + cornerRadius, y);
+
+        // Top edge
+        if (edges.top === 0) {
+            this.ctx.lineTo(x + width - cornerRadius, y);
+        } else {
+            const midX = x + width / 2;
+            this.ctx.lineTo(midX - bumpSize, y);
+            this.ctx.arc(midX, y, bumpSize, Math.PI, 0, edges.top > 0);
+            this.ctx.lineTo(x + width - cornerRadius, y);
+        }
+
+        // Top-right corner
+        this.ctx.arcTo(x + width, y, x + width, y + cornerRadius, cornerRadius);
+
+        // Right edge
+        if (edges.right === 0) {
+            this.ctx.lineTo(x + width, y + height - cornerRadius);
+        } else {
+            const midY = y + height / 2;
+            this.ctx.lineTo(x + width, midY - bumpSize);
+            this.ctx.arc(x + width, midY, bumpSize, -Math.PI/2, Math.PI/2, edges.right < 0);
+            this.ctx.lineTo(x + width, y + height - cornerRadius);
+        }
+
+        // Bottom-right corner
+        this.ctx.arcTo(x + width, y + height, x + width - cornerRadius, y + height, cornerRadius);
+
+        // Bottom edge
+        if (edges.bottom === 0) {
+            this.ctx.lineTo(x + cornerRadius, y + height);
+        } else {
+            const midX = x + width / 2;
+            this.ctx.lineTo(midX + bumpSize, y + height);
+            this.ctx.arc(midX, y + height, bumpSize, 0, Math.PI, edges.bottom < 0);
+            this.ctx.lineTo(x + cornerRadius, y + height);
+        }
+
+        // Bottom-left corner
+        this.ctx.arcTo(x, y + height, x, y + height - cornerRadius, cornerRadius);
+
+        // Left edge
+        if (edges.left === 0) {
+            this.ctx.lineTo(x, y + cornerRadius);
+        } else {
+            const midY = y + height / 2;
+            this.ctx.lineTo(x, midY + bumpSize);
+            this.ctx.arc(x, midY, bumpSize, Math.PI/2, -Math.PI/2, edges.left > 0);
+            this.ctx.lineTo(x, y + cornerRadius);
+        }
+
+        // Top-left corner
+        this.ctx.arcTo(x, y, x + cornerRadius, y, cornerRadius);
+
+        this.ctx.closePath();
+    },
+
+    // Classic jigsaw style with bezier curves
+    createJigsawPath(x, y, width, height, edges) {
+        const tabSize = Math.min(width, height) * 0.15;
+        const neckWidth = tabSize * 0.4;
+
+        this.ctx.beginPath();
         this.ctx.moveTo(x, y);
 
         // Top edge
@@ -1154,16 +1271,16 @@ const PuzzleEngine = {
             this.ctx.lineTo(midX - tabSize, y);
             this.ctx.bezierCurveTo(
                 midX - neckWidth, y,
-                midX - neckWidth, y - dir * tabSize * 0.3,
-                midX - neckWidth, y - dir * tabSize * 0.5
+                midX - neckWidth, y - dir * tabSize * 0.4,
+                midX - neckWidth, y - dir * tabSize * 0.6
             );
             this.ctx.bezierCurveTo(
-                midX - tabSize * 0.8, y - dir * tabSize,
-                midX + tabSize * 0.8, y - dir * tabSize,
-                midX + neckWidth, y - dir * tabSize * 0.5
+                midX - tabSize * 0.9, y - dir * tabSize,
+                midX + tabSize * 0.9, y - dir * tabSize,
+                midX + neckWidth, y - dir * tabSize * 0.6
             );
             this.ctx.bezierCurveTo(
-                midX + neckWidth, y - dir * tabSize * 0.3,
+                midX + neckWidth, y - dir * tabSize * 0.4,
                 midX + neckWidth, y,
                 midX + tabSize, y
             );
@@ -1179,23 +1296,23 @@ const PuzzleEngine = {
             this.ctx.lineTo(x + width, midY - tabSize);
             this.ctx.bezierCurveTo(
                 x + width, midY - neckWidth,
-                x + width + dir * tabSize * 0.3, midY - neckWidth,
-                x + width + dir * tabSize * 0.5, midY - neckWidth
+                x + width + dir * tabSize * 0.4, midY - neckWidth,
+                x + width + dir * tabSize * 0.6, midY - neckWidth
             );
             this.ctx.bezierCurveTo(
-                x + width + dir * tabSize, midY - tabSize * 0.8,
-                x + width + dir * tabSize, midY + tabSize * 0.8,
-                x + width + dir * tabSize * 0.5, midY + neckWidth
+                x + width + dir * tabSize, midY - tabSize * 0.9,
+                x + width + dir * tabSize, midY + tabSize * 0.9,
+                x + width + dir * tabSize * 0.6, midY + neckWidth
             );
             this.ctx.bezierCurveTo(
-                x + width + dir * tabSize * 0.3, midY + neckWidth,
+                x + width + dir * tabSize * 0.4, midY + neckWidth,
                 x + width, midY + neckWidth,
                 x + width, midY + tabSize
             );
             this.ctx.lineTo(x + width, y + height);
         }
 
-        // Bottom edge (reverse direction)
+        // Bottom edge
         if (edges.bottom === 0) {
             this.ctx.lineTo(x, y + height);
         } else {
@@ -1204,23 +1321,23 @@ const PuzzleEngine = {
             this.ctx.lineTo(midX + tabSize, y + height);
             this.ctx.bezierCurveTo(
                 midX + neckWidth, y + height,
-                midX + neckWidth, y + height + dir * tabSize * 0.3,
-                midX + neckWidth, y + height + dir * tabSize * 0.5
+                midX + neckWidth, y + height + dir * tabSize * 0.4,
+                midX + neckWidth, y + height + dir * tabSize * 0.6
             );
             this.ctx.bezierCurveTo(
-                midX + tabSize * 0.8, y + height + dir * tabSize,
-                midX - tabSize * 0.8, y + height + dir * tabSize,
-                midX - neckWidth, y + height + dir * tabSize * 0.5
+                midX + tabSize * 0.9, y + height + dir * tabSize,
+                midX - tabSize * 0.9, y + height + dir * tabSize,
+                midX - neckWidth, y + height + dir * tabSize * 0.6
             );
             this.ctx.bezierCurveTo(
-                midX - neckWidth, y + height + dir * tabSize * 0.3,
+                midX - neckWidth, y + height + dir * tabSize * 0.4,
                 midX - neckWidth, y + height,
                 midX - tabSize, y + height
             );
             this.ctx.lineTo(x, y + height);
         }
 
-        // Left edge (reverse direction)
+        // Left edge
         if (edges.left === 0) {
             this.ctx.lineTo(x, y);
         } else {
@@ -1229,16 +1346,16 @@ const PuzzleEngine = {
             this.ctx.lineTo(x, midY + tabSize);
             this.ctx.bezierCurveTo(
                 x, midY + neckWidth,
-                x - dir * tabSize * 0.3, midY + neckWidth,
-                x - dir * tabSize * 0.5, midY + neckWidth
+                x - dir * tabSize * 0.4, midY + neckWidth,
+                x - dir * tabSize * 0.6, midY + neckWidth
             );
             this.ctx.bezierCurveTo(
-                x - dir * tabSize, midY + tabSize * 0.8,
-                x - dir * tabSize, midY - tabSize * 0.8,
-                x - dir * tabSize * 0.5, midY - neckWidth
+                x - dir * tabSize, midY + tabSize * 0.9,
+                x - dir * tabSize, midY - tabSize * 0.9,
+                x - dir * tabSize * 0.6, midY - neckWidth
             );
             this.ctx.bezierCurveTo(
-                x - dir * tabSize * 0.3, midY - neckWidth,
+                x - dir * tabSize * 0.4, midY - neckWidth,
                 x, midY - neckWidth,
                 x, midY - tabSize
             );
