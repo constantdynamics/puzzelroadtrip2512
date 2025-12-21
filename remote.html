@@ -826,85 +826,125 @@
             color: white;
         }
 
-        .setting-item {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .setting-item label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
-        }
-
-        .setting-item input[type="range"] {
-            width: 100%;
-            height: 8px;
-            -webkit-appearance: none;
-            background: #ddd;
-            border-radius: 4px;
-            outline: none;
-        }
-
-        .setting-item input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 24px;
-            height: 24px;
-            background: #4CAF50;
-            border-radius: 50%;
-            cursor: pointer;
-        }
-
-        .setting-item input[type="number"] {
-            width: 80px;
-            padding: 10px;
-            font-size: 16px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .setting-item select {
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            background: white;
-        }
-
-        /* Color Grid */
-        .color-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-        }
-
-        .color-btn {
-            width: 100%;
-            aspect-ratio: 1;
-            border: 3px solid transparent;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .color-btn.selected {
-            border-color: #333;
-            transform: scale(1.1);
-        }
-
-        .color-btn:active {
-            transform: scale(0.95);
-        }
-
-        /* Toggle Switch */
+        /* Compact Setting Row */
         .setting-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .setting-row:last-child {
+            border-bottom: none;
+        }
+
+        .setting-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .setting-value {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Dropdown selector button */
+        .setting-select {
+            padding: 8px 12px;
+            font-size: 13px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        /* Mini color buttons in row */
+        .color-row {
+            display: flex;
+            gap: 6px;
+        }
+
+        .color-btn-mini {
+            width: 28px;
+            height: 28px;
+            border: 2px solid transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .color-btn-mini.selected {
+            border-color: #333;
+            transform: scale(1.15);
+        }
+
+        /* Mini vehicle buttons */
+        .vehicle-row {
+            display: flex;
+            gap: 4px;
+        }
+
+        .vehicle-btn-mini {
+            width: 32px;
+            height: 32px;
+            border: 2px solid transparent;
+            border-radius: 6px;
+            background: #f5f5f5;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .vehicle-btn-mini.selected {
+            border-color: #4CAF50;
+            background: #e8f5e9;
+        }
+
+        /* Timer stepper */
+        .timer-stepper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .timer-stepper button {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 50%;
+            background: #4CAF50;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .timer-stepper span {
+            min-width: 50px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        /* Settings footer */
+        .settings-footer {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .settings-footer .save-btn {
+            flex: 3;
+        }
+
+        .settings-footer .back-btn {
+            flex: 1;
+            padding: 12px 10px;
         }
 
         .switch {
@@ -1289,6 +1329,11 @@
                 <button class="nav-btn queue" id="show-queue-btn">📋 Wachtrij</button>
             </div>
 
+            <div class="nav-grid" style="margin-bottom:10px;">
+                <button class="nav-btn" id="pause-btn" style="background:linear-gradient(135deg,#607D8B 0%,#455A64 100%);">⏸️ Pauze</button>
+                <button class="nav-btn" id="reset-btn" style="background:linear-gradient(135deg,#FF5722 0%,#E64A19 100%);">🔄 Opnieuw</button>
+            </div>
+
             <button class="nav-btn settings" id="show-settings-btn" style="margin-bottom:10px;">⚙️ Instellingen</button>
 
             <button class="disconnect-btn" id="disconnect-btn">Verbinding verbreken</button>
@@ -1369,79 +1414,69 @@
         <div class="card settings-screen" id="settings-screen">
             <h2>⚙️ Instellingen</h2>
 
-            <div class="setting-item">
-                <label>👶 Leeftijd kind:</label>
-                <div class="age-selector" id="age-selector">
-                    <button class="age-btn" data-age="1">1 jaar</button>
-                    <button class="age-btn selected" data-age="2">2 jaar</button>
-                    <button class="age-btn" data-age="3">3 jaar</button>
-                    <button class="age-btn" data-age="4">4 jaar</button>
-                    <button class="age-btn" data-age="5">5+ jaar</button>
+            <div class="setting-row">
+                <span class="setting-label">👶 Leeftijd</span>
+                <select class="setting-select" id="age-select">
+                    <option value="1">1 jaar</option>
+                    <option value="2" selected>2 jaar</option>
+                    <option value="3">3 jaar</option>
+                    <option value="4">4 jaar</option>
+                    <option value="5">5+ jaar</option>
+                </select>
+            </div>
+
+            <div class="setting-row">
+                <span class="setting-label">⏱️ Min/stukje</span>
+                <div class="timer-stepper">
+                    <button id="timer-minus">−</button>
+                    <span id="timer-value">15</span>
+                    <button id="timer-plus">+</button>
                 </div>
             </div>
 
-            <div class="setting-item">
-                <button class="action-btn" id="manage-tasks-btn" style="width:100%;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;">
+            <div class="setting-row">
+                <span class="setting-label">🧩 Stukjes</span>
+                <select class="setting-select" id="piece-count">
+                    <option value="12">12</option>
+                    <option value="20">20</option>
+                    <option value="30">30</option>
+                    <option value="40" selected>40</option>
+                    <option value="60">60</option>
+                </select>
+            </div>
+
+            <div class="setting-row">
+                <span class="setting-label">🎨 Kleur</span>
+                <div class="color-row" id="color-grid">
+                    <button class="color-btn-mini selected" data-color="ocean" style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)"></button>
+                    <button class="color-btn-mini" data-color="sunset" style="background:linear-gradient(135deg,#FF6B6B 0%,#FF8E53 100%)"></button>
+                    <button class="color-btn-mini" data-color="forest" style="background:linear-gradient(135deg,#11998e 0%,#38ef7d 100%)"></button>
+                    <button class="color-btn-mini" data-color="sunshine" style="background:linear-gradient(135deg,#F7971E 0%,#FFD200 100%)"></button>
+                    <button class="color-btn-mini" data-color="night" style="background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%)"></button>
+                </div>
+            </div>
+
+            <div class="setting-row">
+                <span class="setting-label">🚗 Voertuig</span>
+                <div class="vehicle-row" id="vehicle-grid">
+                    <button class="vehicle-btn-mini selected" data-vehicle="🏍️">🏍️</button>
+                    <button class="vehicle-btn-mini" data-vehicle="🚜">🚜</button>
+                    <button class="vehicle-btn-mini" data-vehicle="✈️">✈️</button>
+                    <button class="vehicle-btn-mini" data-vehicle="🚀">🚀</button>
+                    <button class="vehicle-btn-mini" data-vehicle="🚁">🚁</button>
+                    <button class="vehicle-btn-mini" data-vehicle="🚤">🚤</button>
+                </div>
+            </div>
+
+            <div class="setting-row" style="border-bottom:none;padding-top:8px;">
+                <button class="action-btn" id="manage-tasks-btn" style="flex:1;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:10px;">
                     ✏️ Bucketlist beheren
                 </button>
             </div>
 
-            <div class="setting-item">
-                <label>⏱️ Minuten per stukje: <span id="timer-value">15</span></label>
-                <input type="range" id="timer-slider" min="1" max="60" value="15">
-            </div>
-
-            <div class="setting-item">
-                <label>🎨 Achtergrondkleur tablet:</label>
-                <div class="color-grid" id="color-grid">
-                    <button class="color-btn selected" data-color="ocean" style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)"></button>
-                    <button class="color-btn" data-color="sunset" style="background:linear-gradient(135deg,#FF6B6B 0%,#FF8E53 100%)"></button>
-                    <button class="color-btn" data-color="forest" style="background:linear-gradient(135deg,#11998e 0%,#38ef7d 100%)"></button>
-                    <button class="color-btn" data-color="candy" style="background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%)"></button>
-                    <button class="color-btn" data-color="sky" style="background:linear-gradient(135deg,#4ECDC4 0%,#44A08D 100%)"></button>
-                    <button class="color-btn" data-color="berry" style="background:linear-gradient(135deg,#8E2DE2 0%,#4A00E0 100%)"></button>
-                    <button class="color-btn" data-color="sunshine" style="background:linear-gradient(135deg,#F7971E 0%,#FFD200 100%)"></button>
-                    <button class="color-btn" data-color="mint" style="background:linear-gradient(135deg,#00b09b 0%,#96c93d 100%)"></button>
-                    <button class="color-btn" data-color="flamingo" style="background:linear-gradient(135deg,#fc67fa 0%,#f4c4f3 100%)"></button>
-                    <button class="color-btn" data-color="night" style="background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%)"></button>
-                </div>
-            </div>
-
-            <div class="setting-item">
-                <label>🧩 Aantal stukjes:</label>
-                <select id="piece-count">
-                    <option value="12">12 stukjes (3x4)</option>
-                    <option value="20">20 stukjes (4x5)</option>
-                    <option value="30">30 stukjes (5x6)</option>
-                    <option value="40" selected>40 stukjes (5x8)</option>
-                    <option value="60">60 stukjes (6x10)</option>
-                </select>
-            </div>
-
-            <div class="setting-item">
-                <label>🚗 Voertuig:</label>
-                <div class="vehicle-grid" id="vehicle-grid">
-                    <button class="vehicle-btn selected" data-vehicle="🏍️">🏍️</button>
-                    <button class="vehicle-btn" data-vehicle="🛵">🛵</button>
-                    <button class="vehicle-btn" data-vehicle="🚜">🚜</button>
-                    <button class="vehicle-btn" data-vehicle="✈️">✈️</button>
-                    <button class="vehicle-btn" data-vehicle="🚀">🚀</button>
-                    <button class="vehicle-btn" data-vehicle="🚁">🚁</button>
-                    <button class="vehicle-btn" data-vehicle="🛸">🛸</button>
-                    <button class="vehicle-btn" data-vehicle="🚤">🚤</button>
-                </div>
-            </div>
-
-            <div class="setting-item">
-                <div class="action-buttons">
-                    <button class="action-btn pause" id="pause-btn">⏸️ Pauze</button>
-                    <button class="action-btn reset" id="reset-btn">🔄 Reset</button>
-                </div>
-            </div>
-
             <div class="settings-footer">
-                <button class="back-btn" id="settings-back-btn">← Terug</button>
                 <button class="save-btn" id="settings-save-btn">✓ Opslaan</button>
+                <button class="back-btn" id="settings-back-btn">←</button>
             </div>
         </div>
 
@@ -1511,7 +1546,7 @@
             <button class="back-btn" id="puzzles-back-btn">← Terug</button>
         </div>
 
-        <div class="version-info">v2.8.0</div>
+        <div class="version-info">v2.8.1</div>
     </div>
 
     <script src="src/js/storage.js"></script>
@@ -1939,47 +1974,56 @@
         // === SETTINGS STATE (temporary until saved) ===
         let pendingSettings = {};
 
-        // Timer slider
-        document.getElementById('timer-slider').addEventListener('input', (e) => {
-            const value = e.target.value;
-            document.getElementById('timer-value').textContent = value;
-            pendingSettings.timerInterval = parseInt(value);
-        });
-
         // Piece count
         document.getElementById('piece-count').addEventListener('change', (e) => {
             pendingSettings.pieceCount = parseInt(e.target.value);
         });
 
-        // Vehicle grid
-        document.querySelectorAll('.vehicle-btn').forEach(btn => {
+        // Vehicle grid (mini buttons)
+        document.querySelectorAll('.vehicle-btn-mini').forEach(btn => {
             btn.addEventListener('click', () => {
-                document.querySelectorAll('.vehicle-btn').forEach(b => b.classList.remove('selected'));
+                document.querySelectorAll('.vehicle-btn-mini').forEach(b => b.classList.remove('selected'));
                 btn.classList.add('selected');
                 pendingSettings.vehicle = btn.dataset.vehicle;
             });
         });
 
-        // Color grid for background
-        document.querySelectorAll('.color-btn').forEach(btn => {
+        // Color grid for background (mini buttons)
+        document.querySelectorAll('.color-btn-mini').forEach(btn => {
             btn.addEventListener('click', () => {
-                document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+                document.querySelectorAll('.color-btn-mini').forEach(b => b.classList.remove('selected'));
                 btn.classList.add('selected');
                 pendingSettings.bgColor = btn.dataset.color;
             });
         });
 
-        // Pause button
+        // Timer stepper buttons
+        let timerValue = 15;
+        document.getElementById('timer-minus').addEventListener('click', () => {
+            if (timerValue > 1) {
+                timerValue--;
+                document.getElementById('timer-value').textContent = timerValue;
+                pendingSettings.timerInterval = timerValue;
+            }
+        });
+        document.getElementById('timer-plus').addEventListener('click', () => {
+            if (timerValue < 60) {
+                timerValue++;
+                document.getElementById('timer-value').textContent = timerValue;
+                pendingSettings.timerInterval = timerValue;
+            }
+        });
+
+        // Pause button (now on main screen)
         document.getElementById('pause-btn').addEventListener('click', async (e) => {
             isPaused = !isPaused;
             e.target.textContent = isPaused ? '▶️ Doorgaan' : '⏸️ Pauze';
-            e.target.className = isPaused ? 'action-btn resume' : 'action-btn pause';
             await sendSettings({ timerPaused: isPaused });
         });
 
-        // Reset button
+        // Reset button (now on main screen)
         document.getElementById('reset-btn').addEventListener('click', async () => {
-            if (confirm('Weet je zeker dat je de puzzel wilt resetten?')) {
+            if (confirm('Deze puzzel opnieuw starten?')) {
                 await sendSettings({ resetPuzzle: true });
             }
         });
@@ -2838,35 +2882,35 @@
             if (firstCategory) firstCategory.classList.add('open');
         }
 
-        // Age selector handlers
-        document.querySelectorAll('.age-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.age-btn').forEach(b => b.classList.remove('selected'));
-                btn.classList.add('selected');
-                const settings = loadTaskSettings();
-                settings.age = parseInt(btn.dataset.age);
+        // Age selector handler (now using select dropdown)
+        document.getElementById('age-select').addEventListener('change', (e) => {
+            const settings = loadTaskSettings();
+            settings.age = parseInt(e.target.value);
 
-                // Apply age preset if needed (for age 1, restrict tasks)
-                const preset = agePresets[settings.age];
-                if (preset && preset.enabled) {
-                    // Disable tasks not in the preset
-                    const allBaseTasks = [];
-                    for (const tasks of Object.values(remoteTasks)) {
-                        allBaseTasks.push(...tasks);
-                    }
-                    settings.disabledTasks = allBaseTasks.filter(t => !preset.enabled.includes(t));
+            // Apply age preset if needed (for age 1, restrict tasks)
+            const preset = agePresets[settings.age];
+            if (preset && preset.enabled) {
+                // Disable tasks not in the preset
+                const allBaseTasks = [];
+                for (const tasks of Object.values(remoteTasks)) {
+                    allBaseTasks.push(...tasks);
                 }
+                settings.disabledTasks = allBaseTasks.filter(t => !preset.enabled.includes(t));
+            } else {
+                // Reset disabled tasks for other ages
+                settings.disabledTasks = [];
+            }
 
-                saveTaskSettings(settings);
-            });
+            saveTaskSettings(settings);
         });
 
         // Initialize age selector from saved settings
         function initAgeSelector() {
             const settings = loadTaskSettings();
-            document.querySelectorAll('.age-btn').forEach(btn => {
-                btn.classList.toggle('selected', parseInt(btn.dataset.age) === settings.age);
-            });
+            const ageSelect = document.getElementById('age-select');
+            if (ageSelect) {
+                ageSelect.value = settings.age.toString();
+            }
         }
 
         // Manage tasks button
