@@ -1609,6 +1609,14 @@
             </div>
 
             <div class="setting-row">
+                <span class="setting-label">📐 Puzzellijnen</span>
+                <select class="setting-select" id="puzzle-lines">
+                    <option value="on">Aan</option>
+                    <option value="off">Uit</option>
+                </select>
+            </div>
+
+            <div class="setting-row">
                 <span class="setting-label">🎨 Kleur</span>
                 <div class="color-row" id="color-grid">
                     <button class="color-btn-mini selected" data-color="ocean" style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)"></button>
@@ -1776,7 +1784,7 @@
             </div>
         </div>
 
-        <div class="version-info">v2.11.1</div>
+        <div class="version-info">v2.12.0</div>
     </div>
 
     <script src="src/js/storage.js"></script>
@@ -2228,6 +2236,11 @@
         // Puzzle mode (auto/manual)
         document.getElementById('puzzle-mode').addEventListener('change', (e) => {
             pendingSettings.puzzleMode = e.target.value;
+        });
+
+        // Puzzle lines (on/off)
+        document.getElementById('puzzle-lines').addEventListener('change', (e) => {
+            pendingSettings.puzzleLines = e.target.value === 'on';
         });
 
         // Vehicle grid (mini buttons)

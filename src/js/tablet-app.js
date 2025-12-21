@@ -210,6 +210,10 @@ const TabletApp = {
             this.setPuzzleMode(settings.puzzleMode);
         }
 
+        if (settings.puzzleLines !== undefined) {
+            PuzzleEngine.setShowPuzzleLines(settings.puzzleLines);
+        }
+
         if (settings.age !== undefined) {
             this.state.age = settings.age;
             console.log('Age set to:', settings.age, 'snap tolerance:', this.snapTolerances[settings.age]);
@@ -357,27 +361,169 @@ const TabletApp = {
         });
     },
 
-    // Draw a piece preview on a mini canvas
+    // Draw a piece preview on a mini canvas with jigsaw shape
     drawPiecePreview(canvas, pieceIndex) {
         const ctx = canvas.getContext('2d');
         const pos = PuzzleEngine.getPiecePosition(pieceIndex);
+        const edges = PuzzleEngine.getEdgePattern(pieceIndex);
 
         // Draw the piece from the puzzle image
         if (PuzzleEngine.puzzleImage) {
-            const sx = pos.col * PuzzleEngine.pieceWidth;
-            const sy = pos.row * PuzzleEngine.pieceHeight;
+            const sourceScale = 2; // Puzzle image is 2x resolution
+            const pieceW = PuzzleEngine.pieceWidth;
+            const pieceH = PuzzleEngine.pieceHeight;
+            const tabSize = Math.min(pieceW, pieceH) * 0.18;
 
+            // Calculate scale to fit piece with tabs in canvas
+            const totalW = pieceW + tabSize * 2;
+            const totalH = pieceH + tabSize * 2;
+            const scale = Math.min(canvas.width / totalW, canvas.height / totalH) * 0.9;
+
+            // Center the piece
+            const offsetX = (canvas.width - pieceW * scale) / 2;
+            const offsetY = (canvas.height - pieceH * scale) / 2;
+
+            ctx.save();
+            ctx.translate(offsetX, offsetY);
+            ctx.scale(scale, scale);
+
+            // Create jigsaw clipping path
+            this.createPiecePathForPreview(ctx, 0, 0, pieceW, pieceH, edges);
+            ctx.clip();
+
+            // Draw the piece image
+            const margin = tabSize;
             ctx.drawImage(
                 PuzzleEngine.puzzleImage,
-                sx, sy, PuzzleEngine.pieceWidth, PuzzleEngine.pieceHeight,
-                0, 0, canvas.width, canvas.height
+                (pos.x - margin) * sourceScale, (pos.y - margin) * sourceScale,
+                (pieceW + margin * 2) * sourceScale, (pieceH + margin * 2) * sourceScale,
+                -margin, -margin,
+                pieceW + margin * 2, pieceH + margin * 2
             );
 
-            // Add border
-            ctx.strokeStyle = '#ddd';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(0, 0, canvas.width, canvas.height);
+            ctx.restore();
+
+            // Draw border with jigsaw shape
+            ctx.save();
+            ctx.translate(offsetX, offsetY);
+            ctx.scale(scale, scale);
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.4)';
+            ctx.lineWidth = 2 / scale;
+            this.createPiecePathForPreview(ctx, 0, 0, pieceW, pieceH, edges);
+            ctx.stroke();
+            ctx.restore();
         }
+    },
+
+    // Create jigsaw piece path for preview (same as PuzzleEngine but on separate context)
+    createPiecePathForPreview(ctx, x, y, width, height, edges) {
+        const tabSize = Math.min(width, height) * 0.18;
+        const neckWidth = tabSize * 0.5;
+
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+
+        // Top edge
+        if (edges.top === 0) {
+            ctx.lineTo(x + width, y);
+        } else {
+            const dir = edges.top;
+            const midX = x + width / 2;
+            ctx.lineTo(midX - tabSize, y);
+            ctx.bezierCurveTo(
+                midX - neckWidth, y,
+                midX - neckWidth, y - dir * tabSize * 0.3,
+                midX - neckWidth, y - dir * tabSize * 0.5
+            );
+            ctx.bezierCurveTo(
+                midX - tabSize * 0.8, y - dir * tabSize,
+                midX + tabSize * 0.8, y - dir * tabSize,
+                midX + neckWidth, y - dir * tabSize * 0.5
+            );
+            ctx.bezierCurveTo(
+                midX + neckWidth, y - dir * tabSize * 0.3,
+                midX + neckWidth, y,
+                midX + tabSize, y
+            );
+            ctx.lineTo(x + width, y);
+        }
+
+        // Right edge
+        if (edges.right === 0) {
+            ctx.lineTo(x + width, y + height);
+        } else {
+            const dir = edges.right;
+            const midY = y + height / 2;
+            ctx.lineTo(x + width, midY - tabSize);
+            ctx.bezierCurveTo(
+                x + width, midY - neckWidth,
+                x + width + dir * tabSize * 0.3, midY - neckWidth,
+                x + width + dir * tabSize * 0.5, midY - neckWidth
+            );
+            ctx.bezierCurveTo(
+                x + width + dir * tabSize, midY - tabSize * 0.8,
+                x + width + dir * tabSize, midY + tabSize * 0.8,
+                x + width + dir * tabSize * 0.5, midY + neckWidth
+            );
+            ctx.bezierCurveTo(
+                x + width + dir * tabSize * 0.3, midY + neckWidth,
+                x + width, midY + neckWidth,
+                x + width, midY + tabSize
+            );
+            ctx.lineTo(x + width, y + height);
+        }
+
+        // Bottom edge (reverse direction)
+        if (edges.bottom === 0) {
+            ctx.lineTo(x, y + height);
+        } else {
+            const dir = edges.bottom;
+            const midX = x + width / 2;
+            ctx.lineTo(midX + tabSize, y + height);
+            ctx.bezierCurveTo(
+                midX + neckWidth, y + height,
+                midX + neckWidth, y + height + dir * tabSize * 0.3,
+                midX + neckWidth, y + height + dir * tabSize * 0.5
+            );
+            ctx.bezierCurveTo(
+                midX + tabSize * 0.8, y + height + dir * tabSize,
+                midX - tabSize * 0.8, y + height + dir * tabSize,
+                midX - neckWidth, y + height + dir * tabSize * 0.5
+            );
+            ctx.bezierCurveTo(
+                midX - neckWidth, y + height + dir * tabSize * 0.3,
+                midX - neckWidth, y + height,
+                midX - tabSize, y + height
+            );
+            ctx.lineTo(x, y + height);
+        }
+
+        // Left edge (reverse direction)
+        if (edges.left === 0) {
+            ctx.lineTo(x, y);
+        } else {
+            const dir = edges.left;
+            const midY = y + height / 2;
+            ctx.lineTo(x, midY + tabSize);
+            ctx.bezierCurveTo(
+                x, midY + neckWidth,
+                x - dir * tabSize * 0.3, midY + neckWidth,
+                x - dir * tabSize * 0.5, midY + neckWidth
+            );
+            ctx.bezierCurveTo(
+                x - dir * tabSize, midY + tabSize * 0.8,
+                x - dir * tabSize, midY - tabSize * 0.8,
+                x - dir * tabSize * 0.5, midY - neckWidth
+            );
+            ctx.bezierCurveTo(
+                x - dir * tabSize * 0.3, midY - neckWidth,
+                x, midY - neckWidth,
+                x, midY - tabSize
+            );
+            ctx.lineTo(x, y);
+        }
+
+        ctx.closePath();
     },
 
     // Drag start

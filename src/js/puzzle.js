@@ -17,6 +17,7 @@ const PuzzleEngine = {
     offsetX: 0,
     offsetY: 0,
     customImageData: null, // Voor eigen afbeelding
+    showPuzzleLines: true, // Show jigsaw lines overlay on puzzle
 
     // Piece configurations: pieceCount -> {rows, cols}
     pieceConfigs: {
@@ -930,6 +931,12 @@ const PuzzleEngine = {
         this.customImageData = null;
     },
 
+    // Set puzzle lines visibility
+    setShowPuzzleLines(show) {
+        this.showPuzzleLines = show;
+        this.redraw();
+    },
+
     // Resize canvas to fit container
     resizeCanvas() {
         const container = this.canvas.parentElement;
@@ -1086,32 +1093,31 @@ const PuzzleEngine = {
         }
     },
 
-    // Draw background grid showing where pieces go
+    // Draw background grid showing where pieces go with jigsaw shapes
     drawGrid() {
-        this.ctx.strokeStyle = 'rgba(200, 200, 200, 0.5)';
-        this.ctx.lineWidth = 1;
-
-        // Draw grid lines
-        for (let col = 0; col <= this.cols; col++) {
-            const x = col * this.pieceWidth;
-            this.ctx.beginPath();
-            this.ctx.moveTo(x, 0);
-            this.ctx.lineTo(x, this.puzzleHeight);
-            this.ctx.stroke();
-        }
-
-        for (let row = 0; row <= this.rows; row++) {
-            const y = row * this.pieceHeight;
-            this.ctx.beginPath();
-            this.ctx.moveTo(0, y);
-            this.ctx.lineTo(this.puzzleWidth, y);
-            this.ctx.stroke();
-        }
-
-        // Draw puzzle outline
+        // Draw puzzle outline first
         this.ctx.strokeStyle = '#666';
         this.ctx.lineWidth = 3;
         this.ctx.strokeRect(0, 0, this.puzzleWidth, this.puzzleHeight);
+
+        // Only draw jigsaw lines if enabled
+        if (!this.showPuzzleLines) return;
+
+        // Draw jigsaw piece outlines for each piece position
+        this.ctx.strokeStyle = 'rgba(100, 100, 100, 0.4)';
+        this.ctx.lineWidth = 1.5;
+
+        for (let pieceIndex = 0; pieceIndex < this.totalPieces; pieceIndex++) {
+            // Skip if piece is already placed
+            if (this.placedPieces.includes(pieceIndex)) continue;
+
+            const pos = this.getPiecePosition(pieceIndex);
+            const edges = this.getEdgePattern(pieceIndex);
+
+            // Draw piece outline
+            this.createPiecePath(pos.x, pos.y, this.pieceWidth, this.pieceHeight, edges);
+            this.ctx.stroke();
+        }
     },
 
     // Generate edge pattern for a piece (determines tab direction)
@@ -1242,86 +1248,65 @@ const PuzzleEngine = {
         this.ctx.closePath();
     },
 
-    // Draw a single piece (simple rectangle with jigsaw border)
+    // Draw a single piece with jigsaw shape clipping
     drawPiece(pieceIndex) {
         if (!this.puzzleImage) return;
 
         const pos = this.getPiecePosition(pieceIndex);
         const sourceScale = 2; // Because we create image at 2x resolution
+        const edges = this.getEdgePattern(pieceIndex);
+        const tabSize = Math.min(this.pieceWidth, this.pieceHeight) * 0.18;
 
-        // Draw the piece from the puzzle image
+        this.ctx.save();
+
+        // Create clipping path with jigsaw shape
+        this.createPiecePath(pos.x, pos.y, this.pieceWidth, this.pieceHeight, edges);
+        this.ctx.clip();
+
+        // Draw the piece from the puzzle image (slightly larger to account for tabs)
+        const margin = tabSize;
         this.ctx.drawImage(
             this.puzzleImage,
-            pos.x * sourceScale, pos.y * sourceScale,
-            this.pieceWidth * sourceScale, this.pieceHeight * sourceScale,
-            pos.x, pos.y,
-            this.pieceWidth, this.pieceHeight
+            (pos.x - margin) * sourceScale, (pos.y - margin) * sourceScale,
+            (this.pieceWidth + margin * 2) * sourceScale, (this.pieceHeight + margin * 2) * sourceScale,
+            pos.x - margin, pos.y - margin,
+            this.pieceWidth + margin * 2, this.pieceHeight + margin * 2
         );
 
+        this.ctx.restore();
+
         // Draw jigsaw-style border for visual effect
-        this.drawPieceBorder(pos.x, pos.y, this.pieceWidth, this.pieceHeight, pieceIndex);
+        this.drawPieceBorder(pos.x, pos.y, this.pieceWidth, this.pieceHeight, edges);
     },
 
-    // Draw jigsaw piece border (visual effect only)
-    drawPieceBorder(x, y, width, height, pieceIndex) {
-        const col = pieceIndex % this.cols;
-        const row = Math.floor(pieceIndex / this.cols);
-
+    // Draw jigsaw piece border using edge pattern
+    drawPieceBorder(x, y, width, height, edges) {
         this.ctx.save();
         this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
         this.ctx.lineWidth = 2;
 
-        // Draw the border with tabs/notches for jigsaw effect
-        this.ctx.beginPath();
-
-        // Top edge
-        this.ctx.moveTo(x, y);
-        if (row > 0) {
-            this.ctx.lineTo(x + width * 0.35, y);
-            this.ctx.arc(x + width * 0.5, y, width * 0.08, Math.PI, 0, pieceIndex % 2 === 0);
-            this.ctx.lineTo(x + width, y);
-        } else {
-            this.ctx.lineTo(x + width, y);
-        }
-
-        // Right edge
-        if (col < this.cols - 1) {
-            this.ctx.lineTo(x + width, y + height * 0.35);
-            this.ctx.arc(x + width, y + height * 0.5, height * 0.08, -Math.PI/2, Math.PI/2, (pieceIndex + 1) % 2 === 0);
-            this.ctx.lineTo(x + width, y + height);
-        } else {
-            this.ctx.lineTo(x + width, y + height);
-        }
-
-        // Bottom edge
-        if (row < this.rows - 1) {
-            this.ctx.lineTo(x + width * 0.65, y + height);
-            this.ctx.arc(x + width * 0.5, y + height, width * 0.08, 0, Math.PI, (pieceIndex + row) % 2 === 0);
-            this.ctx.lineTo(x, y + height);
-        } else {
-            this.ctx.lineTo(x, y + height);
-        }
-
-        // Left edge
-        if (col > 0) {
-            this.ctx.lineTo(x, y + height * 0.65);
-            this.ctx.arc(x, y + height * 0.5, height * 0.08, Math.PI/2, -Math.PI/2, (pieceIndex + col) % 2 === 0);
-            this.ctx.lineTo(x, y);
-        } else {
-            this.ctx.lineTo(x, y);
-        }
-
+        // Use the same path as clipping for border
+        this.createPiecePath(x, y, width, height, edges);
         this.ctx.stroke();
+
         this.ctx.restore();
     },
 
-    // Draw the animating piece
+    // Draw the animating piece with jigsaw shape
     drawAnimatingPiece() {
         if (!this.animatingPiece || !this.puzzleImage) return;
 
         const { pieceIndex, currentX, currentY, scale, opacity } = this.animatingPiece;
         const sourceScale = 2;
         const pos = this.getPiecePosition(pieceIndex);
+        const edges = this.getEdgePattern(pieceIndex);
+        const tabSize = Math.min(this.pieceWidth, this.pieceHeight) * 0.18;
+
+        // Calculate scaled dimensions and position
+        const drawWidth = this.pieceWidth * scale;
+        const drawHeight = this.pieceHeight * scale;
+        const drawX = currentX - drawWidth / 2;
+        const drawY = currentY - drawHeight / 2;
 
         this.ctx.save();
         this.ctx.globalAlpha = opacity;
@@ -1331,29 +1316,40 @@ const PuzzleEngine = {
         this.ctx.shadowBlur = 20;
         this.ctx.shadowOffsetY = 8;
 
-        // Calculate scaled dimensions and position
-        const drawWidth = this.pieceWidth * scale;
-        const drawHeight = this.pieceHeight * scale;
-        const drawX = currentX - drawWidth / 2;
-        const drawY = currentY - drawHeight / 2;
+        // Create scaled clipping path
+        this.ctx.translate(drawX, drawY);
+        this.ctx.scale(scale, scale);
+        this.ctx.translate(-pos.x, -pos.y);
 
-        // Draw the piece
+        // Create jigsaw clipping path
+        this.createPiecePath(pos.x, pos.y, this.pieceWidth, this.pieceHeight, edges);
+        this.ctx.clip();
+
+        // Draw the piece from the puzzle image
+        const margin = tabSize;
         this.ctx.drawImage(
             this.puzzleImage,
-            pos.x * sourceScale, pos.y * sourceScale,
-            this.pieceWidth * sourceScale, this.pieceHeight * sourceScale,
-            drawX, drawY,
-            drawWidth, drawHeight
+            (pos.x - margin) * sourceScale, (pos.y - margin) * sourceScale,
+            (this.pieceWidth + margin * 2) * sourceScale, (this.pieceHeight + margin * 2) * sourceScale,
+            pos.x - margin, pos.y - margin,
+            this.pieceWidth + margin * 2, this.pieceHeight + margin * 2
         );
 
         this.ctx.restore();
 
-        // Draw border
+        // Draw border with jigsaw shape
         this.ctx.save();
         this.ctx.globalAlpha = opacity;
         this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
-        this.ctx.lineWidth = 3;
-        this.ctx.strokeRect(drawX, drawY, drawWidth, drawHeight);
+        this.ctx.lineWidth = 3 / scale;
+
+        this.ctx.translate(drawX, drawY);
+        this.ctx.scale(scale, scale);
+        this.ctx.translate(-pos.x, -pos.y);
+
+        this.createPiecePath(pos.x, pos.y, this.pieceWidth, this.pieceHeight, edges);
+        this.ctx.stroke();
+
         this.ctx.restore();
     },
 
