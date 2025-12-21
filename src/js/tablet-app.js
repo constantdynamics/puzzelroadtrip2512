@@ -44,6 +44,11 @@ const TabletApp = {
         this.updateUI();
         this.updateVehicle(this.state.vehicle || '🏍️');
 
+        // Apply saved background color
+        if (this.state.bgColor) {
+            this.setBackgroundColor(this.state.bgColor);
+        }
+
         // Start timer
         TimerManager.start();
 
@@ -167,7 +172,34 @@ const TabletApp = {
             this.loadCustomImage(settings.customImage);
         }
 
+        if (settings.bgColor) {
+            this.setBackgroundColor(settings.bgColor);
+        }
+
         this.saveState();
+    },
+
+    // Background color presets
+    bgColorPresets: {
+        ocean: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        sunset: 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)',
+        forest: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
+        candy: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+        sky: 'linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%)',
+        berry: 'linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%)',
+        sunshine: 'linear-gradient(135deg, #F7971E 0%, #FFD200 100%)',
+        mint: 'linear-gradient(135deg, #00b09b 0%, #96c93d 100%)',
+        flamingo: 'linear-gradient(135deg, #fc67fa 0%, #f4c4f3 100%)',
+        night: 'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)'
+    },
+
+    // Set background color
+    setBackgroundColor(colorName) {
+        const gradient = this.bgColorPresets[colorName];
+        if (gradient) {
+            document.body.style.background = gradient;
+            this.state.bgColor = colorName;
+        }
     },
 
     // Load a custom image as puzzle
@@ -438,6 +470,15 @@ const TabletApp = {
         if (!vehicleEl) return;
 
         const timerState = TimerManager.getState();
+
+        // Don't update position if paused
+        if (timerState.isPaused) {
+            vehicleEl.classList.add('paused');
+            return;
+        }
+
+        vehicleEl.classList.remove('paused');
+
         const totalTime = this.state.timerInterval * 60;
         const elapsed = totalTime - timerState.remaining;
         const progress = Math.min(elapsed / totalTime, 1);
@@ -449,12 +490,6 @@ const TabletApp = {
         const currentPos = startPos + (travelDistance * progress);
 
         vehicleEl.style.left = `${currentPos}px`;
-
-        if (timerState.isPaused) {
-            vehicleEl.classList.add('paused');
-        } else {
-            vehicleEl.classList.remove('paused');
-        }
     },
 
     // Save state

@@ -245,17 +245,23 @@
             font-size: 28px;
         }
 
-        /* Navigation Buttons */
+        /* Navigation Buttons - 2 column grid */
+        .nav-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
         .nav-btn {
             width: 100%;
-            padding: 15px;
-            font-size: 16px;
+            padding: 14px 10px;
+            font-size: 13px;
             font-weight: 600;
             border: none;
             border-radius: 12px;
             color: white;
             cursor: pointer;
-            margin-bottom: 10px;
         }
 
         .nav-btn:active {
@@ -266,6 +272,7 @@
         .nav-btn.settings { background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%); }
         .nav-btn.puzzles { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
         .nav-btn.photo { background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%); }
+        .nav-btn.queue { background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%); }
 
         /* Photo Screen */
         .photo-screen {
@@ -868,6 +875,31 @@
             background: white;
         }
 
+        /* Color Grid */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+        }
+
+        .color-btn {
+            width: 100%;
+            aspect-ratio: 1;
+            border: 3px solid transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .color-btn.selected {
+            border-color: #333;
+            transform: scale(1.1);
+        }
+
+        .color-btn:active {
+            transform: scale(0.95);
+        }
+
         /* Toggle Switch */
         .setting-row {
             display: flex;
@@ -1236,7 +1268,6 @@
             <!-- Puzzle Preview -->
             <div class="puzzle-preview" id="puzzle-preview">
                 <div class="puzzle-preview-header">
-                    <span class="puzzle-name" id="preview-puzzle-name">🦁 Dierentuin</span>
                     <span id="preview-progress-text">0/40</span>
                 </div>
                 <img class="puzzle-preview-img" id="preview-img" src="" alt="Puzzel preview">
@@ -1248,14 +1279,17 @@
 
             <button class="piece-btn" id="piece-btn">
                 <span class="emoji">🧩</span>
-                Stukje Geven!
+                Geef een stukje
             </button>
 
-            <button class="nav-btn tasks" id="show-tasks-btn">📋 Taken Kiezen</button>
-            <button class="nav-btn settings" id="show-settings-btn">⚙️ Instellingen</button>
-            <button class="nav-btn puzzles" id="show-puzzles-btn">🧩 Andere Puzzel</button>
-            <button class="nav-btn photo" id="show-photo-btn">📷 Eigen Foto</button>
-            <button class="nav-btn queue" id="show-queue-btn">📋 Wachtrij</button>
+            <div class="nav-grid">
+                <button class="nav-btn tasks" id="show-tasks-btn">📋 Bucketlist</button>
+                <button class="nav-btn puzzles" id="show-puzzles-btn">🧩 Puzzel veranderen</button>
+                <button class="nav-btn photo" id="show-photo-btn">📷 Zelf een puzzel maken</button>
+                <button class="nav-btn queue" id="show-queue-btn">📋 Wachtrij</button>
+            </div>
+
+            <button class="nav-btn settings" id="show-settings-btn" style="margin-bottom:10px;">⚙️ Instellingen</button>
 
             <button class="disconnect-btn" id="disconnect-btn">Verbinding verbreken</button>
         </div>
@@ -1348,28 +1382,29 @@
 
             <div class="setting-item">
                 <button class="action-btn" id="manage-tasks-btn" style="width:100%;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;">
-                    ✏️ Taken beheren
+                    ✏️ Bucketlist beheren
                 </button>
-            </div>
-
-            <div class="setting-item">
-                <div class="setting-row">
-                    <span>🔊 Geluid</span>
-                    <label class="switch">
-                        <input type="checkbox" id="sound-toggle-check" checked>
-                        <span class="slider-toggle"></span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="setting-item" id="volume-setting">
-                <label>🔈 Volume: <span id="volume-value">50</span>%</label>
-                <input type="range" id="volume-slider" min="0" max="100" value="50">
             </div>
 
             <div class="setting-item">
                 <label>⏱️ Minuten per stukje: <span id="timer-value">15</span></label>
                 <input type="range" id="timer-slider" min="1" max="60" value="15">
+            </div>
+
+            <div class="setting-item">
+                <label>🎨 Achtergrondkleur tablet:</label>
+                <div class="color-grid" id="color-grid">
+                    <button class="color-btn selected" data-color="ocean" style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)"></button>
+                    <button class="color-btn" data-color="sunset" style="background:linear-gradient(135deg,#FF6B6B 0%,#FF8E53 100%)"></button>
+                    <button class="color-btn" data-color="forest" style="background:linear-gradient(135deg,#11998e 0%,#38ef7d 100%)"></button>
+                    <button class="color-btn" data-color="candy" style="background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%)"></button>
+                    <button class="color-btn" data-color="sky" style="background:linear-gradient(135deg,#4ECDC4 0%,#44A08D 100%)"></button>
+                    <button class="color-btn" data-color="berry" style="background:linear-gradient(135deg,#8E2DE2 0%,#4A00E0 100%)"></button>
+                    <button class="color-btn" data-color="sunshine" style="background:linear-gradient(135deg,#F7971E 0%,#FFD200 100%)"></button>
+                    <button class="color-btn" data-color="mint" style="background:linear-gradient(135deg,#00b09b 0%,#96c93d 100%)"></button>
+                    <button class="color-btn" data-color="flamingo" style="background:linear-gradient(135deg,#fc67fa 0%,#f4c4f3 100%)"></button>
+                    <button class="color-btn" data-color="night" style="background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%)"></button>
+                </div>
             </div>
 
             <div class="setting-item">
@@ -1412,7 +1447,7 @@
 
         <!-- Tasks Screen -->
         <div class="card tasks-screen" id="tasks-screen">
-            <h2>📋 Kies een Taak</h2>
+            <h2>📋 Bucketlist</h2>
             <p class="subtitle">Tik op een taak als je kind het heeft gedaan</p>
 
             <div class="task-categories" id="task-categories">
@@ -1448,12 +1483,15 @@
                 <h3>➕ Nieuwe Taak</h3>
                 <input type="text" id="new-task-input" placeholder="Bijv: 🎈 Een ballon gezien" maxlength="50">
                 <select id="new-task-category" style="width:100%;padding:12px;border:2px solid #ddd;border-radius:10px;font-size:14px;margin-bottom:15px;">
-                    <option value="🎵 Zingen & Geluid">🎵 Zingen & Geluid</option>
-                    <option value="👀 Kijken & Zoeken">👀 Kijken & Zoeken</option>
-                    <option value="🤸 Beweging">🤸 Beweging</option>
-                    <option value="🔢 Tellen & Leren">🔢 Tellen & Leren</option>
+                    <option value="🎵 Geluiden & Muziek">🎵 Geluiden & Muziek</option>
+                    <option value="👀 Onderweg Spotten">👀 Onderweg Spotten</option>
+                    <option value="🐾 Dieren Spotten">🐾 Dieren Spotten</option>
+                    <option value="🌈 Natuur & Weer">🌈 Natuur & Weer</option>
+                    <option value="🤸 Beweging & Spel">🤸 Beweging & Spel</option>
+                    <option value="🧠 Slim & Leerzaam">🧠 Slim & Leerzaam</option>
                     <option value="🍎 Eten & Drinken">🍎 Eten & Drinken</option>
-                    <option value="😊 Braaf Zijn">😊 Braaf Zijn</option>
+                    <option value="😊 Goed Gedrag">😊 Goed Gedrag</option>
+                    <option value="🏠 Gebouwen Spotten">🏠 Gebouwen Spotten</option>
                 </select>
                 <div class="add-task-buttons">
                     <button class="add-task-cancel" id="cancel-new-task">Annuleren</button>
@@ -1473,49 +1511,80 @@
             <button class="back-btn" id="puzzles-back-btn">← Terug</button>
         </div>
 
-        <div class="version-info">v2.5.0</div>
+        <div class="version-info">v2.8.0</div>
     </div>
 
     <script src="src/js/storage.js"></script>
     <script src="src/js/firebase-config.js"></script>
     <script src="src/js/remote.js"></script>
     <script>
-        // 60+ taken voor 2-jarigen tijdens een autorit
+        // Diverse bucketlist taken per categorie
         const remoteTasks = {
-            "🎵 Zingen & Geluid": [
+            "🎵 Geluiden & Muziek": [
                 "🎵 Een liedje gezongen",
                 "👏 In de handen geklapt",
-                "🐮 Koe-geluid gemaakt (boe!)",
-                "🐷 Varken-geluid gemaakt (knor!)",
-                "🐶 Hond-geluid gemaakt (waf!)",
-                "🐱 Kat-geluid gemaakt (miauw!)",
-                "🦁 Leeuw-geluid gemaakt (roar!)",
-                "🐸 Kikker-geluid gemaakt (kwaak!)",
-                "🐦 Vogel-geluid gemaakt (tjilp!)",
-                "🚗 Auto-geluid gemaakt (broem!)"
+                "🐮 Koe-geluid gemaakt",
+                "🐷 Varken-geluid gemaakt",
+                "🐶 Hond-geluid gemaakt",
+                "🐱 Kat-geluid gemaakt",
+                "🦁 Leeuw-geluid gemaakt",
+                "🐸 Kikker-geluid gemaakt",
+                "🐦 Vogel-geluid gemaakt",
+                "🚗 Auto-geluid gemaakt",
+                "🚂 Trein-geluid gemaakt",
+                "🐝 Bij-geluid gemaakt",
+                "🐍 Slang-geluid gemaakt",
+                "🦆 Eend-geluid gemaakt",
+                "🎤 ABC-liedje gezongen"
             ],
-            "👀 Kijken & Zoeken": [
-                "🚗 Een rode auto gezien",
-                "🚙 Een blauwe auto gezien",
-                "🚕 Een gele auto gezien",
-                "🚚 Een vrachtwagen gezien",
-                "🚌 Een bus gezien",
-                "🚒 Een brandweerauto gezien",
-                "🚑 Een ambulance gezien",
-                "🚜 Een tractor gezien",
-                "🐄 Een koe gezien",
-                "🐑 Een schaap gezien",
-                "🐴 Een paard gezien",
-                "🦆 Een eend gezien",
-                "🐦 Een vogel gezien",
-                "🌳 Een grote boom gezien",
-                "💧 Water gezien (sloot/rivier)",
-                "🌈 Een regenboog gezien",
+            "👀 Onderweg Spotten": [
+                "🚗 Rode auto gezien",
+                "🚙 Blauwe auto gezien",
+                "🚕 Gele auto gezien",
+                "⚪ Witte auto gezien",
+                "⚫ Zwarte auto gezien",
+                "🚚 Vrachtwagen gezien",
+                "🚌 Bus gezien",
+                "🚒 Brandweerauto gezien",
+                "🚑 Ambulance gezien",
+                "🚓 Politieauto gezien",
+                "🚜 Tractor gezien",
+                "🏍️ Motor gezien",
+                "🚲 Fiets gezien",
+                "✈️ Vliegtuig gezien",
+                "🚁 Helikopter gezien",
+                "⛵ Boot gezien"
+            ],
+            "🐾 Dieren Spotten": [
+                "🐄 Koe gezien",
+                "🐑 Schaap gezien",
+                "🐴 Paard gezien",
+                "🐐 Geit gezien",
+                "🐷 Varken gezien",
+                "🦆 Eend gezien",
+                "🐦 Vogel gezien",
+                "🐕 Hond gezien",
+                "🐈 Kat gezien",
+                "🐇 Konijn gezien",
+                "🦢 Zwaan gezien",
+                "🐓 Haan/kip gezien"
+            ],
+            "🌈 Natuur & Weer": [
+                "🌳 Grote boom gezien",
+                "🌲 Dennenboom gezien",
+                "💧 Water gezien",
+                "🌈 Regenboog gezien",
                 "☀️ De zon gezien",
-                "☁️ Een wolk aangewezen"
+                "☁️ Wolk aangewezen",
+                "🌧️ Regen gezien",
+                "🌾 Korenveld gezien",
+                "🌻 Bloemen gezien",
+                "🍂 Herfstbladeren gezien",
+                "🏔️ Heuvels gezien",
+                "🌅 Mooie lucht gezien"
             ],
-            "🤸 Beweging": [
-                "👋 Gezwaaid",
+            "🤸 Beweging & Spel": [
+                "👋 Gezwaaid naar iemand",
                 "👍 Duimpje omhoog gedaan",
                 "✋ High five gegeven",
                 "🦶 Met voetjes gestampt",
@@ -1523,36 +1592,58 @@
                 "👃 Neus aangeraakt",
                 "👂 Oren aangeraakt",
                 "👀 Ogen dichtgedaan",
-                "😛 Tong uitgestoken",
-                "🤗 Knuffel gegeven"
+                "🤗 Knuffel gegeven",
+                "👐 Handen open/dicht",
+                "🙌 Beide handen omhoog",
+                "🤚 Hand opgestoken"
             ],
-            "🔢 Tellen & Leren": [
-                "1️⃣ Tot 3 geteld",
-                "✌️ 2 vingers opgestoken",
+            "🧠 Slim & Leerzaam": [
+                "🔢 Tot 3 geteld",
+                "✌️ 2 vingers laten zien",
                 "🖐️ 5 vingers laten zien",
                 "🔴 Iets roods aangewezen",
                 "🔵 Iets blauws aangewezen",
                 "🟢 Iets groens aangewezen",
                 "🟡 Iets geels aangewezen",
-                "⚫ Iets zwarts aangewezen",
-                "⚪ Iets wits aangewezen"
+                "⬛ Iets zwarts aangewezen",
+                "⬜ Iets wits aangewezen",
+                "🟠 Iets oranje aangewezen",
+                "🟣 Iets paars aangewezen",
+                "🔷 Een vorm genoemd"
             ],
             "🍎 Eten & Drinken": [
-                "🧃 Wat gedronken",
-                "🍪 Een koekje gegeten",
+                "🧃 Lekker gedronken",
+                "🍪 Koekje gegeten",
                 "🍎 Fruit gegeten",
                 "🥪 Broodje gegeten",
-                "🍌 Banaan gegeten"
+                "🍌 Banaan gegeten",
+                "🥕 Wortel gegeten",
+                "🧀 Kaas gegeten",
+                "🍇 Druiven gegeten"
             ],
-            "😊 Braaf Zijn": [
+            "😊 Goed Gedrag": [
                 "😊 Lief gelachen",
-                "🤫 Even stil geweest",
+                "🤫 5 minuten stil geweest",
                 "🪑 Rustig blijven zitten",
-                "👶 Lief geweest",
-                "😴 Even geslapen",
+                "👶 Heel lief geweest",
+                "😴 Even gerust",
                 "📖 Naar een boekje gekeken",
                 "🧸 Met knuffel gespeeld",
-                "🎨 Getekend/gekleurd"
+                "🎨 Getekend of gekleurd",
+                "🎧 Rustig naar muziek geluisterd",
+                "🧩 Puzzel opgelost"
+            ],
+            "🏠 Gebouwen Spotten": [
+                "⛪ Kerk gezien",
+                "🏫 School gezien",
+                "🏥 Ziekenhuis gezien",
+                "🏪 Winkel gezien",
+                "⛽ Tankstation gezien",
+                "🏨 Hotel gezien",
+                "🏭 Fabriek gezien",
+                "🌉 Brug overgestoken",
+                "🚏 Bushalte gezien",
+                "🚉 Treinstation gezien"
             ]
         };
 
@@ -1848,21 +1939,6 @@
         // === SETTINGS STATE (temporary until saved) ===
         let pendingSettings = {};
 
-        // Sound toggle
-        document.getElementById('sound-toggle-check').addEventListener('change', (e) => {
-            soundEnabled = e.target.checked;
-            pendingSettings.soundEnabled = soundEnabled;
-            // Show/hide volume slider based on sound enabled
-            document.getElementById('volume-setting').style.opacity = soundEnabled ? '1' : '0.5';
-        });
-
-        // Volume slider
-        document.getElementById('volume-slider').addEventListener('input', (e) => {
-            const value = e.target.value;
-            document.getElementById('volume-value').textContent = value;
-            pendingSettings.volume = parseInt(value);
-        });
-
         // Timer slider
         document.getElementById('timer-slider').addEventListener('input', (e) => {
             const value = e.target.value;
@@ -1881,6 +1957,15 @@
                 document.querySelectorAll('.vehicle-btn').forEach(b => b.classList.remove('selected'));
                 btn.classList.add('selected');
                 pendingSettings.vehicle = btn.dataset.vehicle;
+            });
+        });
+
+        // Color grid for background
+        document.querySelectorAll('.color-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                pendingSettings.bgColor = btn.dataset.color;
             });
         });
 
@@ -1953,11 +2038,6 @@
         // Update the preview display
         function updatePuzzlePreview(state) {
             const { puzzleIndex, piecesPlaced, totalPieces, isComplete, imageData } = state;
-
-            // Update puzzle name
-            const puzzle = puzzleList[puzzleIndex] || puzzleList[0];
-            document.getElementById('preview-puzzle-name').textContent =
-                `${puzzle.emoji} ${puzzle.name}`;
 
             // Update progress text
             document.getElementById('preview-progress-text').textContent =
@@ -2480,14 +2560,14 @@
         // Default tasks per age group (which tasks are enabled)
         const agePresets = {
             1: {
-                // 1 year: Simple sounds, basic observation, simple movement
+                // 1 year: Simple sounds, basic movement, easy spotting
                 enabled: [
-                    "🎵 Een liedje gezongen", "👏 In de handen geklapt", "🐮 Koe-geluid gemaakt (boe!)",
-                    "🐶 Hond-geluid gemaakt (waf!)", "🐱 Kat-geluid gemaakt (miauw!)",
-                    "🚗 Een rode auto gezien", "🚙 Een blauwe auto gezien", "🐄 Een koe gezien",
-                    "👋 Gezwaaid", "👍 Duimpje omhoog gedaan", "✋ High five gegeven",
-                    "🧃 Wat gedronken", "🍪 Een koekje gegeten", "🍌 Banaan gegeten",
-                    "😊 Lief gelachen", "😴 Even geslapen", "🧸 Met knuffel gespeeld"
+                    "🎵 Een liedje gezongen", "👏 In de handen geklapt", "🐮 Koe-geluid gemaakt",
+                    "🐶 Hond-geluid gemaakt", "🐱 Kat-geluid gemaakt", "🦆 Eend-geluid gemaakt",
+                    "🚗 Rode auto gezien", "🚙 Blauwe auto gezien", "🐄 Koe gezien", "🐑 Schaap gezien",
+                    "👋 Gezwaaid naar iemand", "👍 Duimpje omhoog gedaan", "✋ High five gegeven", "🤗 Knuffel gegeven",
+                    "🧃 Lekker gedronken", "🍪 Koekje gegeten", "🍌 Banaan gegeten",
+                    "😊 Lief gelachen", "😴 Even gerust", "🧸 Met knuffel gespeeld"
                 ]
             },
             2: {
@@ -2495,17 +2575,18 @@
                 enabled: null // null means all enabled
             },
             3: {
-                // 3 years: Add counting, more complex observation
+                // 3 years: Add counting, colors, shapes
                 enabled: null,
                 extra: [
-                    "🔢 Tot 5 geteld", "🎨 Een vorm benoemd (cirkel, vierkant)"
+                    "🔢 Tot 5 geteld", "🔷 Een vorm genoemd", "🎨 3 kleuren opgenoemd"
                 ]
             },
             4: {
                 // 4 years: More challenge
                 enabled: null,
                 extra: [
-                    "📖 Een letter herkend", "🔢 Tot 10 geteld", "🎵 Een rijmpje opgezegd"
+                    "📖 Een letter herkend", "🔢 Tot 10 geteld", "🎵 Een rijmpje opgezegd",
+                    "🔤 Eigen naam gespeld"
                 ]
             },
             5: {
@@ -2513,7 +2594,8 @@
                 enabled: null,
                 extra: [
                     "📖 Een woord gelezen", "🔢 Tot 20 geteld", "🧮 Een simpele som gemaakt",
-                    "🗣️ Een verhaal verteld", "🎯 Iets in een bepaalde kleur gevonden"
+                    "🗣️ Een verhaal verteld", "🎯 Alle kleuren van de regenboog genoemd",
+                    "📝 Iets opgeschreven"
                 ]
             }
         };
