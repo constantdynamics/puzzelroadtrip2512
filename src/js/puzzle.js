@@ -1171,73 +1171,61 @@ const PuzzleEngine = {
         }
     },
 
-    // Unique shapes: each piece has a different shape based on its index
+    // Seeded random number generator for consistent shapes per piece
+    seededRandom(seed) {
+        const x = Math.sin(seed * 9999) * 10000;
+        return x - Math.floor(x);
+    },
+
+    // Unique shapes: each piece has a truly unique procedural blob shape
     createUniqueShapePath(x, y, width, height, edges) {
         const pieceIndex = edges.pieceIndex || 0;
-        const shapes = ['circle', 'rounded', 'hexagon', 'diamond', 'oval', 'squircle'];
-        const shapeType = shapes[pieceIndex % shapes.length];
-
         const cx = x + width / 2;
         const cy = y + height / 2;
-        const radius = Math.min(width, height) * 0.45;
+        const baseRadius = Math.min(width, height) * 0.42;
 
+        // Generate unique parameters for this piece using seeded random
+        const seed = pieceIndex * 137 + 42; // Different seed per piece
+        const numPoints = 5 + Math.floor(this.seededRandom(seed) * 6); // 5-10 points
+        const angleOffset = this.seededRandom(seed + 1) * Math.PI * 2;
+        const wobble = 0.15 + this.seededRandom(seed + 2) * 0.25; // How much radius varies
+
+        // Generate control points for unique blob shape
+        const points = [];
+        for (let i = 0; i < numPoints; i++) {
+            const angle = angleOffset + (i / numPoints) * Math.PI * 2;
+            // Each point has unique radius variation based on piece index and point index
+            const radiusVar = 1 + (this.seededRandom(seed + i * 17 + 100) - 0.5) * wobble * 2;
+            const r = baseRadius * radiusVar;
+            points.push({
+                x: cx + Math.cos(angle) * r,
+                y: cy + Math.sin(angle) * r
+            });
+        }
+
+        // Draw smooth blob using bezier curves through points
         this.ctx.beginPath();
 
-        switch (shapeType) {
-            case 'circle':
-                this.ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-                break;
+        // Calculate control points for smooth curve
+        const tension = 0.3 + this.seededRandom(seed + 50) * 0.3; // Curve smoothness varies per piece
 
-            case 'rounded':
-                // Rounded rectangle
-                const r = Math.min(width, height) * 0.2;
-                this.ctx.moveTo(x + r, y);
-                this.ctx.lineTo(x + width - r, y);
-                this.ctx.arcTo(x + width, y, x + width, y + r, r);
-                this.ctx.lineTo(x + width, y + height - r);
-                this.ctx.arcTo(x + width, y + height, x + width - r, y + height, r);
-                this.ctx.lineTo(x + r, y + height);
-                this.ctx.arcTo(x, y + height, x, y + height - r, r);
-                this.ctx.lineTo(x, y + r);
-                this.ctx.arcTo(x, y, x + r, y, r);
-                break;
+        for (let i = 0; i < numPoints; i++) {
+            const p0 = points[(i - 1 + numPoints) % numPoints];
+            const p1 = points[i];
+            const p2 = points[(i + 1) % numPoints];
+            const p3 = points[(i + 2) % numPoints];
 
-            case 'hexagon':
-                for (let i = 0; i < 6; i++) {
-                    const angle = (i * Math.PI / 3) - Math.PI / 2;
-                    const px = cx + radius * Math.cos(angle);
-                    const py = cy + radius * Math.sin(angle);
-                    if (i === 0) this.ctx.moveTo(px, py);
-                    else this.ctx.lineTo(px, py);
-                }
-                break;
+            if (i === 0) {
+                this.ctx.moveTo(p1.x, p1.y);
+            }
 
-            case 'diamond':
-                this.ctx.moveTo(cx, y + height * 0.05);
-                this.ctx.lineTo(x + width * 0.95, cy);
-                this.ctx.lineTo(cx, y + height * 0.95);
-                this.ctx.lineTo(x + width * 0.05, cy);
-                break;
+            // Catmull-Rom to Bezier conversion for smooth curves
+            const cp1x = p1.x + (p2.x - p0.x) * tension;
+            const cp1y = p1.y + (p2.y - p0.y) * tension;
+            const cp2x = p2.x - (p3.x - p1.x) * tension;
+            const cp2y = p2.y - (p3.y - p1.y) * tension;
 
-            case 'oval':
-                this.ctx.ellipse(cx, cy, width * 0.45, height * 0.35, 0, 0, Math.PI * 2);
-                break;
-
-            case 'squircle':
-                // Superellipse / squircle shape
-                const n = 4; // roundness
-                const a = width * 0.45;
-                const b = height * 0.45;
-                for (let i = 0; i <= 100; i++) {
-                    const t = (i / 100) * Math.PI * 2;
-                    const cosT = Math.cos(t);
-                    const sinT = Math.sin(t);
-                    const px = cx + a * Math.sign(cosT) * Math.pow(Math.abs(cosT), 2/n);
-                    const py = cy + b * Math.sign(sinT) * Math.pow(Math.abs(sinT), 2/n);
-                    if (i === 0) this.ctx.moveTo(px, py);
-                    else this.ctx.lineTo(px, py);
-                }
-                break;
+            this.ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
         }
 
         this.ctx.closePath();

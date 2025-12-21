@@ -444,71 +444,57 @@ const TabletApp = {
         }
     },
 
-    // Unique shapes path for preview
+    // Seeded random for consistent shapes (same as PuzzleEngine)
+    seededRandom(seed) {
+        const x = Math.sin(seed * 9999) * 10000;
+        return x - Math.floor(x);
+    },
+
+    // Unique shapes path for preview - procedural blob matching PuzzleEngine
     createUniqueShapePathForPreview(ctx, x, y, width, height, edges) {
         const pieceIndex = edges.pieceIndex || 0;
-        const shapes = ['circle', 'rounded', 'hexagon', 'diamond', 'oval', 'squircle'];
-        const shapeType = shapes[pieceIndex % shapes.length];
-
         const cx = x + width / 2;
         const cy = y + height / 2;
-        const radius = Math.min(width, height) * 0.45;
+        const baseRadius = Math.min(width, height) * 0.42;
 
+        // Same seed calculation as PuzzleEngine for consistency
+        const seed = pieceIndex * 137 + 42;
+        const numPoints = 5 + Math.floor(this.seededRandom(seed) * 6);
+        const angleOffset = this.seededRandom(seed + 1) * Math.PI * 2;
+        const wobble = 0.15 + this.seededRandom(seed + 2) * 0.25;
+
+        // Generate control points
+        const points = [];
+        for (let i = 0; i < numPoints; i++) {
+            const angle = angleOffset + (i / numPoints) * Math.PI * 2;
+            const radiusVar = 1 + (this.seededRandom(seed + i * 17 + 100) - 0.5) * wobble * 2;
+            const r = baseRadius * radiusVar;
+            points.push({
+                x: cx + Math.cos(angle) * r,
+                y: cy + Math.sin(angle) * r
+            });
+        }
+
+        // Draw smooth blob
         ctx.beginPath();
+        const tension = 0.3 + this.seededRandom(seed + 50) * 0.3;
 
-        switch (shapeType) {
-            case 'circle':
-                ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-                break;
+        for (let i = 0; i < numPoints; i++) {
+            const p0 = points[(i - 1 + numPoints) % numPoints];
+            const p1 = points[i];
+            const p2 = points[(i + 1) % numPoints];
+            const p3 = points[(i + 2) % numPoints];
 
-            case 'rounded':
-                const r = Math.min(width, height) * 0.2;
-                ctx.moveTo(x + r, y);
-                ctx.lineTo(x + width - r, y);
-                ctx.arcTo(x + width, y, x + width, y + r, r);
-                ctx.lineTo(x + width, y + height - r);
-                ctx.arcTo(x + width, y + height, x + width - r, y + height, r);
-                ctx.lineTo(x + r, y + height);
-                ctx.arcTo(x, y + height, x, y + height - r, r);
-                ctx.lineTo(x, y + r);
-                ctx.arcTo(x, y, x + r, y, r);
-                break;
+            if (i === 0) {
+                ctx.moveTo(p1.x, p1.y);
+            }
 
-            case 'hexagon':
-                for (let i = 0; i < 6; i++) {
-                    const angle = (i * Math.PI / 3) - Math.PI / 2;
-                    const px = cx + radius * Math.cos(angle);
-                    const py = cy + radius * Math.sin(angle);
-                    if (i === 0) ctx.moveTo(px, py);
-                    else ctx.lineTo(px, py);
-                }
-                break;
+            const cp1x = p1.x + (p2.x - p0.x) * tension;
+            const cp1y = p1.y + (p2.y - p0.y) * tension;
+            const cp2x = p2.x - (p3.x - p1.x) * tension;
+            const cp2y = p2.y - (p3.y - p1.y) * tension;
 
-            case 'diamond':
-                ctx.moveTo(cx, y + height * 0.05);
-                ctx.lineTo(x + width * 0.95, cy);
-                ctx.lineTo(cx, y + height * 0.95);
-                ctx.lineTo(x + width * 0.05, cy);
-                break;
-
-            case 'oval':
-                ctx.ellipse(cx, cy, width * 0.45, height * 0.35, 0, 0, Math.PI * 2);
-                break;
-
-            case 'squircle':
-                const n = 4;
-                const a = width * 0.45;
-                const b = height * 0.45;
-                for (let i = 0; i <= 100; i++) {
-                    const t = (i / 100) * Math.PI * 2;
-                    const cosT = Math.cos(t);
-                    const sinT = Math.sin(t);
-                    const px = cx + a * Math.sign(cosT) * Math.pow(Math.abs(cosT), 2/n);
-                    const py = cy + b * Math.sign(sinT) * Math.pow(Math.abs(sinT), 2/n);
-                    if (i === 0) ctx.moveTo(px, py);
-                    else ctx.lineTo(px, py);
-                }
-                break;
+            ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
         }
 
         ctx.closePath();
