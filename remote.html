@@ -245,34 +245,64 @@
             font-size: 28px;
         }
 
-        /* Navigation Buttons - 2 column grid */
+        /* Navigation Buttons - Clean unified style */
         .nav-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 12px;
+            gap: 8px;
+            margin-bottom: 10px;
         }
 
         .nav-btn {
             width: 100%;
-            padding: 14px 10px;
+            padding: 14px 8px;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 500;
             border: none;
             border-radius: 12px;
-            color: white;
+            background: #f5f5f5;
+            color: #333;
             cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.15s;
+        }
+
+        .nav-btn .icon {
+            font-size: 22px;
+        }
+
+        .nav-btn .label {
+            font-size: 11px;
+            opacity: 0.8;
         }
 
         .nav-btn:active {
-            transform: scale(0.98);
+            transform: scale(0.97);
+            background: #e8e8e8;
         }
 
-        .nav-btn.tasks { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .nav-btn.settings { background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%); }
-        .nav-btn.puzzles { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-        .nav-btn.photo { background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%); }
-        .nav-btn.queue { background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%); }
+        /* Subtle accent colors - just left border */
+        .nav-btn.primary {
+            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+            color: white;
+        }
+
+        .nav-btn.secondary {
+            border-left: 3px solid #4CAF50;
+        }
+
+        .nav-btn.control {
+            background: #fff;
+            border: 1px solid #ddd;
+        }
+
+        .nav-btn.control.active {
+            background: #fff3e0;
+            border-color: #FF9800;
+        }
 
         /* Photo Screen */
         .photo-screen {
@@ -465,7 +495,6 @@
         }
 
         /* Queue styles */
-        .nav-btn.queue { background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%); }
 
         .queue-screen {
             display: none;
@@ -1270,6 +1299,121 @@
             font-size: 12px;
             color: rgba(255,255,255,0.7);
         }
+
+        /* Tutorial/Onboarding Overlay */
+        .tutorial-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .tutorial-overlay.show {
+            display: flex;
+        }
+
+        .tutorial-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 340px;
+            width: 100%;
+            text-align: center;
+            animation: tutorialSlideIn 0.3s ease;
+        }
+
+        @keyframes tutorialSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .tutorial-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+
+        .tutorial-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .tutorial-text {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .tutorial-progress {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 20px;
+        }
+
+        .tutorial-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ddd;
+            transition: all 0.2s;
+        }
+
+        .tutorial-dot.active {
+            background: #4CAF50;
+            transform: scale(1.2);
+        }
+
+        .tutorial-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tutorial-btn {
+            flex: 1;
+            padding: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .tutorial-btn.skip {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .tutorial-btn.next {
+            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+            color: white;
+        }
+
+        .tutorial-btn:active {
+            transform: scale(0.97);
+        }
+
+        .tutorial-highlight {
+            box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.5);
+            position: relative;
+            z-index: 2001;
+        }
     </style>
 </head>
 <body>
@@ -1322,19 +1466,42 @@
                 Geef een stukje
             </button>
 
+            <!-- Main navigation - clean grid -->
             <div class="nav-grid">
-                <button class="nav-btn tasks" id="show-tasks-btn">📋 Bucketlist</button>
-                <button class="nav-btn puzzles" id="show-puzzles-btn">🧩 Puzzel veranderen</button>
-                <button class="nav-btn photo" id="show-photo-btn">📷 Zelf een puzzel maken</button>
-                <button class="nav-btn queue" id="show-queue-btn">📋 Wachtrij</button>
+                <button class="nav-btn secondary" id="show-tasks-btn">
+                    <span class="icon">📋</span>
+                    <span class="label">Bucketlist</span>
+                </button>
+                <button class="nav-btn secondary" id="show-puzzles-btn">
+                    <span class="icon">🧩</span>
+                    <span class="label">Andere puzzel</span>
+                </button>
+                <button class="nav-btn secondary" id="show-photo-btn">
+                    <span class="icon">📷</span>
+                    <span class="label">Eigen foto</span>
+                </button>
+                <button class="nav-btn secondary" id="show-queue-btn">
+                    <span class="icon">📋</span>
+                    <span class="label">Wachtrij</span>
+                </button>
             </div>
 
-            <div class="nav-grid" style="margin-bottom:10px;">
-                <button class="nav-btn" id="pause-btn" style="background:linear-gradient(135deg,#607D8B 0%,#455A64 100%);">⏸️ Pauze</button>
-                <button class="nav-btn" id="reset-btn" style="background:linear-gradient(135deg,#FF5722 0%,#E64A19 100%);">🔄 Opnieuw</button>
+            <!-- Control buttons -->
+            <div class="nav-grid">
+                <button class="nav-btn control" id="pause-btn">
+                    <span class="icon">⏸️</span>
+                    <span class="label">Pauze</span>
+                </button>
+                <button class="nav-btn control" id="reset-btn">
+                    <span class="icon">🔄</span>
+                    <span class="label">Opnieuw</span>
+                </button>
             </div>
 
-            <button class="nav-btn settings" id="show-settings-btn" style="margin-bottom:10px;">⚙️ Instellingen</button>
+            <button class="nav-btn control" id="show-settings-btn" style="width:100%;flex-direction:row;justify-content:center;gap:8px;padding:12px;">
+                <span class="icon" style="font-size:18px;">⚙️</span>
+                <span class="label" style="font-size:13px;opacity:1;">Instellingen</span>
+            </button>
 
             <button class="disconnect-btn" id="disconnect-btn">Verbinding verbreken</button>
         </div>
@@ -1468,9 +1635,17 @@
                 </div>
             </div>
 
-            <div class="setting-row" style="border-bottom:none;padding-top:8px;">
-                <button class="action-btn" id="manage-tasks-btn" style="flex:1;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:10px;">
-                    ✏️ Bucketlist beheren
+            <div class="setting-row">
+                <span class="setting-label">📋 Bucketlist</span>
+                <button class="setting-select" id="manage-tasks-btn" style="background:#4CAF50;color:white;border:none;">
+                    Beheren
+                </button>
+            </div>
+
+            <div class="setting-row" style="border-bottom:none;">
+                <span class="setting-label">❓ Uitleg</span>
+                <button class="setting-select" id="start-tutorial-btn" style="background:#2196F3;color:white;border:none;">
+                    Tutorial
                 </button>
             </div>
 
@@ -1546,7 +1721,23 @@
             <button class="back-btn" id="puzzles-back-btn">← Terug</button>
         </div>
 
-        <div class="version-info">v2.8.1</div>
+        <!-- Tutorial Overlay -->
+        <div class="tutorial-overlay" id="tutorial-overlay">
+            <div class="tutorial-card">
+                <div class="tutorial-icon" id="tutorial-icon">🎮</div>
+                <div class="tutorial-title" id="tutorial-title">Welkom!</div>
+                <div class="tutorial-text" id="tutorial-text">Leer hoe je de puzzel app bedient.</div>
+                <div class="tutorial-progress" id="tutorial-progress">
+                    <!-- Dots will be added by JS -->
+                </div>
+                <div class="tutorial-buttons">
+                    <button class="tutorial-btn skip" id="tutorial-skip">Overslaan</button>
+                    <button class="tutorial-btn next" id="tutorial-next">Volgende</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="version-info">v2.9.0</div>
     </div>
 
     <script src="src/js/storage.js"></script>
@@ -2017,7 +2208,10 @@
         // Pause button (now on main screen)
         document.getElementById('pause-btn').addEventListener('click', async (e) => {
             isPaused = !isPaused;
-            e.target.textContent = isPaused ? '▶️ Doorgaan' : '⏸️ Pauze';
+            const btn = document.getElementById('pause-btn');
+            btn.querySelector('.icon').textContent = isPaused ? '▶️' : '⏸️';
+            btn.querySelector('.label').textContent = isPaused ? 'Doorgaan' : 'Pauze';
+            btn.classList.toggle('active', isPaused);
             await sendSettings({ timerPaused: isPaused });
         });
 
@@ -2984,6 +3178,123 @@
 
         // Initialize age selector on load
         initAgeSelector();
+
+        // === TUTORIAL SYSTEM ===
+        const TUTORIAL_SHOWN_KEY = 'roadtrip_tutorial_shown';
+
+        const tutorialSteps = [
+            {
+                icon: '👋',
+                title: 'Welkom bij Puzzel Remote!',
+                text: 'Met deze app bedien je de puzzel op de tablet van je kind. We leggen even uit hoe alles werkt.'
+            },
+            {
+                icon: '🔗',
+                title: 'Stap 1: Verbinden',
+                text: 'Voer de 4-cijferige code in die je ziet op de tablet. Zo weet de app welke tablet je bedient.'
+            },
+            {
+                icon: '🧩',
+                title: 'Stap 2: Puzzelstukje geven',
+                text: 'De grote oranje knop geeft een puzzelstukje. Je kind verdient stukjes door braaf te zijn of taken te doen!'
+            },
+            {
+                icon: '📋',
+                title: 'Bucketlist',
+                text: 'Tik op taken die je kind heeft gedaan (bijv. "koe gezien"). Leuk om de reis speelser te maken!'
+            },
+            {
+                icon: '🎨',
+                title: 'Puzzels kiezen',
+                text: 'Kies uit 25 dierenpuzzels of upload je eigen foto\'s. Je kunt ook een wachtrij maken.'
+            },
+            {
+                icon: '⚙️',
+                title: 'Instellingen',
+                text: 'Pas de timer aan, kies een voertuig voor de tijdbalk, en stel de achtergrondkleur van de tablet in.'
+            },
+            {
+                icon: '⏸️',
+                title: 'Pauze & Opnieuw',
+                text: 'Pauze stopt de timer (handig bij een stop). "Opnieuw" start de huidige puzzel helemaal opnieuw.'
+            },
+            {
+                icon: '🎉',
+                title: 'Klaar!',
+                text: 'Je weet nu alles! Veel plezier onderweg. Je kunt deze uitleg altijd opnieuw bekijken via Instellingen.'
+            }
+        ];
+
+        let currentTutorialStep = 0;
+
+        function showTutorial() {
+            currentTutorialStep = 0;
+            updateTutorialUI();
+            document.getElementById('tutorial-overlay').classList.add('show');
+        }
+
+        function hideTutorial() {
+            document.getElementById('tutorial-overlay').classList.remove('show');
+            localStorage.setItem(TUTORIAL_SHOWN_KEY, 'true');
+        }
+
+        function updateTutorialUI() {
+            const step = tutorialSteps[currentTutorialStep];
+            document.getElementById('tutorial-icon').textContent = step.icon;
+            document.getElementById('tutorial-title').textContent = step.title;
+            document.getElementById('tutorial-text').textContent = step.text;
+
+            // Update progress dots
+            const progressContainer = document.getElementById('tutorial-progress');
+            progressContainer.innerHTML = tutorialSteps.map((_, i) =>
+                `<div class="tutorial-dot${i === currentTutorialStep ? ' active' : ''}"></div>`
+            ).join('');
+
+            // Update button text
+            const nextBtn = document.getElementById('tutorial-next');
+            if (currentTutorialStep === tutorialSteps.length - 1) {
+                nextBtn.textContent = 'Klaar!';
+            } else {
+                nextBtn.textContent = 'Volgende';
+            }
+        }
+
+        document.getElementById('tutorial-next').addEventListener('click', () => {
+            if (currentTutorialStep < tutorialSteps.length - 1) {
+                currentTutorialStep++;
+                updateTutorialUI();
+            } else {
+                hideTutorial();
+            }
+        });
+
+        document.getElementById('tutorial-skip').addEventListener('click', () => {
+            hideTutorial();
+        });
+
+        // Tutorial button in settings
+        document.getElementById('start-tutorial-btn').addEventListener('click', () => {
+            showScreen(connectedScreen);
+            setTimeout(() => showTutorial(), 300);
+        });
+
+        // Show tutorial on first visit (after connecting)
+        function maybeShowTutorialOnConnect() {
+            if (!localStorage.getItem(TUTORIAL_SHOWN_KEY)) {
+                setTimeout(() => showTutorial(), 500);
+            }
+        }
+
+        // Hook into connect success
+        const originalConnectHandler = connectBtn.onclick;
+        connectBtn.addEventListener('click', async () => {
+            // Wait a bit for connection, then check if we should show tutorial
+            setTimeout(() => {
+                if (connectedScreen.style.display !== 'none') {
+                    maybeShowTutorialOnConnect();
+                }
+            }, 1500);
+        });
 
         // Focus first digit on load
         digits[0].focus();
