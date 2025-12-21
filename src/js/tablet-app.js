@@ -367,6 +367,9 @@ const TabletApp = {
         const pos = PuzzleEngine.getPiecePosition(pieceIndex);
         const edges = PuzzleEngine.getEdgePattern(pieceIndex);
 
+        // Clear canvas first
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
         // Draw the piece from the puzzle image
         if (PuzzleEngine.puzzleImage) {
             const sourceScale = 2; // Puzzle image is 2x resolution
@@ -377,28 +380,28 @@ const TabletApp = {
             // Calculate scale to fit piece with tabs in canvas
             const totalW = pieceW + tabSize * 2;
             const totalH = pieceH + tabSize * 2;
-            const scale = Math.min(canvas.width / totalW, canvas.height / totalH) * 0.9;
+            const scale = Math.min(canvas.width / totalW, canvas.height / totalH) * 0.85;
 
-            // Center the piece
-            const offsetX = (canvas.width - pieceW * scale) / 2;
-            const offsetY = (canvas.height - pieceH * scale) / 2;
+            // Center the piece in canvas
+            const offsetX = canvas.width / 2;
+            const offsetY = canvas.height / 2;
 
             ctx.save();
             ctx.translate(offsetX, offsetY);
             ctx.scale(scale, scale);
 
-            // Create jigsaw clipping path
-            this.createPiecePathForPreview(ctx, 0, 0, pieceW, pieceH, edges);
+            // Create jigsaw clipping path centered at origin
+            this.createPiecePathForPreview(ctx, -pieceW/2, -pieceH/2, pieceW, pieceH, edges);
             ctx.clip();
 
-            // Draw the piece image
+            // Draw the piece image - source from puzzle image at correct position
             const margin = tabSize;
             ctx.drawImage(
                 PuzzleEngine.puzzleImage,
-                (pos.x - margin) * sourceScale, (pos.y - margin) * sourceScale,
-                (pieceW + margin * 2) * sourceScale, (pieceH + margin * 2) * sourceScale,
-                -margin, -margin,
-                pieceW + margin * 2, pieceH + margin * 2
+                pos.x * sourceScale, pos.y * sourceScale,
+                pieceW * sourceScale, pieceH * sourceScale,
+                -pieceW/2, -pieceH/2,
+                pieceW, pieceH
             );
 
             ctx.restore();
@@ -407,9 +410,9 @@ const TabletApp = {
             ctx.save();
             ctx.translate(offsetX, offsetY);
             ctx.scale(scale, scale);
-            ctx.strokeStyle = 'rgba(0, 0, 0, 0.4)';
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
             ctx.lineWidth = 2 / scale;
-            this.createPiecePathForPreview(ctx, 0, 0, pieceW, pieceH, edges);
+            this.createPiecePathForPreview(ctx, -pieceW/2, -pieceH/2, pieceW, pieceH, edges);
             ctx.stroke();
             ctx.restore();
         }
