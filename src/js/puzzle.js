@@ -20,6 +20,7 @@ const PuzzleEngine = {
 
     // Piece configurations: pieceCount -> {rows, cols}
     pieceConfigs: {
+        4: { rows: 2, cols: 2 },
         12: { rows: 3, cols: 4 },
         20: { rows: 4, cols: 5 },
         30: { rows: 5, cols: 6 },

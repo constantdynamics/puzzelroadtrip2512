@@ -5,6 +5,20 @@ const TabletApp = {
     state: null,
     timerAnimationFrame: null,
 
+    // Manual mode state
+    collectedPieces: [], // Pieces available to place
+    draggingPiece: null,
+    dragStartPos: null,
+
+    // Age-based snap tolerance (percentage of piece size)
+    snapTolerances: {
+        1: 0.6,  // 60% tolerance - very forgiving
+        2: 0.5,  // 50% tolerance - forgiving
+        3: 0.4,  // 40% tolerance
+        4: 0.3,  // 30% tolerance
+        5: 0.2   // 20% tolerance - more precise
+    },
+
     async init() {
         console.log('Tablet App initializing...');
 
@@ -176,7 +190,51 @@ const TabletApp = {
             this.setBackgroundColor(settings.bgColor);
         }
 
+        if (settings.puzzleMode !== undefined) {
+            this.setPuzzleMode(settings.puzzleMode);
+        }
+
+        if (settings.age !== undefined) {
+            this.state.age = settings.age;
+            console.log('Age set to:', settings.age, 'snap tolerance:', this.snapTolerances[settings.age]);
+        }
+
         this.saveState();
+    },
+
+    // Set puzzle mode (auto/manual)
+    setPuzzleMode(mode) {
+        this.state.puzzleMode = mode;
+        const tray = document.getElementById('piece-tray');
+
+        if (mode === 'manual') {
+            tray.style.display = 'block';
+            this.setupManualModeEvents();
+            this.renderPieceTray();
+        } else {
+            tray.style.display = 'none';
+        }
+
+        console.log('Puzzle mode set to:', mode);
+    },
+
+    // Setup touch/mouse events for manual mode
+    setupManualModeEvents() {
+        if (this.manualModeSetup) return;
+        this.manualModeSetup = true;
+
+        const puzzleContainer = document.querySelector('.puzzle-container');
+        const trayItems = document.getElementById('piece-tray-items');
+
+        // Touch events for dragging pieces
+        trayItems.addEventListener('touchstart', (e) => this.onPieceDragStart(e), { passive: false });
+        document.addEventListener('touchmove', (e) => this.onPieceDragMove(e), { passive: false });
+        document.addEventListener('touchend', (e) => this.onPieceDragEnd(e));
+
+        // Mouse events for testing on desktop
+        trayItems.addEventListener('mousedown', (e) => this.onPieceDragStart(e));
+        document.addEventListener('mousemove', (e) => this.onPieceDragMove(e));
+        document.addEventListener('mouseup', (e) => this.onPieceDragEnd(e));
     },
 
     // Background color presets
@@ -232,9 +290,209 @@ const TabletApp = {
         this.updateSavedCount();
         AudioManager.playTaskComplete();
 
-        // Auto-place piece if puzzle not complete
+        // In manual mode, add to collection instead of auto-placing
+        if (this.state.puzzleMode === 'manual') {
+            this.addPieceToCollection();
+            return;
+        }
+
+        // Auto-place piece if puzzle not complete (auto mode)
         if (!PuzzleEngine.isComplete()) {
             this.placeSavedPiece();
+        }
+    },
+
+    // Add a piece to the collection tray (manual mode)
+    addPieceToCollection() {
+        if (PuzzleEngine.pieces.length === 0) return;
+
+        const pieceIndex = PuzzleEngine.pieces.shift();
+        this.collectedPieces.push(pieceIndex);
+        this.renderPieceTray();
+
+        // Visual feedback
+        const tray = document.getElementById('piece-tray');
+        tray.classList.add('pulse');
+        setTimeout(() => tray.classList.remove('pulse'), 300);
+    },
+
+    // Render the pieces in the tray
+    renderPieceTray() {
+        const trayItems = document.getElementById('piece-tray-items');
+        const trayCount = document.getElementById('piece-tray-count');
+
+        trayItems.innerHTML = '';
+        trayCount.textContent = this.collectedPieces.length;
+
+        this.collectedPieces.forEach((pieceIndex, arrayIndex) => {
+            const pieceEl = document.createElement('div');
+            pieceEl.className = 'tray-piece';
+            pieceEl.dataset.pieceIndex = pieceIndex;
+            pieceEl.dataset.arrayIndex = arrayIndex;
+
+            // Create mini canvas for piece preview
+            const canvas = document.createElement('canvas');
+            canvas.width = 80;
+            canvas.height = 80;
+            this.drawPiecePreview(canvas, pieceIndex);
+            pieceEl.appendChild(canvas);
+
+            trayItems.appendChild(pieceEl);
+        });
+    },
+
+    // Draw a piece preview on a mini canvas
+    drawPiecePreview(canvas, pieceIndex) {
+        const ctx = canvas.getContext('2d');
+        const pos = PuzzleEngine.getPiecePosition(pieceIndex);
+
+        // Draw the piece from the puzzle image
+        if (PuzzleEngine.puzzleImage) {
+            const sx = pos.col * PuzzleEngine.pieceWidth;
+            const sy = pos.row * PuzzleEngine.pieceHeight;
+
+            ctx.drawImage(
+                PuzzleEngine.puzzleImage,
+                sx, sy, PuzzleEngine.pieceWidth, PuzzleEngine.pieceHeight,
+                0, 0, canvas.width, canvas.height
+            );
+
+            // Add border
+            ctx.strokeStyle = '#ddd';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(0, 0, canvas.width, canvas.height);
+        }
+    },
+
+    // Drag start
+    onPieceDragStart(e) {
+        const trayPiece = e.target.closest('.tray-piece');
+        if (!trayPiece) return;
+
+        e.preventDefault();
+
+        const touch = e.touches ? e.touches[0] : e;
+        const pieceIndex = parseInt(trayPiece.dataset.pieceIndex);
+        const arrayIndex = parseInt(trayPiece.dataset.arrayIndex);
+
+        this.draggingPiece = {
+            pieceIndex,
+            arrayIndex,
+            element: trayPiece
+        };
+
+        this.dragStartPos = { x: touch.clientX, y: touch.clientY };
+
+        // Show dragging overlay
+        const dragEl = document.getElementById('dragging-piece');
+        const dragCanvas = document.getElementById('drag-piece-canvas');
+        dragCanvas.width = 100;
+        dragCanvas.height = 100;
+        this.drawPiecePreview(dragCanvas, pieceIndex);
+
+        dragEl.style.display = 'block';
+        dragEl.style.left = touch.clientX + 'px';
+        dragEl.style.top = touch.clientY + 'px';
+
+        // Highlight drop zone
+        document.querySelector('.puzzle-container').classList.add('drop-active');
+
+        trayPiece.classList.add('selected');
+    },
+
+    // Drag move
+    onPieceDragMove(e) {
+        if (!this.draggingPiece) return;
+
+        e.preventDefault();
+
+        const touch = e.touches ? e.touches[0] : e;
+        const dragEl = document.getElementById('dragging-piece');
+
+        dragEl.style.left = touch.clientX + 'px';
+        dragEl.style.top = touch.clientY + 'px';
+    },
+
+    // Drag end
+    onPieceDragEnd(e) {
+        if (!this.draggingPiece) return;
+
+        const touch = e.changedTouches ? e.changedTouches[0] : e;
+        const dropX = touch.clientX;
+        const dropY = touch.clientY;
+
+        // Hide dragging overlay
+        document.getElementById('dragging-piece').style.display = 'none';
+        document.querySelector('.puzzle-container').classList.remove('drop-active');
+
+        if (this.draggingPiece.element) {
+            this.draggingPiece.element.classList.remove('selected');
+        }
+
+        // Check if dropped on puzzle area
+        const puzzleCanvas = document.getElementById('puzzle-canvas');
+        const canvasRect = puzzleCanvas.getBoundingClientRect();
+
+        if (dropX >= canvasRect.left && dropX <= canvasRect.right &&
+            dropY >= canvasRect.top && dropY <= canvasRect.bottom) {
+
+            // Calculate position relative to canvas
+            const relX = (dropX - canvasRect.left) / canvasRect.width;
+            const relY = (dropY - canvasRect.top) / canvasRect.height;
+
+            this.tryPlacePiece(this.draggingPiece.pieceIndex, relX, relY, this.draggingPiece.arrayIndex);
+        }
+
+        this.draggingPiece = null;
+    },
+
+    // Try to place a piece at the given position
+    tryPlacePiece(pieceIndex, relX, relY, arrayIndex) {
+        const targetPos = PuzzleEngine.getPiecePosition(pieceIndex);
+
+        // Calculate expected relative position of piece center
+        const expectedRelX = (targetPos.col + 0.5) / PuzzleEngine.cols;
+        const expectedRelY = (targetPos.row + 0.5) / PuzzleEngine.rows;
+
+        // Get snap tolerance based on age
+        const age = this.state.age || 2;
+        const tolerance = this.snapTolerances[age] || 0.5;
+
+        // Calculate distance (normalized)
+        const dx = Math.abs(relX - expectedRelX);
+        const dy = Math.abs(relY - expectedRelY);
+
+        // Tolerance is relative to piece size
+        const toleranceX = tolerance / PuzzleEngine.cols;
+        const toleranceY = tolerance / PuzzleEngine.rows;
+
+        if (dx <= toleranceX && dy <= toleranceY) {
+            // Success! Place the piece
+            this.collectedPieces.splice(arrayIndex, 1);
+            PuzzleEngine.placedPieces.push(pieceIndex);
+            PuzzleEngine.redraw();
+
+            AudioManager.playPiecePlaced();
+            this.updateProgress();
+            this.renderPieceTray();
+            this.state.savedPieces--;
+            this.updateSavedCount();
+
+            if (PuzzleEngine.isComplete()) {
+                this.onPuzzleComplete();
+            }
+
+            this.saveState();
+        } else {
+            // Wrong position - bounce back with feedback
+            AudioManager.playClick();
+
+            // Visual feedback on the tray piece
+            const trayPiece = document.querySelector(`.tray-piece[data-array-index="${arrayIndex}"]`);
+            if (trayPiece) {
+                trayPiece.classList.add('shake');
+                setTimeout(() => trayPiece.classList.remove('shake'), 300);
+            }
         }
     },
 
@@ -251,7 +509,13 @@ const TabletApp = {
         TimerManager.reset();
         TimerManager.start();
 
-        // Auto-place if not complete
+        // In manual mode, add to collection
+        if (this.state.puzzleMode === 'manual') {
+            this.addPieceToCollection();
+            return;
+        }
+
+        // Auto-place if not complete (auto mode)
         if (!PuzzleEngine.isComplete()) {
             this.placeSavedPiece();
         }

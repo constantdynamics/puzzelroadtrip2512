@@ -43,6 +43,22 @@
             </div>
         </main>
 
+        <!-- Piece Collection Tray (for manual mode) -->
+        <div class="piece-tray" id="piece-tray" style="display:none;">
+            <div class="piece-tray-header">
+                <span>🧩 Mijn stukjes</span>
+                <span class="piece-tray-count" id="piece-tray-count">0</span>
+            </div>
+            <div class="piece-tray-items" id="piece-tray-items">
+                <!-- Collected pieces appear here as draggable items -->
+            </div>
+        </div>
+
+        <!-- Dragging piece overlay -->
+        <div class="dragging-piece" id="dragging-piece" style="display:none;">
+            <canvas id="drag-piece-canvas"></canvas>
+        </div>
+
         <!-- Celebration Overlay -->
         <div id="celebration" class="celebration" style="display:none;">
             <div class="celebration-content">
@@ -59,7 +75,7 @@
         </div>
 
         <!-- Version info -->
-        <div class="version-info">v2.10.0</div>
+        <div class="version-info">v2.11.0</div>
     </div>
 
     <script src="src/js/audio.js"></script>
