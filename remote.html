@@ -2073,6 +2073,10 @@
                 updateConnectButton();
             });
 
+            // Also listen to change and keyup for better compatibility
+            digit.addEventListener('change', updateConnectButton);
+            digit.addEventListener('keyup', updateConnectButton);
+
             digit.addEventListener('keydown', (e) => {
                 if (e.key === 'Backspace' && !e.target.value && index > 0) {
                     digits[index - 1].focus();
@@ -2093,7 +2097,9 @@
 
         function updateConnectButton() {
             const code = digits.map(d => d.value).join('');
-            connectBtn.disabled = code.length !== 4;
+            const shouldEnable = code.length === 4;
+            connectBtn.disabled = !shouldEnable;
+            console.log('updateConnectButton:', code, 'length:', code.length, 'enabled:', shouldEnable);
         }
 
         function getCode() {
@@ -3296,8 +3302,9 @@
             }, 1500);
         });
 
-        // Focus first digit on load
+        // Focus first digit on load and check if any digits are pre-filled
         digits[0].focus();
+        updateConnectButton();
     </script>
 </body>
 </html>
