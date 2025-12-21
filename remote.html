@@ -639,6 +639,186 @@
             display: none;
         }
 
+        /* Age selector */
+        .age-selector {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .age-btn {
+            padding: 10px 16px;
+            border: 2px solid #ddd;
+            border-radius: 20px;
+            background: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .age-btn.selected {
+            border-color: #4CAF50;
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .age-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Task management */
+        .task-manage-screen {
+            display: none;
+        }
+
+        .task-manage-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .task-manage-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .task-manage-actions button {
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .reset-tasks-btn {
+            background: #ff9800;
+            color: white;
+        }
+
+        .add-task-btn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .task-manage-list {
+            max-height: 55vh;
+            overflow-y: auto;
+        }
+
+        .task-manage-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-bottom: 6px;
+        }
+
+        .task-manage-item.disabled {
+            opacity: 0.5;
+        }
+
+        .task-manage-item .task-toggle {
+            flex-shrink: 0;
+        }
+
+        .task-manage-item .task-text {
+            flex: 1;
+            font-size: 13px;
+        }
+
+        .task-manage-item .task-delete {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: none;
+            background: #ffebee;
+            color: #f44336;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .task-manage-item.custom {
+            border-color: #4CAF50;
+            background: #f1f8e9;
+        }
+
+        /* Add task modal */
+        .add-task-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .add-task-modal.show {
+            display: flex;
+        }
+
+        .add-task-content {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            width: 100%;
+            max-width: 350px;
+        }
+
+        .add-task-content h3 {
+            margin: 0 0 15px 0;
+            text-align: center;
+        }
+
+        .add-task-content input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .add-task-content input:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+        .add-task-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .add-task-buttons button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+        }
+
+        .add-task-cancel {
+            background: #eee;
+            color: #666;
+        }
+
+        .add-task-save {
+            background: #4CAF50;
+            color: white;
+        }
+
         .setting-item {
             margin-bottom: 20px;
             text-align: left;
@@ -1156,6 +1336,23 @@
             <h2>⚙️ Instellingen</h2>
 
             <div class="setting-item">
+                <label>👶 Leeftijd kind:</label>
+                <div class="age-selector" id="age-selector">
+                    <button class="age-btn" data-age="1">1 jaar</button>
+                    <button class="age-btn selected" data-age="2">2 jaar</button>
+                    <button class="age-btn" data-age="3">3 jaar</button>
+                    <button class="age-btn" data-age="4">4 jaar</button>
+                    <button class="age-btn" data-age="5">5+ jaar</button>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <button class="action-btn" id="manage-tasks-btn" style="width:100%;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;">
+                    ✏️ Taken beheren
+                </button>
+            </div>
+
+            <div class="setting-item">
                 <div class="setting-row">
                     <span>🔊 Geluid</span>
                     <label class="switch">
@@ -1223,6 +1420,46 @@
             </div>
 
             <button class="back-btn" id="tasks-back-btn">← Terug</button>
+        </div>
+
+        <!-- Task Management Screen -->
+        <div class="card task-manage-screen" id="task-manage-screen">
+            <h2>✏️ Taken Beheren</h2>
+            <p class="subtitle">Schakel taken in/uit of voeg eigen taken toe</p>
+
+            <div class="task-manage-header">
+                <span id="active-task-count">0 actief</span>
+                <div class="task-manage-actions">
+                    <button class="reset-tasks-btn" id="reset-tasks-btn">🔄 Reset</button>
+                    <button class="add-task-btn" id="add-custom-task-btn">➕ Nieuw</button>
+                </div>
+            </div>
+
+            <div class="task-manage-list" id="task-manage-list">
+                <!-- Tasks will be populated by JS -->
+            </div>
+
+            <button class="back-btn" id="task-manage-back-btn">← Terug</button>
+        </div>
+
+        <!-- Add Task Modal -->
+        <div class="add-task-modal" id="add-task-modal">
+            <div class="add-task-content">
+                <h3>➕ Nieuwe Taak</h3>
+                <input type="text" id="new-task-input" placeholder="Bijv: 🎈 Een ballon gezien" maxlength="50">
+                <select id="new-task-category" style="width:100%;padding:12px;border:2px solid #ddd;border-radius:10px;font-size:14px;margin-bottom:15px;">
+                    <option value="🎵 Zingen & Geluid">🎵 Zingen & Geluid</option>
+                    <option value="👀 Kijken & Zoeken">👀 Kijken & Zoeken</option>
+                    <option value="🤸 Beweging">🤸 Beweging</option>
+                    <option value="🔢 Tellen & Leren">🔢 Tellen & Leren</option>
+                    <option value="🍎 Eten & Drinken">🍎 Eten & Drinken</option>
+                    <option value="😊 Braaf Zijn">😊 Braaf Zijn</option>
+                </select>
+                <div class="add-task-buttons">
+                    <button class="add-task-cancel" id="cancel-new-task">Annuleren</button>
+                    <button class="add-task-save" id="save-new-task">Toevoegen</button>
+                </div>
+            </div>
         </div>
 
         <!-- Puzzles Screen -->
@@ -1360,6 +1597,7 @@
         const puzzlesScreen = document.getElementById('puzzles-screen');
         const photoScreen = document.getElementById('photo-screen');
         const queueScreen = document.getElementById('queue-screen');
+        const taskManageScreen = document.getElementById('task-manage-screen');
 
         const connectBtn = document.getElementById('connect-btn');
         const errorMsg = document.getElementById('error-msg');
@@ -1382,6 +1620,7 @@
             puzzlesScreen.style.display = 'none';
             photoScreen.style.display = 'none';
             queueScreen.style.display = 'none';
+            taskManageScreen.style.display = 'none';
             screen.style.display = 'block';
         }
 
@@ -2234,6 +2473,391 @@
                 return false;
             }
         }, true); // Use capture to intercept first
+
+        // === AGE-BASED TASK PRESETS & TASK MANAGEMENT ===
+        const TASK_SETTINGS_KEY = 'roadtrip_task_settings';
+
+        // Default tasks per age group (which tasks are enabled)
+        const agePresets = {
+            1: {
+                // 1 year: Simple sounds, basic observation, simple movement
+                enabled: [
+                    "🎵 Een liedje gezongen", "👏 In de handen geklapt", "🐮 Koe-geluid gemaakt (boe!)",
+                    "🐶 Hond-geluid gemaakt (waf!)", "🐱 Kat-geluid gemaakt (miauw!)",
+                    "🚗 Een rode auto gezien", "🚙 Een blauwe auto gezien", "🐄 Een koe gezien",
+                    "👋 Gezwaaid", "👍 Duimpje omhoog gedaan", "✋ High five gegeven",
+                    "🧃 Wat gedronken", "🍪 Een koekje gegeten", "🍌 Banaan gegeten",
+                    "😊 Lief gelachen", "😴 Even geslapen", "🧸 Met knuffel gespeeld"
+                ]
+            },
+            2: {
+                // 2 years: All basic tasks (default)
+                enabled: null // null means all enabled
+            },
+            3: {
+                // 3 years: Add counting, more complex observation
+                enabled: null,
+                extra: [
+                    "🔢 Tot 5 geteld", "🎨 Een vorm benoemd (cirkel, vierkant)"
+                ]
+            },
+            4: {
+                // 4 years: More challenge
+                enabled: null,
+                extra: [
+                    "📖 Een letter herkend", "🔢 Tot 10 geteld", "🎵 Een rijmpje opgezegd"
+                ]
+            },
+            5: {
+                // 5+ years: Full challenge
+                enabled: null,
+                extra: [
+                    "📖 Een woord gelezen", "🔢 Tot 20 geteld", "🧮 Een simpele som gemaakt",
+                    "🗣️ Een verhaal verteld", "🎯 Iets in een bepaalde kleur gevonden"
+                ]
+            }
+        };
+
+        // Load task settings from storage
+        function loadTaskSettings() {
+            try {
+                const saved = localStorage.getItem(TASK_SETTINGS_KEY);
+                if (saved) {
+                    return JSON.parse(saved);
+                }
+            } catch (e) {
+                console.error('Error loading task settings:', e);
+            }
+            return {
+                age: 2,
+                disabledTasks: [],
+                customTasks: []
+            };
+        }
+
+        // Save task settings to storage
+        function saveTaskSettings(settings) {
+            localStorage.setItem(TASK_SETTINGS_KEY, JSON.stringify(settings));
+        }
+
+        // Get active tasks based on settings
+        function getActiveTasks() {
+            const settings = loadTaskSettings();
+            const activeTasks = {};
+
+            // Start with base remoteTasks
+            for (const [category, tasks] of Object.entries(remoteTasks)) {
+                activeTasks[category] = tasks.filter(task =>
+                    !settings.disabledTasks.includes(task)
+                );
+            }
+
+            // Add custom tasks
+            for (const customTask of settings.customTasks) {
+                if (!activeTasks[customTask.category]) {
+                    activeTasks[customTask.category] = [];
+                }
+                activeTasks[customTask.category].push(customTask.text);
+            }
+
+            // Add age-specific extra tasks
+            const preset = agePresets[settings.age];
+            if (preset && preset.extra) {
+                // Add extra tasks to appropriate category
+                for (const extraTask of preset.extra) {
+                    const category = extraTask.startsWith('🔢') || extraTask.startsWith('🧮')
+                        ? '🔢 Tellen & Leren'
+                        : extraTask.startsWith('📖') || extraTask.startsWith('🗣️')
+                        ? '😊 Braaf Zijn'
+                        : '🎵 Zingen & Geluid';
+                    if (!settings.disabledTasks.includes(extraTask)) {
+                        if (!activeTasks[category]) activeTasks[category] = [];
+                        if (!activeTasks[category].includes(extraTask)) {
+                            activeTasks[category].push(extraTask);
+                        }
+                    }
+                }
+            }
+
+            return activeTasks;
+        }
+
+        // Get all available tasks (for management screen)
+        function getAllAvailableTasks() {
+            const settings = loadTaskSettings();
+            const allTasks = [];
+
+            // Base tasks
+            for (const [category, tasks] of Object.entries(remoteTasks)) {
+                for (const task of tasks) {
+                    allTasks.push({
+                        text: task,
+                        category: category,
+                        enabled: !settings.disabledTasks.includes(task),
+                        isCustom: false
+                    });
+                }
+            }
+
+            // Age-specific extra tasks
+            const preset = agePresets[settings.age];
+            if (preset && preset.extra) {
+                for (const task of preset.extra) {
+                    allTasks.push({
+                        text: task,
+                        category: task.startsWith('🔢') || task.startsWith('🧮')
+                            ? '🔢 Tellen & Leren' : '😊 Braaf Zijn',
+                        enabled: !settings.disabledTasks.includes(task),
+                        isCustom: false,
+                        isExtra: true
+                    });
+                }
+            }
+
+            // Custom tasks
+            for (const customTask of settings.customTasks) {
+                allTasks.push({
+                    text: customTask.text,
+                    category: customTask.category,
+                    enabled: true,
+                    isCustom: true
+                });
+            }
+
+            return allTasks;
+        }
+
+        // Render task management list
+        function renderTaskManageList() {
+            const list = document.getElementById('task-manage-list');
+            const allTasks = getAllAvailableTasks();
+            const settings = loadTaskSettings();
+
+            const enabledCount = allTasks.filter(t => t.enabled).length;
+            document.getElementById('active-task-count').textContent = `${enabledCount} actief`;
+
+            // Group by category
+            const byCategory = {};
+            for (const task of allTasks) {
+                if (!byCategory[task.category]) byCategory[task.category] = [];
+                byCategory[task.category].push(task);
+            }
+
+            list.innerHTML = '';
+            for (const [category, tasks] of Object.entries(byCategory)) {
+                const catHeader = document.createElement('div');
+                catHeader.style.cssText = 'font-weight:bold;font-size:13px;color:#667eea;margin:12px 0 6px 0;';
+                catHeader.textContent = category;
+                list.appendChild(catHeader);
+
+                for (const task of tasks) {
+                    const item = document.createElement('div');
+                    item.className = `task-manage-item ${task.enabled ? '' : 'disabled'} ${task.isCustom ? 'custom' : ''}`;
+                    item.innerHTML = `
+                        <label class="switch task-toggle" style="transform:scale(0.8);">
+                            <input type="checkbox" ${task.enabled ? 'checked' : ''} data-task="${task.text.replace(/"/g, '&quot;')}">
+                            <span class="slider-toggle"></span>
+                        </label>
+                        <span class="task-text">${task.text}${task.isExtra ? ' <small style="color:#ff9800">(bonus)</small>' : ''}</span>
+                        ${task.isCustom ? `<button class="task-delete" data-task="${task.text.replace(/"/g, '&quot;')}">✕</button>` : ''}
+                    `;
+                    list.appendChild(item);
+                }
+            }
+
+            // Add toggle handlers
+            list.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', (e) => {
+                    const taskText = e.target.dataset.task;
+                    const settings = loadTaskSettings();
+                    if (e.target.checked) {
+                        settings.disabledTasks = settings.disabledTasks.filter(t => t !== taskText);
+                    } else {
+                        if (!settings.disabledTasks.includes(taskText)) {
+                            settings.disabledTasks.push(taskText);
+                        }
+                    }
+                    saveTaskSettings(settings);
+                    renderTaskManageList();
+                });
+            });
+
+            // Add delete handlers for custom tasks
+            list.querySelectorAll('.task-delete').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const taskText = btn.dataset.task;
+                    if (confirm(`"${taskText}" verwijderen?`)) {
+                        const settings = loadTaskSettings();
+                        settings.customTasks = settings.customTasks.filter(t => t.text !== taskText);
+                        saveTaskSettings(settings);
+                        renderTaskManageList();
+                    }
+                });
+            });
+        }
+
+        // Update populateTaskCategories to use active tasks
+        const originalPopulateTaskCategories = populateTaskCategories;
+        function populateTaskCategories() {
+            const container = document.getElementById('task-categories');
+            container.innerHTML = '';
+
+            const activeTasks = getActiveTasks();
+
+            for (const [categoryName, tasks] of Object.entries(activeTasks)) {
+                if (tasks.length === 0) continue;
+
+                const categoryId = categoryName.replace(/\s/g, '_');
+                completedTasks[categoryId] = completedTasks[categoryId] || new Set();
+
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category';
+                categoryDiv.id = `cat-${categoryId}`;
+
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'category-header';
+                headerDiv.innerHTML = `
+                    <span>${categoryName}</span>
+                    <span>
+                        <span class="category-count" id="count-${categoryId}">${completedTasks[categoryId].size}/${tasks.length}</span>
+                        <span class="toggle-icon">▼</span>
+                    </span>
+                `;
+
+                const tasksDiv = document.createElement('div');
+                tasksDiv.className = 'category-tasks';
+                tasksDiv.id = `tasks-${categoryId}`;
+
+                tasks.forEach((task, index) => {
+                    const taskId = `${categoryId}-${index}`;
+                    const isCompleted = completedTasks[categoryId].has(index);
+
+                    const taskBtn = document.createElement('button');
+                    taskBtn.className = `task-item${isCompleted ? ' completed' : ''}`;
+                    taskBtn.id = taskId;
+                    taskBtn.innerHTML = `
+                        <span class="task-checkbox">${isCompleted ? '✓' : ''}</span>
+                        <span class="task-text">${task}</span>
+                    `;
+                    taskBtn.addEventListener('click', () => toggleTask(taskBtn, categoryId, index, tasks.length));
+                    tasksDiv.appendChild(taskBtn);
+                });
+
+                headerDiv.addEventListener('click', () => {
+                    categoryDiv.classList.toggle('open');
+                });
+
+                categoryDiv.appendChild(headerDiv);
+                categoryDiv.appendChild(tasksDiv);
+                container.appendChild(categoryDiv);
+            }
+
+            const firstCategory = container.querySelector('.category');
+            if (firstCategory) firstCategory.classList.add('open');
+        }
+
+        // Age selector handlers
+        document.querySelectorAll('.age-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.age-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                const settings = loadTaskSettings();
+                settings.age = parseInt(btn.dataset.age);
+
+                // Apply age preset if needed (for age 1, restrict tasks)
+                const preset = agePresets[settings.age];
+                if (preset && preset.enabled) {
+                    // Disable tasks not in the preset
+                    const allBaseTasks = [];
+                    for (const tasks of Object.values(remoteTasks)) {
+                        allBaseTasks.push(...tasks);
+                    }
+                    settings.disabledTasks = allBaseTasks.filter(t => !preset.enabled.includes(t));
+                }
+
+                saveTaskSettings(settings);
+            });
+        });
+
+        // Initialize age selector from saved settings
+        function initAgeSelector() {
+            const settings = loadTaskSettings();
+            document.querySelectorAll('.age-btn').forEach(btn => {
+                btn.classList.toggle('selected', parseInt(btn.dataset.age) === settings.age);
+            });
+        }
+
+        // Manage tasks button
+        document.getElementById('manage-tasks-btn').addEventListener('click', () => {
+            renderTaskManageList();
+            showScreen(taskManageScreen);
+        });
+
+        // Back from task management
+        document.getElementById('task-manage-back-btn').addEventListener('click', () => {
+            showScreen(settingsScreen);
+        });
+
+        // Reset tasks to default for current age
+        document.getElementById('reset-tasks-btn').addEventListener('click', () => {
+            if (confirm('Alle taken resetten naar standaard voor deze leeftijd?')) {
+                const settings = loadTaskSettings();
+                settings.disabledTasks = [];
+
+                // Apply age preset
+                const preset = agePresets[settings.age];
+                if (preset && preset.enabled) {
+                    const allBaseTasks = [];
+                    for (const tasks of Object.values(remoteTasks)) {
+                        allBaseTasks.push(...tasks);
+                    }
+                    settings.disabledTasks = allBaseTasks.filter(t => !preset.enabled.includes(t));
+                }
+
+                saveTaskSettings(settings);
+                renderTaskManageList();
+            }
+        });
+
+        // Add custom task button
+        document.getElementById('add-custom-task-btn').addEventListener('click', () => {
+            document.getElementById('add-task-modal').classList.add('show');
+            document.getElementById('new-task-input').value = '';
+            document.getElementById('new-task-input').focus();
+        });
+
+        // Cancel add task
+        document.getElementById('cancel-new-task').addEventListener('click', () => {
+            document.getElementById('add-task-modal').classList.remove('show');
+        });
+
+        // Save new task
+        document.getElementById('save-new-task').addEventListener('click', () => {
+            const text = document.getElementById('new-task-input').value.trim();
+            const category = document.getElementById('new-task-category').value;
+
+            if (!text) {
+                alert('Voer een taakomschrijving in');
+                return;
+            }
+
+            const settings = loadTaskSettings();
+            settings.customTasks.push({ text, category });
+            saveTaskSettings(settings);
+
+            document.getElementById('add-task-modal').classList.remove('show');
+            renderTaskManageList();
+        });
+
+        // Close modal on backdrop click
+        document.getElementById('add-task-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'add-task-modal') {
+                document.getElementById('add-task-modal').classList.remove('show');
+            }
+        });
+
+        // Initialize age selector on load
+        initAgeSelector();
 
         // Focus first digit on load
         digits[0].focus();
