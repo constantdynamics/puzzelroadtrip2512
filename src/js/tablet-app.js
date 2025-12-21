@@ -175,7 +175,17 @@ const TabletApp = {
         console.log('Loading custom image...');
         this.state.customImage = imageData;
         PuzzleEngine.setCustomImage(imageData);
-        this.resetCurrentPuzzle();
+
+        // Reload the puzzle to apply the custom image
+        this.state.piecesPlaced = 0;
+        await PuzzleEngine.loadPuzzle(this.state.currentPuzzleIndex);
+
+        TimerManager.reset();
+        TimerManager.start();
+
+        this.updateProgress();
+        this.saveState();
+
         // Update preview name
         const previewName = document.getElementById('preview-puzzle-name');
         if (previewName) previewName.textContent = '📷 Eigen Foto';
