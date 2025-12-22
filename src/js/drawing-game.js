@@ -12,6 +12,8 @@ const DrawingGame = {
     container: null,
     currentPrompt: null,
     currentCategory: 'all',
+    multiplayerMode: false,
+    drawer: 'child', // 'child' or 'parent'
 
     // Drawing prompts organized by category
     categories: {
@@ -129,6 +131,29 @@ const DrawingGame = {
     setCategory(category) {
         this.currentCategory = category;
         this.newPrompt();
+    },
+
+    setMultiplayerMode(enabled) {
+        this.multiplayerMode = enabled;
+        this.syncGameState();
+    },
+
+    setDrawer(drawer) {
+        this.drawer = drawer;
+        this.syncGameState();
+    },
+
+    // Sync game state to Firebase for remote display
+    syncGameState() {
+        if (typeof TabletApp !== 'undefined' && TabletApp.roomRef) {
+            TabletApp.roomRef.child('gameState').update({
+                game: 'drawing',
+                currentPrompt: this.currentPrompt || {},
+                multiplayerMode: this.multiplayerMode,
+                drawer: this.drawer,
+                timestamp: Date.now()
+            });
+        }
     },
 
     getAllPrompts() {
@@ -329,15 +354,26 @@ const DrawingGame = {
 
         const promptEl = document.getElementById('drawing-prompt');
         if (promptEl) {
-            promptEl.innerHTML = `
-                <span class="prompt-emoji">${this.currentPrompt.emoji}</span>
-                <span class="prompt-text">${this.currentPrompt.text}</span>
-            `;
+            // In multiplayer mode with parent drawing, hide the word from child
+            if (this.multiplayerMode && this.drawer === 'parent') {
+                promptEl.innerHTML = `
+                    <span class="prompt-emoji">🤫</span>
+                    <span class="prompt-text">Raad wat papa/mama tekent!</span>
+                `;
+            } else {
+                promptEl.innerHTML = `
+                    <span class="prompt-emoji">${this.currentPrompt.emoji}</span>
+                    <span class="prompt-text">${this.currentPrompt.text}</span>
+                `;
+            }
 
             // Animate
             promptEl.classList.add('bounce');
             setTimeout(() => promptEl.classList.remove('bounce'), 500);
         }
+
+        // Sync new prompt to remote
+        this.syncGameState();
 
         if (typeof AudioManager !== 'undefined') {
             AudioManager.playTaskComplete();

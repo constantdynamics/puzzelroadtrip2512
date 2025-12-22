@@ -1,5 +1,6 @@
 // Cooking Game for Toddlers
 // Follow simple recipes by adding ingredients
+// Visual actions: stir, pour, place (no text on tablet)
 
 const CookingGame = {
     container: null,
@@ -9,7 +10,18 @@ const CookingGame = {
     step: 0,
     draggedIngredient: null,
 
-    // Recipes
+    // Visual action types (icons instead of text)
+    actionIcons: {
+        add: '➕',      // Add ingredient
+        stir: '🥄',     // Stir with spoon
+        pour: '💧',     // Pour liquid
+        mix: '🔄',      // Mix together
+        sprinkle: '✨', // Sprinkle on top
+        place: '👇',    // Place on top
+        spread: '🧈'    // Spread on
+    },
+
+    // Recipes with visual action types
     recipes: {
         pizza: {
             name: 'Pizza',
@@ -17,9 +29,11 @@ const CookingGame = {
             result: '🍕',
             base: '🫓',
             steps: [
-                { ingredient: '🍅', name: 'Tomatensaus', action: 'Doe er tomatensaus op!' },
-                { ingredient: '🧀', name: 'Kaas', action: 'Strooi er kaas over!' },
-                { ingredient: '🍄', name: 'Champignons', action: 'Leg er champignons op!' }
+                { ingredient: '🍅', name: 'Tomatensaus', action: 'spread', actionText: 'Smeer de saus!' },
+                { ingredient: '🧀', name: 'Kaas', action: 'sprinkle', actionText: 'Strooi de kaas!' },
+                { ingredient: '🍄', name: 'Champignons', action: 'place', actionText: 'Leg er op!' },
+                { ingredient: '🫑', name: 'Paprika', action: 'place', actionText: 'Leg er op!' },
+                { ingredient: '🧅', name: 'Ui', action: 'place', actionText: 'Leg er op!' }
             ]
         },
         salad: {
@@ -28,9 +42,11 @@ const CookingGame = {
             result: '🥗',
             base: '🥣',
             steps: [
-                { ingredient: '🥬', name: 'Sla', action: 'Doe de sla erin!' },
-                { ingredient: '🍅', name: 'Tomaat', action: 'Voeg tomaat toe!' },
-                { ingredient: '🥒', name: 'Komkommer', action: 'Doe er komkommer bij!' }
+                { ingredient: '🥬', name: 'Sla', action: 'add', actionText: 'Doe erin!' },
+                { ingredient: '🍅', name: 'Tomaat', action: 'add', actionText: 'Doe erbij!' },
+                { ingredient: '🥒', name: 'Komkommer', action: 'add', actionText: 'Doe erbij!' },
+                { ingredient: '🥕', name: 'Wortel', action: 'add', actionText: 'Doe erbij!' },
+                { ingredient: '🫒', name: 'Olijf', action: 'add', actionText: 'Doe erbij!' }
             ]
         },
         smoothie: {
@@ -39,9 +55,11 @@ const CookingGame = {
             result: '🥤',
             base: '🫙',
             steps: [
-                { ingredient: '🍌', name: 'Banaan', action: 'Doe de banaan erin!' },
-                { ingredient: '🍓', name: 'Aardbeien', action: 'Voeg aardbeien toe!' },
-                { ingredient: '🥛', name: 'Melk', action: 'Giet er melk bij!' }
+                { ingredient: '🍌', name: 'Banaan', action: 'add', actionText: 'Doe erin!' },
+                { ingredient: '🍓', name: 'Aardbeien', action: 'add', actionText: 'Doe erbij!' },
+                { ingredient: '🥛', name: 'Melk', action: 'pour', actionText: 'Giet erbij!' },
+                { ingredient: '🍯', name: 'Honing', action: 'pour', actionText: 'Giet erbij!' },
+                { ingredient: '🥄', name: 'Roeren', action: 'stir', actionText: 'Roer!' }
             ]
         },
         sandwich: {
@@ -50,9 +68,11 @@ const CookingGame = {
             result: '🥪',
             base: '🍞',
             steps: [
-                { ingredient: '🧈', name: 'Boter', action: 'Smeer er boter op!' },
-                { ingredient: '🧀', name: 'Kaas', action: 'Leg er kaas op!' },
-                { ingredient: '🥬', name: 'Sla', action: 'Doe er sla op!' }
+                { ingredient: '🧈', name: 'Boter', action: 'spread', actionText: 'Smeer erop!' },
+                { ingredient: '🧀', name: 'Kaas', action: 'place', actionText: 'Leg erop!' },
+                { ingredient: '🥬', name: 'Sla', action: 'place', actionText: 'Leg erop!' },
+                { ingredient: '🍅', name: 'Tomaat', action: 'place', actionText: 'Leg erop!' },
+                { ingredient: '🥒', name: 'Komkommer', action: 'place', actionText: 'Leg erop!' }
             ]
         },
         pancakes: {
@@ -61,9 +81,11 @@ const CookingGame = {
             result: '🥞',
             base: '🍳',
             steps: [
-                { ingredient: '🥚', name: 'Ei', action: 'Breek het ei!' },
-                { ingredient: '🥛', name: 'Melk', action: 'Giet er melk bij!' },
-                { ingredient: '🌾', name: 'Meel', action: 'Doe het meel erbij!' }
+                { ingredient: '🥚', name: 'Ei', action: 'add', actionText: 'Breek erin!' },
+                { ingredient: '🥛', name: 'Melk', action: 'pour', actionText: 'Giet erbij!' },
+                { ingredient: '🌾', name: 'Meel', action: 'add', actionText: 'Doe erbij!' },
+                { ingredient: '🥄', name: 'Roeren', action: 'stir', actionText: 'Roer!' },
+                { ingredient: '🍯', name: 'Stroop', action: 'pour', actionText: 'Giet erop!' }
             ]
         },
         soup: {
@@ -72,9 +94,11 @@ const CookingGame = {
             result: '🍲',
             base: '🥘',
             steps: [
-                { ingredient: '💧', name: 'Water', action: 'Doe water in de pan!' },
-                { ingredient: '🥕', name: 'Wortel', action: 'Voeg wortels toe!' },
-                { ingredient: '🧅', name: 'Ui', action: 'Doe er ui bij!' }
+                { ingredient: '💧', name: 'Water', action: 'pour', actionText: 'Giet erin!' },
+                { ingredient: '🥕', name: 'Wortel', action: 'add', actionText: 'Doe erbij!' },
+                { ingredient: '🧅', name: 'Ui', action: 'add', actionText: 'Doe erbij!' },
+                { ingredient: '🥔', name: 'Aardappel', action: 'add', actionText: 'Doe erbij!' },
+                { ingredient: '🥄', name: 'Roeren', action: 'stir', actionText: 'Roer!' }
             ]
         },
         cake: {
@@ -83,9 +107,11 @@ const CookingGame = {
             result: '🎂',
             base: '🍰',
             steps: [
-                { ingredient: '🥚', name: 'Eieren', action: 'Breek de eieren!' },
-                { ingredient: '🧈', name: 'Boter', action: 'Voeg boter toe!' },
-                { ingredient: '🍫', name: 'Chocolade', action: 'Doe er chocolade bij!' }
+                { ingredient: '🥚', name: 'Eieren', action: 'add', actionText: 'Breek erin!' },
+                { ingredient: '🧈', name: 'Boter', action: 'add', actionText: 'Doe erbij!' },
+                { ingredient: '🍫', name: 'Chocolade', action: 'add', actionText: 'Doe erbij!' },
+                { ingredient: '🥄', name: 'Roeren', action: 'stir', actionText: 'Mixen!' },
+                { ingredient: '🍓', name: 'Fruit', action: 'place', actionText: 'Versieren!' }
             ]
         },
         icecream: {
@@ -94,17 +120,20 @@ const CookingGame = {
             result: '🍦',
             base: '🍨',
             steps: [
-                { ingredient: '🥛', name: 'Room', action: 'Doe de room erin!' },
-                { ingredient: '🍓', name: 'Fruit', action: 'Voeg fruit toe!' },
-                { ingredient: '🍫', name: 'Chocolade', action: 'Strooi er chocolade over!' }
+                { ingredient: '🥛', name: 'Room', action: 'pour', actionText: 'Giet erin!' },
+                { ingredient: '🍓', name: 'Fruit', action: 'add', actionText: 'Doe erbij!' },
+                { ingredient: '🍫', name: 'Chocolade', action: 'sprinkle', actionText: 'Strooi erop!' },
+                { ingredient: '🍒', name: 'Kers', action: 'place', actionText: 'Leg erop!' },
+                { ingredient: '🥜', name: 'Nootjes', action: 'sprinkle', actionText: 'Strooi erop!' }
             ]
         }
     },
 
+    // Difficulty: 2-5 ingredients
     difficulties: {
-        easy: 2,   // 2 steps
-        medium: 3, // 3 steps
-        hard: 4    // all steps + bonus
+        easy: 2,    // 2 steps
+        medium: 3,  // 3 steps
+        hard: 5     // 5 steps
     },
 
     difficulty: 'easy',
@@ -166,6 +195,25 @@ const CookingGame = {
         this.ingredients = [...recipeIngredients, ...distractors].sort(() => Math.random() - 0.5);
 
         this.render();
+        this.syncGameState();
+    },
+
+    // Sync game state to Firebase for remote display
+    syncGameState() {
+        if (typeof TabletApp !== 'undefined' && TabletApp.roomRef) {
+            const currentStep = this.currentRecipe?.steps[this.step];
+            TabletApp.roomRef.child('gameState').update({
+                game: 'cooking',
+                recipeName: this.currentRecipe?.name || 'Recept',
+                recipeEmoji: this.currentRecipe?.emoji || '🍳',
+                step: this.step,
+                totalSteps: this.currentRecipe?.steps?.length || 5,
+                nextIngredient: currentStep?.ingredient || '',
+                actionText: currentStep?.actionText || '',
+                completed: this.step >= (this.currentRecipe?.steps?.length || 0),
+                timestamp: Date.now()
+            });
+        }
     },
 
     render() {
@@ -174,13 +222,21 @@ const CookingGame = {
         const currentStep = this.currentRecipe.steps[this.step];
         const isComplete = this.step >= this.currentRecipe.steps.length;
         const unusedIngredients = this.ingredients.filter(i => !i.used);
+        const actionIcon = currentStep ? this.actionIcons[currentStep.action] || '➕' : '';
 
+        // Visual-only interface (no text - parent reads from remote)
         this.container.innerHTML = `
             <div class="cooking-game">
                 <div class="cooking-header">
-                    <h2>👨‍🍳 We maken: ${this.currentRecipe.name} ${this.currentRecipe.emoji}</h2>
-                    <div class="cooking-progress">
-                        Stap ${Math.min(this.step + 1, this.currentRecipe.steps.length)}/${this.currentRecipe.steps.length}
+                    <div class="cooking-recipe-icon">
+                        <span class="recipe-target">${this.currentRecipe.emoji}</span>
+                    </div>
+                    <div class="cooking-progress-visual">
+                        ${this.currentRecipe.steps.map((_, i) => `
+                            <span class="cooking-step-dot ${i < this.step ? 'done' : ''} ${i === this.step ? 'current' : ''}">
+                                ${i < this.step ? '✓' : ''}
+                            </span>
+                        `).join('')}
                     </div>
                 </div>
                 <div class="cooking-area">
@@ -190,8 +246,9 @@ const CookingGame = {
                             ${this.addedIngredients.map(i => `<span class="added-ingredient">${i}</span>`).join('')}
                         </div>
                         ${!isComplete ? `
-                            <div class="cooking-instruction">
-                                ${currentStep.action}
+                            <div class="cooking-action-indicator">
+                                <span class="action-icon">${actionIcon}</span>
+                                <span class="next-ingredient-hint">${currentStep.ingredient}</span>
                             </div>
                         ` : ''}
                     </div>
@@ -201,7 +258,6 @@ const CookingGame = {
                                 <div class="cooking-ingredient ${item.isRecipe && item.stepIndex === this.step ? 'correct-next' : ''}"
                                      data-id="${item.id}">
                                     <span class="ingredient-emoji">${item.emoji}</span>
-                                    <span class="ingredient-name">${item.name}</span>
                                 </div>
                             `).join('')}
                         </div>
@@ -291,6 +347,9 @@ const CookingGame = {
                         AudioManager.playPiecePlaced();
                     }
 
+                    // Sync progress to remote
+                    this.syncGameState();
+
                     if (this.step >= this.currentRecipe.steps.length) {
                         setTimeout(() => this.onGameComplete(), 300);
                     }
@@ -322,16 +381,19 @@ const CookingGame = {
             AudioManager.playPuzzleComplete();
         }
 
+        // Visual-only celebration (no text)
         const celebrationEl = document.createElement('div');
         celebrationEl.className = 'cooking-celebration';
         celebrationEl.innerHTML = `
             <div class="cooking-celebration-content">
-                <h2>🎉 Heerlijk! 🎉</h2>
-                <p>Je ${this.currentRecipe.name} is klaar!</p>
+                <div class="celebration-emoji">🎉👨‍🍳🎉</div>
                 <div class="cooking-result">
                     ${this.currentRecipe.result}
                 </div>
-                <button class="cooking-play-again-btn" id="cooking-play-again">Nieuw recept</button>
+                <div class="cooking-ingredients-used">
+                    ${this.addedIngredients.join(' ')}
+                </div>
+                <button class="cooking-play-again-btn" id="cooking-play-again">🔄</button>
             </div>
         `;
         this.container.appendChild(celebrationEl);

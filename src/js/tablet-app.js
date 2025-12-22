@@ -10,6 +10,11 @@ const TabletApp = {
     draggingPiece: null,
     dragStartPos: null,
 
+    // Getter for roomRef - delegates to RemoteControl
+    get roomRef() {
+        return typeof RemoteControl !== 'undefined' ? RemoteControl.roomRef : null;
+    },
+
     // Age-based snap tolerance (percentage of piece size)
     snapTolerances: {
         1: 0.6,  // 60% tolerance - very forgiving
@@ -298,6 +303,44 @@ const TabletApp = {
         // Drawing/Pictionary category
         if (settings.drawingCategory !== undefined) {
             GameManager.setDrawingCategory(settings.drawingCategory);
+        }
+
+        // Pictionary multiplayer settings
+        if (settings.pictionaryMultiplayer !== undefined) {
+            if (typeof DrawingGame !== 'undefined') {
+                DrawingGame.setMultiplayerMode(settings.pictionaryMultiplayer);
+            }
+        }
+
+        if (settings.pictionaryNewWord) {
+            if (typeof DrawingGame !== 'undefined') {
+                DrawingGame.newPrompt();
+            }
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings/pictionaryNewWord').remove();
+            }
+        }
+
+        if (settings.pictionaryDrawer !== undefined) {
+            if (typeof DrawingGame !== 'undefined') {
+                DrawingGame.setDrawer(settings.pictionaryDrawer);
+                // Refresh the prompt display based on new drawer
+                const promptEl = document.getElementById('drawing-prompt');
+                if (promptEl && DrawingGame.currentPrompt) {
+                    if (DrawingGame.multiplayerMode && settings.pictionaryDrawer === 'parent') {
+                        promptEl.innerHTML = `
+                            <span class="prompt-emoji">🤫</span>
+                            <span class="prompt-text">Raad wat papa/mama tekent!</span>
+                        `;
+                    } else {
+                        promptEl.innerHTML = `
+                            <span class="prompt-emoji">${DrawingGame.currentPrompt.emoji}</span>
+                            <span class="prompt-text">${DrawingGame.currentPrompt.text}</span>
+                        `;
+                    }
+                }
+                DrawingGame.syncGameState();
+            }
         }
 
         this.saveState();

@@ -75,6 +75,9 @@ const ColorsGame = {
         const targetKey = colorKeys[Math.floor(Math.random() * colorKeys.length)];
         this.targetColor = { key: targetKey, ...this.colors[targetKey] };
 
+        // Sync target color to remote via Firebase
+        this.syncTargetColor();
+
         // Get difficulty settings
         const config = this.difficulties[this.difficulty];
 
@@ -109,19 +112,42 @@ const ColorsGame = {
         this.render();
     },
 
+    syncTargetColor() {
+        // Sync to Firebase so remote can display the target color
+        if (typeof TabletApp !== 'undefined' && TabletApp.roomRef) {
+            TabletApp.roomRef.child('gameState').update({
+                game: 'colors',
+                targetColor: this.targetColor.key,
+                targetColorName: this.targetColor.name,
+                targetColorHex: this.targetColor.hex,
+                found: this.found,
+                total: this.total,
+                timestamp: Date.now()
+            });
+        }
+    },
+
     render() {
         if (!this.container) return;
 
+        // Visual-only indicator (no text - parent reads from remote)
         this.container.innerHTML = `
             <div class="colors-game">
                 <div class="colors-header">
-                    <div class="target-color" style="background: ${this.targetColor.hex}">
-                        <span>Zoek alles wat</span>
-                        <strong>${this.targetColor.name}</strong>
-                        <span>is!</span>
+                    <div class="target-color-indicator" style="background: ${this.targetColor.hex}">
+                        <span class="target-color-emoji">🔍</span>
                     </div>
-                    <div class="colors-score">
-                        Gevonden: ${this.found}/${this.total}
+                    <div class="colors-progress">
+                        <div class="colors-progress-bar">
+                            <div class="colors-progress-fill" style="width: ${(this.found / this.total) * 100}%; background: ${this.targetColor.hex}"></div>
+                        </div>
+                        <div class="colors-progress-dots">
+                            ${Array(this.total).fill(0).map((_, i) => `
+                                <span class="progress-dot ${i < this.found ? 'filled' : ''}" style="background: ${i < this.found ? this.targetColor.hex : '#ddd'}">
+                                    ${i < this.found ? '✓' : ''}
+                                </span>
+                            `).join('')}
+                        </div>
                     </div>
                 </div>
                 <div class="colors-grid">
@@ -170,8 +196,11 @@ const ColorsGame = {
                 AudioManager.playPiecePlaced();
             }
 
-            // Update score
-            this.container.querySelector('.colors-score').textContent = `Gevonden: ${this.found}/${this.total}`;
+            // Update visual progress (re-render to update progress bar)
+            this.render();
+
+            // Sync progress to remote
+            this.syncProgress();
 
             if (this.found === this.total) {
                 this.onGameComplete();
@@ -189,20 +218,40 @@ const ColorsGame = {
         }
     },
 
+    syncProgress() {
+        // Sync progress to Firebase
+        if (typeof TabletApp !== 'undefined' && TabletApp.roomRef) {
+            TabletApp.roomRef.child('gameState').update({
+                found: this.found,
+                total: this.total,
+                timestamp: Date.now()
+            });
+        }
+    },
+
     onGameComplete() {
         if (typeof AudioManager !== 'undefined') {
             AudioManager.playPuzzleComplete();
+        }
+
+        // Sync completion to remote
+        if (typeof TabletApp !== 'undefined' && TabletApp.roomRef) {
+            TabletApp.roomRef.child('gameState').update({
+                completed: true,
+                timestamp: Date.now()
+            });
         }
 
         setTimeout(() => {
             if (this.container) {
                 const celebrationEl = document.createElement('div');
                 celebrationEl.className = 'colors-celebration';
+                // Visual-only celebration (no text)
                 celebrationEl.innerHTML = `
                     <div class="colors-celebration-content">
-                        <h2>🎨 Geweldig! 🎨</h2>
-                        <p>Je hebt alles gevonden dat ${this.targetColor.name.toLowerCase()} is!</p>
-                        <button class="colors-play-again-btn" id="colors-play-again">Andere kleur</button>
+                        <div class="celebration-emoji">🎨🌟🎨</div>
+                        <div class="celebration-color" style="background: ${this.targetColor.hex}; width: 120px; height: 120px; border-radius: 50%; margin: 20px auto; border: 6px solid white;"></div>
+                        <button class="colors-play-again-btn" id="colors-play-again">🔄</button>
                     </div>
                 `;
                 this.container.appendChild(celebrationEl);

@@ -117,6 +117,22 @@ const FarmGame = {
 
         this.total = this.animals.length;
         this.render();
+        this.syncGameState();
+    },
+
+    // Sync game state to Firebase for remote display
+    syncGameState() {
+        if (typeof TabletApp !== 'undefined' && TabletApp.roomRef) {
+            const nextAnimal = this.animals.find(a => !a.fed);
+            TabletApp.roomRef.child('gameState').update({
+                game: 'farm',
+                fed: this.fed,
+                total: this.total,
+                currentAnimal: nextAnimal?.emoji || '🐄',
+                completed: this.fed === this.total,
+                timestamp: Date.now()
+            });
+        }
     },
 
     render() {
@@ -245,6 +261,9 @@ const FarmGame = {
                         if (typeof AudioManager !== 'undefined') {
                             AudioManager.playPiecePlaced();
                         }
+
+                        // Sync progress to remote
+                        this.syncGameState();
 
                         if (this.fed === this.total) {
                             setTimeout(() => this.onGameComplete(), 500);

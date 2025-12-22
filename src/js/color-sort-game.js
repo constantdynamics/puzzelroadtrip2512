@@ -1,5 +1,6 @@
 // Color Sorting Game for Toddlers
 // Sort items into matching colored bins
+// Only using clearly colored items (WCAG compliant)
 
 const ColorSortGame = {
     container: null,
@@ -9,43 +10,49 @@ const ColorSortGame = {
     total: 0,
     draggedItem: null,
 
-    // Colors with items
+    // WCAG compliant colors with clearly colored items only
     colorData: {
         red: {
             name: 'Rood',
-            hex: '#FF6B6B',
-            items: ['🍎', '🍓', '❤️', '🌹', '🍅', '🦀', '🎈']
+            hex: '#E53935',
+            darkHex: '#B71C1C',
+            items: ['🍎', '🍓', '❤️', '🍅', '🎈', '🌶️', '🍒']
         },
         blue: {
             name: 'Blauw',
-            hex: '#4D96FF',
-            items: ['🐳', '💎', '🫐', '🧢', '🐬', '🦋', '💧']
+            hex: '#1E88E5',
+            darkHex: '#0D47A1',
+            items: ['🐳', '💎', '🫐', '💧', '🧊', '🐟', '🔵']
         },
         yellow: {
             name: 'Geel',
-            hex: '#FFD93D',
-            items: ['⭐', '🌻', '🍋', '🍌', '🐥', '☀️', '🧀']
+            hex: '#FDD835',
+            darkHex: '#F9A825',
+            items: ['⭐', '🌻', '🍋', '🍌', '☀️', '🌽', '🟡']
         },
         green: {
             name: 'Groen',
-            hex: '#6BCB77',
-            items: ['🥒', '🍀', '🐸', '🥝', '🌿', '🐢', '🥦']
+            hex: '#43A047',
+            darkHex: '#2E7D32',
+            items: ['🥒', '🍀', '🥝', '🥦', '🥬', '🌲', '🟢']
         },
         orange: {
             name: 'Oranje',
-            hex: '#FF8E53',
-            items: ['🍊', '🥕', '🎃', '🦊', '🏀', '🥭', '🐅']
+            hex: '#FB8C00',
+            darkHex: '#E65100',
+            items: ['🍊', '🥕', '🎃', '🥭', '🏀', '🧡', '🟠']
         },
         purple: {
             name: 'Paars',
-            hex: '#9B59B6',
-            items: ['🍇', '🍆', '💜', '🔮', '🦄', '👾', '🪻']
+            hex: '#8E24AA',
+            darkHex: '#6A1B9A',
+            items: ['🍇', '🍆', '💜', '🔮', '🟣', '☂️', '🪻']
         }
     },
 
     difficulties: {
-        easy: { colors: 2, itemsPerColor: 2 },
-        medium: { colors: 3, itemsPerColor: 2 },
+        easy: { colors: 2, itemsPerColor: 3 },
+        medium: { colors: 3, itemsPerColor: 3 },
         hard: { colors: 4, itemsPerColor: 3 }
     },
 
@@ -106,6 +113,20 @@ const ColorSortGame = {
         this.total = this.items.length;
 
         this.render();
+        this.syncGameState();
+    },
+
+    // Sync game state to Firebase for remote display
+    syncGameState() {
+        if (typeof TabletApp !== 'undefined' && TabletApp.roomRef) {
+            TabletApp.roomRef.child('gameState').update({
+                game: 'colorsort',
+                sorted: this.sorted,
+                total: this.total,
+                completed: this.sorted === this.total,
+                timestamp: Date.now()
+            });
+        }
     },
 
     render() {
@@ -116,17 +137,16 @@ const ColorSortGame = {
         this.container.innerHTML = `
             <div class="color-sort-game">
                 <div class="color-sort-header">
-                    <h2>🎨 Sorteer op kleur!</h2>
                     <div class="color-sort-score">
-                        ${this.sorted}/${this.total} gesorteerd
+                        ${this.sorted}/${this.total}
                     </div>
                 </div>
                 <div class="color-sort-area">
                     <div class="color-sort-bins">
                         ${this.bins.map(bin => `
                             <div class="color-sort-bin" data-color="${bin.color}"
-                                 style="background: ${bin.hex}20; border-color: ${bin.hex}">
-                                <div class="bin-label" style="background: ${bin.hex}">${bin.name}</div>
+                                 style="background: ${bin.hex}25; border-color: ${bin.hex}">
+                                <div class="bin-label" style="background: ${bin.hex}; border: 3px solid ${bin.darkHex}">${bin.name}</div>
                                 <div class="bin-contents">
                                     ${bin.items.map(emoji => `<span class="bin-item">${emoji}</span>`).join('')}
                                 </div>
@@ -228,6 +248,9 @@ const ColorSortGame = {
                         AudioManager.playPiecePlaced();
                     }
 
+                    // Sync progress to remote
+                    this.syncGameState();
+
                     if (this.sorted === this.total) {
                         setTimeout(() => this.onGameComplete(), 300);
                     }
@@ -263,9 +286,9 @@ const ColorSortGame = {
         celebrationEl.className = 'color-sort-celebration';
         celebrationEl.innerHTML = `
             <div class="color-sort-celebration-content">
-                <h2>🌈 Geweldig! 🌈</h2>
-                <p>Je hebt alles op kleur gesorteerd!</p>
-                <button class="color-sort-play-again-btn" id="color-sort-play-again">Opnieuw spelen</button>
+                <h2>🌈 Super! 🌈</h2>
+                <p>Alles op kleur!</p>
+                <button class="color-sort-play-again-btn" id="color-sort-play-again">Opnieuw</button>
             </div>
         `;
         this.container.appendChild(celebrationEl);

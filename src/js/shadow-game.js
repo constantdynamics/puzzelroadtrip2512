@@ -1,5 +1,6 @@
 // Shadow Matching Game for Toddlers
 // Drag items to match their shadows
+// Configurable count and category
 
 const ShadowGame = {
     container: null,
@@ -11,51 +12,75 @@ const ShadowGame = {
 
     // Items with their emoji representations
     itemSets: {
-        animals: [
-            { emoji: '🐘', name: 'olifant' },
-            { emoji: '🦒', name: 'giraffe' },
-            { emoji: '🐕', name: 'hond' },
-            { emoji: '🐈', name: 'kat' },
-            { emoji: '🐰', name: 'konijn' },
-            { emoji: '🦋', name: 'vlinder' },
-            { emoji: '🐢', name: 'schildpad' },
-            { emoji: '🐟', name: 'vis' },
-            { emoji: '🦆', name: 'eend' },
-            { emoji: '🐓', name: 'haan' }
-        ],
-        vehicles: [
-            { emoji: '🚗', name: 'auto' },
-            { emoji: '🚌', name: 'bus' },
-            { emoji: '✈️', name: 'vliegtuig' },
-            { emoji: '🚂', name: 'trein' },
-            { emoji: '🚢', name: 'boot' },
-            { emoji: '🚁', name: 'helikopter' },
-            { emoji: '🚲', name: 'fiets' },
-            { emoji: '🏍️', name: 'motor' },
-            { emoji: '🚜', name: 'tractor' },
-            { emoji: '🚒', name: 'brandweer' }
-        ],
-        objects: [
-            { emoji: '⭐', name: 'ster' },
-            { emoji: '❤️', name: 'hart' },
-            { emoji: '🌙', name: 'maan' },
-            { emoji: '🌳', name: 'boom' },
-            { emoji: '🏠', name: 'huis' },
-            { emoji: '⚽', name: 'bal' },
-            { emoji: '🎈', name: 'ballon' },
-            { emoji: '🍎', name: 'appel' },
-            { emoji: '🌻', name: 'bloem' },
-            { emoji: '☂️', name: 'paraplu' }
-        ]
+        animals: {
+            name: 'Dieren',
+            emoji: '🐘',
+            items: [
+                { emoji: '🐘', name: 'olifant' },
+                { emoji: '🦒', name: 'giraffe' },
+                { emoji: '🐕', name: 'hond' },
+                { emoji: '🐈', name: 'kat' },
+                { emoji: '🐰', name: 'konijn' },
+                { emoji: '🐢', name: 'schildpad' },
+                { emoji: '🐟', name: 'vis' },
+                { emoji: '🦆', name: 'eend' },
+                { emoji: '🐓', name: 'haan' },
+                { emoji: '🐷', name: 'varken' }
+            ]
+        },
+        vehicles: {
+            name: 'Voertuigen',
+            emoji: '🚗',
+            items: [
+                { emoji: '🚗', name: 'auto' },
+                { emoji: '🚌', name: 'bus' },
+                { emoji: '✈️', name: 'vliegtuig' },
+                { emoji: '🚂', name: 'trein' },
+                { emoji: '🚢', name: 'boot' },
+                { emoji: '🚁', name: 'helikopter' },
+                { emoji: '🚲', name: 'fiets' },
+                { emoji: '🚜', name: 'tractor' },
+                { emoji: '🚒', name: 'brandweer' },
+                { emoji: '🚀', name: 'raket' }
+            ]
+        },
+        objects: {
+            name: 'Voorwerpen',
+            emoji: '⭐',
+            items: [
+                { emoji: '⭐', name: 'ster' },
+                { emoji: '❤️', name: 'hart' },
+                { emoji: '🌙', name: 'maan' },
+                { emoji: '🌳', name: 'boom' },
+                { emoji: '🏠', name: 'huis' },
+                { emoji: '⚽', name: 'bal' },
+                { emoji: '🎈', name: 'ballon' },
+                { emoji: '🍎', name: 'appel' },
+                { emoji: '🌻', name: 'bloem' },
+                { emoji: '☂️', name: 'paraplu' }
+            ]
+        },
+        food: {
+            name: 'Eten',
+            emoji: '🍕',
+            items: [
+                { emoji: '🍕', name: 'pizza' },
+                { emoji: '🍔', name: 'hamburger' },
+                { emoji: '🍎', name: 'appel' },
+                { emoji: '🍌', name: 'banaan' },
+                { emoji: '🍓', name: 'aardbei' },
+                { emoji: '🥕', name: 'wortel' },
+                { emoji: '🍪', name: 'koekje' },
+                { emoji: '🧁', name: 'cupcake' },
+                { emoji: '🍩', name: 'donut' },
+                { emoji: '🍦', name: 'ijsje' }
+            ]
+        }
     },
 
-    difficulties: {
-        easy: 3,
-        medium: 4,
-        hard: 6
-    },
-
-    difficulty: 'easy',
+    // Count options
+    countOptions: [2, 3, 4, 5, 6],
+    itemCount: 3,
     currentSet: 'animals',
 
     init(containerId) {
@@ -68,14 +93,22 @@ const ShadowGame = {
     },
 
     setDifficulty(level) {
-        if (this.difficulties[level]) {
-            this.difficulty = level;
+        // Map difficulty to count
+        const mapping = { easy: 3, medium: 4, hard: 5 };
+        if (mapping[level]) {
+            this.itemCount = mapping[level];
         }
     },
 
-    setTheme(theme) {
-        if (this.itemSets[theme]) {
-            this.currentSet = theme;
+    setCount(count) {
+        if (this.countOptions.includes(count)) {
+            this.itemCount = count;
+        }
+    },
+
+    setCategory(category) {
+        if (this.itemSets[category]) {
+            this.currentSet = category;
         }
     },
 
@@ -83,12 +116,11 @@ const ShadowGame = {
         this.matched = 0;
         this.draggedItem = null;
 
-        const itemCount = this.difficulties[this.difficulty];
-        const allItems = [...this.itemSets[this.currentSet]];
+        const allItems = [...this.itemSets[this.currentSet].items];
 
         // Shuffle and pick items
         const shuffled = allItems.sort(() => Math.random() - 0.5);
-        this.items = shuffled.slice(0, itemCount).map((item, index) => ({
+        this.items = shuffled.slice(0, this.itemCount).map((item, index) => ({
             ...item,
             id: index,
             matched: false
@@ -96,6 +128,22 @@ const ShadowGame = {
 
         this.total = this.items.length;
         this.render();
+        this.syncGameState();
+    },
+
+    // Sync game state to Firebase for remote display
+    syncGameState() {
+        if (typeof TabletApp !== 'undefined' && TabletApp.roomRef) {
+            const nextItem = this.items.find(i => !i.matched);
+            TabletApp.roomRef.child('gameState').update({
+                game: 'shadow',
+                found: this.matched,
+                total: this.total,
+                targetEmoji: nextItem?.emoji || '🔍',
+                completed: this.matched === this.total,
+                timestamp: Date.now()
+            });
+        }
     },
 
     render() {
@@ -104,12 +152,35 @@ const ShadowGame = {
         // Create shuffled order for draggable items
         const dragOrder = [...this.items].sort(() => Math.random() - 0.5);
 
+        // Category buttons
+        const categoryButtons = Object.entries(this.itemSets).map(([key, cat]) => `
+            <button class="shadow-category-btn ${key === this.currentSet ? 'active' : ''}"
+                    data-category="${key}">
+                ${cat.emoji}
+            </button>
+        `).join('');
+
+        // Count buttons
+        const countButtons = this.countOptions.map(count => `
+            <button class="shadow-count-btn ${count === this.itemCount ? 'active' : ''}"
+                    data-count="${count}">
+                ${count}
+            </button>
+        `).join('');
+
         this.container.innerHTML = `
             <div class="shadow-game">
                 <div class="shadow-header">
-                    <h2>🔍 Sleep naar de schaduw!</h2>
+                    <div class="shadow-settings">
+                        <div class="shadow-categories">
+                            ${categoryButtons}
+                        </div>
+                        <div class="shadow-counts">
+                            ${countButtons}
+                        </div>
+                    </div>
                     <div class="shadow-score">
-                        ${this.matched}/${this.total} gevonden
+                        ${this.matched}/${this.total}
                     </div>
                 </div>
                 <div class="shadow-play-area">
@@ -137,6 +208,22 @@ const ShadowGame = {
     },
 
     setupEvents() {
+        // Category buttons
+        this.container.querySelectorAll('.shadow-category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.setCategory(btn.dataset.category);
+                this.reset();
+            });
+        });
+
+        // Count buttons
+        this.container.querySelectorAll('.shadow-count-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.setCount(parseInt(btn.dataset.count));
+                this.reset();
+            });
+        });
+
         const draggables = this.container.querySelectorAll('.shadow-draggable');
 
         draggables.forEach(el => {
@@ -219,6 +306,9 @@ const ShadowGame = {
                     AudioManager.playPiecePlaced();
                 }
 
+                // Sync progress to remote
+                this.syncGameState();
+
                 if (this.matched === this.total) {
                     setTimeout(() => this.onGameComplete(), 300);
                 }
@@ -248,8 +338,8 @@ const ShadowGame = {
         celebrationEl.innerHTML = `
             <div class="shadow-celebration-content">
                 <h2>🌟 Super! 🌟</h2>
-                <p>Je hebt alle schaduwen gevonden!</p>
-                <button class="shadow-play-again-btn" id="shadow-play-again">Opnieuw spelen</button>
+                <p>Alle schaduwen gevonden!</p>
+                <button class="shadow-play-again-btn" id="shadow-play-again">Opnieuw</button>
             </div>
         `;
         this.container.appendChild(celebrationEl);

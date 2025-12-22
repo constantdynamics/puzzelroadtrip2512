@@ -150,11 +150,22 @@ const RemoteControl = {
                 throw new Error('Kamer niet gevonden');
             }
             await this.roomRef.update({ lastActivity: Date.now() });
+
+            // Listen for game state updates (Colors, Counting, etc.)
+            this.roomRef.child('gameState').on('value', (snapshot) => {
+                const gameState = snapshot.val();
+                if (gameState && this.onGameStateUpdate) {
+                    this.onGameStateUpdate(gameState);
+                }
+            });
         }
 
         console.log('RemoteControl: Joined room', code);
         return true;
     },
+
+    // Callback for game state updates
+    onGameStateUpdate: null,
 
     // Send a piece command (called by parent)
     async sendPiece() {

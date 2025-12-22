@@ -1,5 +1,5 @@
 // Shape Sorting Game for Toddlers
-// Drag shapes to matching holes
+// Drag shapes to matching holes - WCAG accessible design
 
 const ShapesGame = {
     container: null,
@@ -9,20 +9,20 @@ const ShapesGame = {
     matched: 0,
     total: 0,
 
-    // Shape definitions with emoji and path
+    // Shape definitions with high contrast WCAG compliant colors
     shapeTypes: [
-        { name: 'circle', emoji: '🔴', color: '#FF6B6B' },
-        { name: 'square', emoji: '🟦', color: '#4D96FF' },
-        { name: 'triangle', emoji: '🔺', color: '#FFD93D' },
-        { name: 'star', emoji: '⭐', color: '#FF8E53' },
-        { name: 'heart', emoji: '💜', color: '#9B59B6' },
-        { name: 'diamond', emoji: '🔷', color: '#4ECDC4' }
+        { name: 'circle', color: '#E53935', darkColor: '#B71C1C' },      // Red
+        { name: 'square', color: '#1E88E5', darkColor: '#0D47A1' },       // Blue
+        { name: 'triangle', color: '#FDD835', darkColor: '#F9A825' },     // Yellow
+        { name: 'star', color: '#FB8C00', darkColor: '#E65100' },         // Orange
+        { name: 'heart', color: '#8E24AA', darkColor: '#6A1B9A' },        // Purple
+        { name: 'diamond', color: '#00ACC1', darkColor: '#006064' }       // Cyan
     ],
 
     difficulties: {
-        easy: 3,    // 3 shapes
-        medium: 4,  // 4 shapes
-        hard: 6     // 6 shapes
+        easy: 3,
+        medium: 4,
+        hard: 5
     },
 
     difficulty: 'easy',
@@ -46,7 +46,6 @@ const ShapesGame = {
         this.matched = 0;
         this.total = this.difficulties[this.difficulty];
 
-        // Select random shapes
         const shuffled = [...this.shapeTypes].sort(() => Math.random() - 0.5);
         this.shapes = shuffled.slice(0, this.total).map((shape, i) => ({
             ...shape,
@@ -54,11 +53,38 @@ const ShapesGame = {
             isMatched: false
         }));
 
-        // Create holes in random order
         this.holes = [...this.shapes].sort(() => Math.random() - 0.5);
 
         this.render();
         this.setupEvents();
+        this.syncGameState();
+    },
+
+    // Sync game state to Firebase for remote display
+    syncGameState() {
+        if (typeof TabletApp !== 'undefined' && TabletApp.roomRef) {
+            const currentShape = this.shapes.find(s => !s.isMatched);
+            TabletApp.roomRef.child('gameState').update({
+                game: 'shapes',
+                placed: this.matched,
+                total: this.total,
+                currentShape: currentShape ? this.getShapeEmoji(currentShape.name) : '',
+                completed: this.matched === this.total,
+                timestamp: Date.now()
+            });
+        }
+    },
+
+    getShapeEmoji(shapeName) {
+        const emojis = {
+            circle: '🔴',
+            square: '🟦',
+            triangle: '🔺',
+            star: '⭐',
+            heart: '❤️',
+            diamond: '💎'
+        };
+        return emojis[shapeName] || '🔷';
     },
 
     render() {
@@ -66,9 +92,6 @@ const ShapesGame = {
 
         this.container.innerHTML = `
             <div class="shapes-game">
-                <div class="shapes-header">
-                    <span class="shapes-score">Gesorteerd: ${this.matched}/${this.total}</span>
-                </div>
                 <div class="shapes-board">
                     <div class="holes-area">
                         ${this.holes.map(hole => this.renderHole(hole)).join('')}
@@ -85,8 +108,8 @@ const ShapesGame = {
         const filled = this.shapes.find(s => s.name === hole.name && s.isMatched);
         return `
             <div class="shape-hole ${filled ? 'filled' : ''}" data-shape="${hole.name}">
-                <div class="hole-outline" style="--shape-color: ${hole.color}">
-                    ${this.getShapeSVG(hole.name, true)}
+                <div class="hole-outline">
+                    ${this.getShapeSVG(hole.name, true, hole.darkColor)}
                 </div>
                 ${filled ? `<div class="hole-filled">${this.getShapeSVG(hole.name, false, hole.color)}</div>` : ''}
             </div>
@@ -101,22 +124,26 @@ const ShapesGame = {
         `;
     },
 
-    getShapeSVG(shapeName, isOutline = false, color = '#ccc') {
-        const stroke = isOutline ? 'stroke="#aaa" stroke-width="3" stroke-dasharray="8,4" fill="rgba(0,0,0,0.05)"' : `fill="${color}"`;
-        const size = 80;
+    getShapeSVG(shapeName, isOutline = false, color = '#666') {
+        // Outline: white fill with colored dashed border
+        // Filled: solid color
+        const size = 120;
+        const stroke = isOutline
+            ? `stroke="${color}" stroke-width="4" stroke-dasharray="10,6" fill="white"`
+            : `fill="${color}" stroke="#333" stroke-width="2"`;
 
         switch(shapeName) {
             case 'circle':
                 return `<svg width="${size}" height="${size}" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="45" ${stroke}/>
+                    <circle cx="50" cy="50" r="42" ${stroke}/>
                 </svg>`;
             case 'square':
                 return `<svg width="${size}" height="${size}" viewBox="0 0 100 100">
-                    <rect x="10" y="10" width="80" height="80" rx="5" ${stroke}/>
+                    <rect x="8" y="8" width="84" height="84" rx="8" ${stroke}/>
                 </svg>`;
             case 'triangle':
                 return `<svg width="${size}" height="${size}" viewBox="0 0 100 100">
-                    <polygon points="50,5 95,90 5,90" ${stroke}/>
+                    <polygon points="50,8 92,88 8,88" ${stroke}/>
                 </svg>`;
             case 'star':
                 return `<svg width="${size}" height="${size}" viewBox="0 0 100 100">
@@ -139,12 +166,9 @@ const ShapesGame = {
         const shapes = this.container.querySelectorAll('.draggable-shape');
 
         shapes.forEach(shape => {
-            // Touch events
             shape.addEventListener('touchstart', (e) => this.onDragStart(e, shape), { passive: false });
             shape.addEventListener('touchmove', (e) => this.onDragMove(e), { passive: false });
             shape.addEventListener('touchend', (e) => this.onDragEnd(e));
-
-            // Mouse events
             shape.addEventListener('mousedown', (e) => this.onDragStart(e, shape));
         });
 
@@ -197,7 +221,6 @@ const ShapesGame = {
         const touch = e.changedTouches ? e.changedTouches[0] : e;
         const el = this.currentDragging.element;
 
-        // Check if dropped on matching hole
         const holes = this.container.querySelectorAll('.shape-hole');
         let matched = false;
 
@@ -210,7 +233,6 @@ const ShapesGame = {
                 dropY >= holeRect.top && dropY <= holeRect.bottom) {
 
                 if (hole.dataset.shape === this.currentDragging.shapeName && !hole.classList.contains('filled')) {
-                    // Match!
                     matched = true;
                     this.onMatch(this.currentDragging.shapeId, hole);
                 }
@@ -218,7 +240,6 @@ const ShapesGame = {
         });
 
         if (!matched) {
-            // Return to original position
             el.classList.remove('dragging');
             el.style.position = '';
             el.style.zIndex = '';
@@ -240,6 +261,7 @@ const ShapesGame = {
             }
 
             this.render();
+            this.syncGameState();
 
             if (this.matched === this.total) {
                 this.onGameComplete();
@@ -258,9 +280,8 @@ const ShapesGame = {
                 celebrationEl.className = 'shapes-celebration';
                 celebrationEl.innerHTML = `
                     <div class="shapes-celebration-content">
-                        <h2>🎉 Super! 🎉</h2>
-                        <p>Alle vormen gesorteerd!</p>
-                        <button class="shapes-play-again-btn" id="shapes-play-again">Opnieuw spelen</button>
+                        <h2>🎉</h2>
+                        <button class="shapes-play-again-btn" id="shapes-play-again">🔄</button>
                     </div>
                 `;
                 this.container.appendChild(celebrationEl);

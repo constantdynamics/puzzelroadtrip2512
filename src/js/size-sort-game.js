@@ -1,58 +1,31 @@
 // Size Sorting Game for Toddlers
-// Sort items from biggest to smallest (or vice versa)
+// Sort shapes from small to big (left to right)
+// Smallest and biggest are already placed as hints
 
 const SizeSortGame = {
     container: null,
     items: [],
     slots: [],
-    currentOrder: [],
     draggedItem: null,
+    currentShape: 'circle',
 
-    // Item themes
-    themes: {
-        animals: [
-            { emoji: '🐘', name: 'olifant' },
-            { emoji: '🦁', name: 'leeuw' },
-            { emoji: '🐕', name: 'hond' },
-            { emoji: '🐈', name: 'kat' },
-            { emoji: '🐰', name: 'konijn' },
-            { emoji: '🐁', name: 'muis' }
-        ],
-        fruits: [
-            { emoji: '🍉', name: 'watermeloen' },
-            { emoji: '🍎', name: 'appel' },
-            { emoji: '🍊', name: 'sinaasappel' },
-            { emoji: '🍋', name: 'citroen' },
-            { emoji: '🍓', name: 'aardbei' },
-            { emoji: '🫐', name: 'bosbes' }
-        ],
-        vehicles: [
-            { emoji: '🚂', name: 'trein' },
-            { emoji: '🚌', name: 'bus' },
-            { emoji: '🚗', name: 'auto' },
-            { emoji: '🏍️', name: 'motor' },
-            { emoji: '🚲', name: 'fiets' },
-            { emoji: '🛴', name: 'step' }
-        ],
-        balls: [
-            { emoji: '🏀', name: 'basketbal' },
-            { emoji: '⚽', name: 'voetbal' },
-            { emoji: '🎾', name: 'tennisbal' },
-            { emoji: '🏐', name: 'volleybal' },
-            { emoji: '⚾', name: 'honkbal' },
-            { emoji: '🏓', name: 'pingpongbal' }
-        ]
-    },
+    // Shape types with colors
+    shapes: [
+        { type: 'circle', color: '#E53935', name: 'cirkel' },
+        { type: 'square', color: '#1E88E5', name: 'vierkant' },
+        { type: 'triangle', color: '#FDD835', name: 'driehoek' },
+        { type: 'star', color: '#FB8C00', name: 'ster' },
+        { type: 'heart', color: '#8E24AA', name: 'hart' }
+    ],
 
-    difficulties: {
-        easy: 3,
-        medium: 4,
-        hard: 5
-    },
-
-    difficulty: 'easy',
-    currentTheme: 'animals',
-    sortDirection: 'big-to-small', // or 'small-to-big'
+    // Always 5 items with distinct sizes
+    sizes: [
+        { size: 1, scale: 0.4 },  // Smallest (left - given)
+        { size: 2, scale: 0.55 },
+        { size: 3, scale: 0.7 },
+        { size: 4, scale: 0.85 },
+        { size: 5, scale: 1.0 }   // Biggest (right - given)
+    ],
 
     init(containerId) {
         this.container = document.getElementById(containerId);
@@ -63,88 +36,150 @@ const SizeSortGame = {
         this.reset();
     },
 
-    setDifficulty(level) {
-        if (this.difficulties[level]) {
-            this.difficulty = level;
-        }
-    },
-
-    setTheme(theme) {
-        if (this.themes[theme]) {
-            this.currentTheme = theme;
-        }
-    },
-
     reset() {
         this.draggedItem = null;
-        this.currentOrder = [];
 
-        // Random direction
-        this.sortDirection = Math.random() < 0.5 ? 'big-to-small' : 'small-to-big';
+        // Pick random shape
+        this.currentShape = this.shapes[Math.floor(Math.random() * this.shapes.length)];
 
-        const itemCount = this.difficulties[this.difficulty];
-        const themeItems = [...this.themes[this.currentTheme]];
-
-        // Take first itemCount items (they're ordered by size in theme)
-        this.items = themeItems.slice(0, itemCount).map((item, index) => ({
-            ...item,
+        // Create 5 items
+        this.items = this.sizes.map((sizeInfo, index) => ({
             id: index,
-            size: itemCount - index, // Biggest = highest number
+            size: sizeInfo.size,
+            scale: sizeInfo.scale,
             placed: false,
-            slotIndex: null
+            slotIndex: null,
+            isHint: index === 0 || index === 4 // First and last are hints
         }));
 
-        // Create empty slots
-        this.slots = Array(itemCount).fill(null);
+        // Pre-place the hints (smallest left, biggest right)
+        this.items[0].placed = true;
+        this.items[0].slotIndex = 0;
+        this.items[4].placed = true;
+        this.items[4].slotIndex = 4;
+
+        // Create slots
+        this.slots = [this.items[0], null, null, null, this.items[4]];
 
         this.render();
+        this.syncGameState();
+    },
+
+    // Sync game state to Firebase for remote display
+    syncGameState() {
+        if (typeof TabletApp !== 'undefined' && TabletApp.roomRef) {
+            const sorted = this.items.filter(i => i.placed).length;
+            TabletApp.roomRef.child('gameState').update({
+                game: 'sizesort',
+                sorted: sorted,
+                total: 5,
+                completed: sorted === 5,
+                timestamp: Date.now()
+            });
+        }
+    },
+
+    getShapeSVG(scale, isPlaceholder = false) {
+        const baseSize = 100;
+        const size = baseSize * scale;
+        const color = isPlaceholder ? '#DDD' : this.currentShape.color;
+        const stroke = isPlaceholder ? '#999' : this.getDarkColor(this.currentShape.color);
+        const strokeStyle = isPlaceholder ? 'stroke-dasharray="8,4"' : '';
+        const fill = isPlaceholder ? 'white' : color;
+
+        switch (this.currentShape.type) {
+            case 'circle':
+                return `<svg width="${size}" height="${size}" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="${fill}" stroke="${stroke}" stroke-width="4" ${strokeStyle}/>
+                </svg>`;
+
+            case 'square':
+                return `<svg width="${size}" height="${size}" viewBox="0 0 100 100">
+                    <rect x="5" y="5" width="90" height="90" rx="8" fill="${fill}" stroke="${stroke}" stroke-width="4" ${strokeStyle}/>
+                </svg>`;
+
+            case 'triangle':
+                return `<svg width="${size}" height="${size}" viewBox="0 0 100 100">
+                    <polygon points="50,5 95,90 5,90" fill="${fill}" stroke="${stroke}" stroke-width="4" ${strokeStyle}/>
+                </svg>`;
+
+            case 'star':
+                return `<svg width="${size}" height="${size}" viewBox="0 0 100 100">
+                    <polygon points="50,5 61,35 95,35 68,55 79,90 50,70 21,90 32,55 5,35 39,35"
+                             fill="${fill}" stroke="${stroke}" stroke-width="3" ${strokeStyle}/>
+                </svg>`;
+
+            case 'heart':
+                return `<svg width="${size}" height="${size}" viewBox="0 0 100 100">
+                    <path d="M50,88 C20,60 5,40 5,25 C5,10 20,5 35,5 C45,5 50,15 50,15
+                             C50,15 55,5 65,5 C80,5 95,10 95,25 C95,40 80,60 50,88Z"
+                          fill="${fill}" stroke="${stroke}" stroke-width="3" ${strokeStyle}/>
+                </svg>`;
+
+            default:
+                return `<svg width="${size}" height="${size}" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="${fill}" stroke="${stroke}" stroke-width="4" ${strokeStyle}/>
+                </svg>`;
+        }
+    },
+
+    getDarkColor(color) {
+        // Simple darkening
+        const colors = {
+            '#E53935': '#B71C1C',
+            '#1E88E5': '#0D47A1',
+            '#FDD835': '#F9A825',
+            '#FB8C00': '#E65100',
+            '#8E24AA': '#6A1B9A'
+        };
+        return colors[color] || '#333';
     },
 
     render() {
         if (!this.container) return;
 
-        const directionText = this.sortDirection === 'big-to-small'
-            ? 'Van GROOT naar klein'
-            : 'Van klein naar GROOT';
-
-        const directionEmoji = this.sortDirection === 'big-to-small'
-            ? '⬇️'
-            : '⬆️';
-
-        // Shuffle items for display
-        const shuffledItems = [...this.items].filter(i => !i.placed).sort(() => Math.random() - 0.5);
+        // Get items that need to be placed (not hints, not placed)
+        const availableItems = this.items.filter(i => !i.placed && !i.isHint);
+        // Shuffle them
+        const shuffledItems = [...availableItems].sort(() => Math.random() - 0.5);
 
         this.container.innerHTML = `
             <div class="size-sort-game">
                 <div class="size-sort-header">
-                    <h2>${directionEmoji} ${directionText} ${directionEmoji}</h2>
-                    <p>Sleep de plaatjes in de goede volgorde!</p>
+                    <div class="size-hint-left">
+                        <span class="hint-arrow">⬅️</span>
+                        <span class="hint-text">Klein</span>
+                    </div>
+                    <div class="size-hint-right">
+                        <span class="hint-text">Groot</span>
+                        <span class="hint-arrow">➡️</span>
+                    </div>
                 </div>
                 <div class="size-sort-area">
                     <div class="size-sort-slots">
                         ${this.slots.map((slot, index) => {
                             const placedItem = this.items.find(i => i.slotIndex === index);
-                            const sizeLabel = this.sortDirection === 'big-to-small'
-                                ? (index === 0 ? 'GROOT' : (index === this.slots.length - 1 ? 'klein' : ''))
-                                : (index === 0 ? 'klein' : (index === this.slots.length - 1 ? 'GROOT' : ''));
+                            const isHintSlot = index === 0 || index === 4;
                             return `
-                                <div class="size-sort-slot ${placedItem ? 'filled' : ''}" data-slot="${index}">
-                                    ${sizeLabel ? `<div class="slot-label">${sizeLabel}</div>` : ''}
+                                <div class="size-sort-slot ${placedItem ? 'filled' : ''} ${isHintSlot ? 'hint-slot' : ''}"
+                                     data-slot="${index}">
                                     ${placedItem ? `
-                                        <div class="size-sort-item placed" style="font-size: ${this.getItemFontSize(placedItem.size)}px">
-                                            ${placedItem.emoji}
+                                        <div class="size-sort-shape placed ${isHintSlot ? 'hint-shape' : ''}">
+                                            ${this.getShapeSVG(placedItem.scale)}
                                         </div>
-                                    ` : '<div class="slot-placeholder">?</div>'}
+                                    ` : `
+                                        <div class="slot-placeholder">
+                                            ${this.getShapeSVG(this.sizes[index].scale, true)}
+                                        </div>
+                                    `}
                                 </div>
                             `;
                         }).join('')}
                     </div>
                     <div class="size-sort-items">
                         ${shuffledItems.map(item => `
-                            <div class="size-sort-item draggable"
-                                 data-id="${item.id}"
-                                 style="font-size: ${this.getItemFontSize(item.size)}px">
-                                ${item.emoji}
+                            <div class="size-sort-shape draggable" data-id="${item.id}">
+                                ${this.getShapeSVG(item.scale)}
                             </div>
                         `).join('')}
                     </div>
@@ -155,16 +190,8 @@ const SizeSortGame = {
         this.setupEvents();
     },
 
-    getItemFontSize(size) {
-        // Scale from 40px to 80px based on size
-        const minSize = 40;
-        const maxSize = 80;
-        const maxItemSize = this.difficulties[this.difficulty];
-        return minSize + ((size / maxItemSize) * (maxSize - minSize));
-    },
-
     setupEvents() {
-        const draggables = this.container.querySelectorAll('.size-sort-item.draggable');
+        const draggables = this.container.querySelectorAll('.size-sort-shape.draggable');
 
         draggables.forEach(el => {
             el.addEventListener('touchstart', (e) => this.startDrag(e, el), { passive: false });
@@ -231,10 +258,9 @@ const SizeSortGame = {
                 clientY >= rect.top && clientY <= rect.bottom &&
                 this.slots[slotIndex] === null) {
 
-                // Check if correct position
-                const expectedSize = this.sortDirection === 'big-to-small'
-                    ? this.difficulties[this.difficulty] - slotIndex
-                    : slotIndex + 1;
+                // Check if correct position (slot index should match size - 1)
+                // Size 1 goes in slot 0, size 2 in slot 1, etc.
+                const expectedSize = slotIndex + 1;
 
                 if (this.draggedItem.item.size === expectedSize) {
                     // Correct!
@@ -246,6 +272,9 @@ const SizeSortGame = {
                     if (typeof AudioManager !== 'undefined') {
                         AudioManager.playPiecePlaced();
                     }
+
+                    // Sync progress to remote
+                    this.syncGameState();
 
                     // Check if complete
                     if (this.items.every(i => i.placed)) {
@@ -283,9 +312,12 @@ const SizeSortGame = {
         celebrationEl.className = 'size-sort-celebration';
         celebrationEl.innerHTML = `
             <div class="size-sort-celebration-content">
-                <h2>🎉 Geweldig! 🎉</h2>
-                <p>Je hebt alles goed gesorteerd!</p>
-                <button class="size-sort-play-again-btn" id="size-sort-play-again">Opnieuw spelen</button>
+                <h2>🎉 Super! 🎉</h2>
+                <p>Alles op volgorde!</p>
+                <div class="celebration-shapes">
+                    ${this.items.map(i => this.getShapeSVG(i.scale)).join('')}
+                </div>
+                <button class="size-sort-play-again-btn" id="size-sort-play-again">Opnieuw</button>
             </div>
         `;
         this.container.appendChild(celebrationEl);

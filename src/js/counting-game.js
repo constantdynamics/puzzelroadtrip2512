@@ -68,7 +68,27 @@ const CountingGame = {
         this.correctAnswer = config.min + Math.floor(Math.random() * (config.max - config.min + 1));
 
         this.currentItem = itemSet;
+
+        // Sync to Firebase for remote display
+        this.syncGameState();
+
         this.render();
+    },
+
+    syncGameState() {
+        // Sync to Firebase so remote can display question and answer
+        if (typeof TabletApp !== 'undefined' && TabletApp.roomRef) {
+            TabletApp.roomRef.child('gameState').update({
+                game: 'counting',
+                emoji: this.currentItem.emoji,
+                itemName: this.currentItem.name,
+                correctAnswer: this.correctAnswer,
+                round: this.rounds,
+                maxRounds: this.maxRounds,
+                score: this.score,
+                timestamp: Date.now()
+            });
+        }
     },
 
     render() {
@@ -81,8 +101,8 @@ const CountingGame = {
         for (let i = 0; i < this.correctAnswer; i++) {
             items.push({
                 emoji: this.currentItem.emoji,
-                x: 15 + Math.random() * 70,
-                y: 15 + Math.random() * 60,
+                x: 10 + Math.random() * 80,
+                y: 10 + Math.random() * 70,
                 rotation: -15 + Math.random() * 30,
                 scale: 0.9 + Math.random() * 0.3
             });
@@ -91,18 +111,24 @@ const CountingGame = {
         // Generate number buttons (shuffled wrong answers + correct)
         const numbers = this.generateNumberOptions();
 
+        // Visual-only interface (no text - parent reads from remote)
         this.container.innerHTML = `
             <div class="counting-game">
                 <div class="counting-header">
-                    <div class="counting-progress">
-                        Ronde ${this.rounds}/${this.maxRounds}
+                    <div class="counting-visual-progress">
+                        ${Array(this.maxRounds).fill(0).map((_, i) => `
+                            <span class="progress-circle ${i < this.rounds ? 'done' : ''} ${i === this.rounds - 1 ? 'current' : ''}">
+                                ${i < this.rounds - 1 ? '✓' : (i === this.rounds - 1 ? this.rounds : '')}
+                            </span>
+                        `).join('')}
                     </div>
-                    <div class="counting-score">
-                        Score: ${this.score}
+                    <div class="counting-visual-score">
+                        ${'⭐'.repeat(this.score)}${'○'.repeat(this.rounds - 1 - this.score)}
                     </div>
                 </div>
-                <div class="counting-question">
-                    <span>Hoeveel ${this.currentItem.name}?</span>
+                <div class="counting-question-visual">
+                    <span class="counting-question-emoji">${this.currentItem.emoji}</span>
+                    <span class="counting-question-mark">?</span>
                 </div>
                 <div class="counting-items-area">
                     ${items.map(item => `
@@ -169,6 +195,9 @@ const CountingGame = {
             // Show celebration briefly
             this.showFeedback(true);
 
+            // Sync score to remote
+            this.syncGameState();
+
             setTimeout(() => {
                 this.nextRound();
             }, 1000);
@@ -204,16 +233,31 @@ const CountingGame = {
 
         const stars = this.score >= this.maxRounds ? 3 : (this.score >= this.maxRounds - 1 ? 2 : 1);
 
+        // Sync completion to remote
+        if (typeof TabletApp !== 'undefined' && TabletApp.roomRef) {
+            TabletApp.roomRef.child('gameState').update({
+                game: 'counting',
+                completed: true,
+                finalScore: this.score,
+                maxRounds: this.maxRounds,
+                stars: stars,
+                timestamp: Date.now()
+            });
+        }
+
+        // Visual-only celebration (no text)
         this.container.innerHTML = `
             <div class="counting-game">
                 <div class="counting-celebration">
-                    <h2>🎉 Klaar! 🎉</h2>
-                    <p>Je hebt ${this.score} van de ${this.maxRounds} goed!</p>
+                    <div class="celebration-emoji">🎉🔢🎉</div>
                     <div class="counting-stars">
                         ${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}
                     </div>
+                    <div class="counting-final-score">
+                        ${this.score}/${this.maxRounds}
+                    </div>
                     <button class="counting-play-again-btn" id="counting-play-again">
-                        Opnieuw tellen
+                        🔄
                     </button>
                 </div>
             </div>

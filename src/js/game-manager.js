@@ -73,11 +73,6 @@ const GameManager = {
             emoji: '🚜',
             description: 'Voer de dieren!'
         },
-        dressup: {
-            name: 'Aankleden',
-            emoji: '👗',
-            description: 'Kleed het poppetje aan!'
-        },
         cooking: {
             name: 'Koken',
             emoji: '👨‍🍳',
@@ -126,7 +121,7 @@ const GameManager = {
         // Hide all other game containers
         const allGames = [
             'memory', 'drawing', 'shapes', 'music', 'carwash', 'colors', 'counting',
-            'shadow', 'sizesort', 'colorsort', 'sorting', 'farm', 'dressup', 'cooking'
+            'shadow', 'sizesort', 'colorsort', 'sorting', 'farm', 'cooking'
         ];
 
         allGames.forEach(game => {
@@ -209,9 +204,6 @@ const GameManager = {
                 break;
             case 'farm':
                 if (typeof FarmGame !== 'undefined') FarmGame.init(containerId);
-                break;
-            case 'dressup':
-                if (typeof DressUpGame !== 'undefined') DressUpGame.init(containerId);
                 break;
             case 'cooking':
                 if (typeof CookingGame !== 'undefined') CookingGame.init(containerId);
@@ -342,16 +334,6 @@ const GameManager = {
         }
     },
 
-    // Settings for dress up game
-    setDressUpDifficulty(level) {
-        if (typeof DressUpGame !== 'undefined') {
-            DressUpGame.setDifficulty(level);
-            if (this.currentGame === 'dressup') {
-                DressUpGame.reset();
-            }
-        }
-    },
-
     // Settings for cooking game
     setCookingDifficulty(level) {
         if (typeof CookingGame !== 'undefined') {
@@ -415,9 +397,6 @@ const GameManager = {
                 break;
             case 'farm':
                 if (typeof FarmGame !== 'undefined') FarmGame.reset();
-                break;
-            case 'dressup':
-                if (typeof DressUpGame !== 'undefined') DressUpGame.reset();
                 break;
             case 'cooking':
                 if (typeof CookingGame !== 'undefined') CookingGame.reset();

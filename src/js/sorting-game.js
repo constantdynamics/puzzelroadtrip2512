@@ -127,6 +127,22 @@ const SortingGame = {
         this.total = this.items.length;
 
         this.render();
+        this.syncGameState();
+    },
+
+    // Sync game state to Firebase for remote display
+    syncGameState() {
+        if (typeof TabletApp !== 'undefined' && TabletApp.roomRef) {
+            const challenge = this.challenges[this.currentChallenge];
+            TabletApp.roomRef.child('gameState').update({
+                game: 'sorting',
+                sorted: this.sorted,
+                total: this.total,
+                category: challenge?.name || 'Sorteren',
+                completed: this.sorted === this.total,
+                timestamp: Date.now()
+            });
+        }
     },
 
     render() {
@@ -250,6 +266,9 @@ const SortingGame = {
                     if (typeof AudioManager !== 'undefined') {
                         AudioManager.playPiecePlaced();
                     }
+
+                    // Sync progress to remote
+                    this.syncGameState();
 
                     if (this.sorted === this.total) {
                         setTimeout(() => this.onGameComplete(), 300);

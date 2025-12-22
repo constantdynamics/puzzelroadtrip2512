@@ -1,5 +1,5 @@
 // Memory Game for Toddlers
-// Simple matching game with emoji cards
+// Simple matching game with emoji cards - with flip animations
 
 const MemoryGame = {
     cards: [],
@@ -7,8 +7,9 @@ const MemoryGame = {
     matchedPairs: 0,
     totalPairs: 0,
     isProcessing: false,
-    difficulty: 'easy', // easy (4 pairs), medium (6 pairs), hard (8 pairs)
+    difficulty: 'easy',
     container: null,
+    flipDelay: 2000, // Longer delay for young children to see the cards
 
     // Emoji sets for different themes
     themes: {
@@ -22,9 +23,9 @@ const MemoryGame = {
     currentTheme: 'animals',
 
     difficulties: {
-        easy: { pairs: 4, cols: 4 },    // 2x4 grid
-        medium: { pairs: 6, cols: 4 },  // 3x4 grid
-        hard: { pairs: 8, cols: 4 }     // 4x4 grid
+        easy: { pairs: 4, cols: 4 },
+        medium: { pairs: 6, cols: 4 },
+        hard: { pairs: 8, cols: 4 }
     },
 
     init(containerId) {
@@ -59,13 +60,26 @@ const MemoryGame = {
 
         this.createCards();
         this.render();
+        this.syncGameState();
+    },
+
+    // Sync game state to Firebase for remote display
+    syncGameState() {
+        if (typeof TabletApp !== 'undefined' && TabletApp.roomRef) {
+            TabletApp.roomRef.child('gameState').update({
+                game: 'memory',
+                pairsFound: this.matchedPairs,
+                totalPairs: this.totalPairs,
+                completed: this.matchedPairs === this.totalPairs,
+                timestamp: Date.now()
+            });
+        }
     },
 
     createCards() {
         const config = this.difficulties[this.difficulty];
         const emojis = this.themes[this.currentTheme].slice(0, config.pairs);
 
-        // Create pairs
         const cardValues = [...emojis, ...emojis];
 
         // Shuffle cards
@@ -92,7 +106,7 @@ const MemoryGame = {
         this.container.innerHTML = `
             <div class="memory-game">
                 <div class="memory-header">
-                    <span class="memory-score">Gevonden: ${this.matchedPairs}/${this.totalPairs}</span>
+                    <span class="memory-score">⭐ ${this.matchedPairs}/${this.totalPairs}</span>
                 </div>
                 <div class="memory-grid" style="--cols: ${cols}; --rows: ${rows}">
                     ${this.cards.map(card => this.renderCard(card)).join('')}
@@ -117,7 +131,9 @@ const MemoryGame = {
         return `
             <div class="memory-card ${flippedClass} ${matchedClass}" data-id="${card.id}">
                 <div class="memory-card-inner">
-                    <div class="memory-card-front">❓</div>
+                    <div class="memory-card-front">
+                        <div class="card-pattern"></div>
+                    </div>
                     <div class="memory-card-back">${card.emoji}</div>
                 </div>
             </div>
@@ -139,12 +155,16 @@ const MemoryGame = {
             AudioManager.playClick();
         }
 
-        this.render();
+        // Update just this card for smooth animation
+        const cardEl = this.container.querySelector(`.memory-card[data-id="${cardId}"]`);
+        if (cardEl) {
+            cardEl.classList.add('flipped');
+        }
 
         // Check for match if two cards are flipped
         if (this.flippedCards.length === 2) {
             this.isProcessing = true;
-            this.checkMatch();
+            setTimeout(() => this.checkMatch(), 300);
         }
     },
 
@@ -157,27 +177,44 @@ const MemoryGame = {
             card2.isMatched = true;
             this.matchedPairs++;
 
+            // Add matched class for celebration animation
+            const card1El = this.container.querySelector(`.memory-card[data-id="${card1.id}"]`);
+            const card2El = this.container.querySelector(`.memory-card[data-id="${card2.id}"]`);
+            if (card1El) card1El.classList.add('matched');
+            if (card2El) card2El.classList.add('matched');
+
             if (typeof AudioManager !== 'undefined') {
                 AudioManager.playPiecePlaced();
             }
 
             this.flippedCards = [];
             this.isProcessing = false;
-            this.render();
+
+            // Update score
+            const scoreEl = this.container.querySelector('.memory-score');
+            if (scoreEl) scoreEl.textContent = `⭐ ${this.matchedPairs}/${this.totalPairs}`;
+
+            // Sync progress to remote
+            this.syncGameState();
 
             // Check for win
             if (this.matchedPairs === this.totalPairs) {
                 this.onGameComplete();
             }
         } else {
-            // No match - flip back after delay
+            // No match - flip back after longer delay (2 seconds for young children)
             setTimeout(() => {
                 card1.isFlipped = false;
                 card2.isFlipped = false;
+
+                const card1El = this.container.querySelector(`.memory-card[data-id="${card1.id}"]`);
+                const card2El = this.container.querySelector(`.memory-card[data-id="${card2.id}"]`);
+                if (card1El) card1El.classList.remove('flipped');
+                if (card2El) card2El.classList.remove('flipped');
+
                 this.flippedCards = [];
                 this.isProcessing = false;
-                this.render();
-            }, 1000);
+            }, this.flipDelay);
         }
     },
 
@@ -186,7 +223,6 @@ const MemoryGame = {
             AudioManager.playPuzzleComplete();
         }
 
-        // Show celebration
         setTimeout(() => {
             if (this.container) {
                 const celebrationEl = document.createElement('div');
@@ -195,7 +231,7 @@ const MemoryGame = {
                     <div class="memory-celebration-content">
                         <h2>🎉 Gewonnen! 🎉</h2>
                         <p>Alle paren gevonden!</p>
-                        <button class="memory-play-again-btn" id="memory-play-again">Opnieuw spelen</button>
+                        <button class="memory-play-again-btn" id="memory-play-again">🔄</button>
                     </div>
                 `;
                 this.container.appendChild(celebrationEl);
@@ -216,5 +252,4 @@ const MemoryGame = {
     }
 };
 
-// Make globally available
 window.MemoryGame = MemoryGame;

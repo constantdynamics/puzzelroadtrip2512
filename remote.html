@@ -1041,6 +1041,231 @@
             text-align: center;
         }
 
+        /* Colors game target display */
+        .colors-target-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .target-info-label {
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .target-color-box {
+            width: 100%;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            border: 4px solid white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .target-color-name {
+            font-size: 32px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .target-progress {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        /* Game Preview on main screen */
+        .game-preview {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+            color: white;
+        }
+
+        .game-preview-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .game-preview-icon {
+            font-size: 32px;
+        }
+
+        .game-preview-name {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .game-preview-content {
+            background: rgba(255,255,255,0.15);
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        .game-preview-info {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .game-preview-progress {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .game-preview-emoji {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+
+        .game-preview-instruction {
+            background: white;
+            color: #333;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .game-preview-hint {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 8px;
+        }
+
+        /* Pictionary multiplayer controls */
+        .pictionary-controls {
+            margin-top: 15px;
+        }
+
+        .pictionary-word-display {
+            background: white;
+            color: #333;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+        }
+
+        .pictionary-word {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .pictionary-hint {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .pictionary-turn-btns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .pictionary-turn-btn {
+            padding: 15px;
+            font-size: 14px;
+            font-weight: 600;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            cursor: pointer;
+        }
+
+        .pictionary-turn-btn.active {
+            background: white;
+            color: #764ba2;
+            border-color: white;
+        }
+
+        .pictionary-new-word-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            background: #FFD93D;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .pictionary-drawer-btn {
+            padding: 10px 15px;
+            font-size: 14px;
+            font-weight: 600;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            background: white;
+            color: #333;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .pictionary-drawer-btn.active {
+            background: #E91E63;
+            color: white;
+            border-color: #E91E63;
+        }
+
+        .pictionary-word-box {
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        /* Counting game target display */
+        .counting-target-display {
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .counting-question {
+            color: white;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .counting-emoji-display {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+
+        .counting-answer-display {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .counting-round-info {
+            margin-top: 10px;
+            color: rgba(255,255,255,0.9);
+            font-size: 14px;
+        }
+
         /* Mini color buttons in row */
         .color-row {
             display: flex;
@@ -1610,6 +1835,17 @@
                 <div class="puzzle-complete-badge" id="puzzle-complete-badge">🎉 Puzzel Af!</div>
             </div>
 
+            <!-- Game Preview (shows current game state for non-puzzle games) -->
+            <div class="game-preview" id="game-preview" style="display: none;">
+                <div class="game-preview-header">
+                    <span class="game-preview-icon" id="game-preview-icon">🎮</span>
+                    <span class="game-preview-name" id="game-preview-name">Spel</span>
+                </div>
+                <div class="game-preview-content" id="game-preview-content">
+                    <!-- Dynamic game content will be inserted here -->
+                </div>
+            </div>
+
             <!-- Row 1: Piece + Bucketlist -->
             <div class="nav-grid">
                 <button class="nav-btn primary" id="piece-btn">
@@ -1725,10 +1961,6 @@
                     <span class="game-emoji">🚜</span>
                     <div><span class="game-name">Boerderij</span><span class="game-desc">Voer de dieren!</span></div>
                 </button>
-                <button class="game-select-btn" data-game="dressup">
-                    <span class="game-emoji">👗</span>
-                    <div><span class="game-name">Aankleden</span><span class="game-desc">Kleed het poppetje aan!</span></div>
-                </button>
                 <button class="game-select-btn" data-game="cooking">
                     <span class="game-emoji">👨‍🍳</span>
                     <div><span class="game-name">Koken</span><span class="game-desc">Maak een recept!</span></div>
@@ -1761,6 +1993,33 @@
             <!-- Drawing/Pictionary Settings -->
             <div class="game-settings" id="drawing-settings" style="display: none;">
                 <h3>Pictionary Instellingen</h3>
+
+                <!-- Multiplayer Controls -->
+                <div class="pictionary-multiplayer-controls" id="pictionary-multiplayer" style="margin-bottom: 15px;">
+                    <div class="setting-row">
+                        <span class="setting-label">🎮 Multiplayer</span>
+                        <label class="switch">
+                            <input type="checkbox" id="pictionary-multiplayer-toggle">
+                            <span class="slider-toggle"></span>
+                        </label>
+                    </div>
+
+                    <div id="pictionary-mp-options" style="display: none;">
+                        <div class="setting-row">
+                            <span class="setting-label">Wie tekent?</span>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="pictionary-drawer-btn active" data-drawer="child" id="drawer-child-btn">👶 Kind</button>
+                                <button class="pictionary-drawer-btn" data-drawer="parent" id="drawer-parent-btn">👨‍👩‍👧 Ouder</button>
+                            </div>
+                        </div>
+                        <div class="pictionary-word-box" id="pictionary-word-box" style="display: none; margin-top: 10px;">
+                            <div style="color: #666; font-size: 12px;">Het woord is:</div>
+                            <div id="pictionary-current-word" style="font-size: 24px; font-weight: bold; padding: 10px;">-</div>
+                        </div>
+                        <button class="pictionary-new-word-btn" id="pictionary-new-word-btn-settings" style="margin-top: 10px;">🎲 Nieuw woord</button>
+                    </div>
+                </div>
+
                 <div class="setting-row">
                     <span class="setting-label">Categorie</span>
                     <select class="setting-select" id="drawing-category">
@@ -1790,6 +2049,18 @@
             <!-- Colors Settings -->
             <div class="game-settings" id="colors-settings" style="display: none;">
                 <h3>Kleuren Instellingen</h3>
+
+                <!-- Target color display for parent to tell child -->
+                <div class="colors-target-display" id="colors-target-display" style="display: none;">
+                    <div class="target-info-label">Zoek kleur:</div>
+                    <div class="target-color-box" id="colors-target-box">
+                        <span class="target-color-name" id="colors-target-name">-</span>
+                    </div>
+                    <div class="target-progress" id="colors-target-progress">
+                        <span id="colors-found">0</span>/<span id="colors-total">0</span> gevonden
+                    </div>
+                </div>
+
                 <div class="setting-row">
                     <span class="setting-label">Moeilijkheid</span>
                     <select class="setting-select" id="colors-difficulty">
@@ -1803,6 +2074,18 @@
             <!-- Counting Settings -->
             <div class="game-settings" id="counting-settings" style="display: none;">
                 <h3>Tellen Instellingen</h3>
+
+                <!-- Target display for parent to tell child the answer -->
+                <div class="counting-target-display" id="counting-target-display" style="display: none;">
+                    <div class="counting-question">Hoeveel <span id="counting-item-name">-</span>?</div>
+                    <div class="counting-emoji-display" id="counting-emoji-display">-</div>
+                    <div class="counting-answer-display" id="counting-answer-display">Antwoord: -</div>
+                    <div class="counting-round-info">
+                        Ronde <span id="counting-round">1</span>/<span id="counting-max-rounds">5</span>
+                        | Score: <span id="counting-score">0</span>
+                    </div>
+                </div>
+
                 <div class="setting-row">
                     <span class="setting-label">Moeilijkheid</span>
                     <select class="setting-select" id="counting-difficulty">
@@ -2076,7 +2359,7 @@
             </div>
         </div>
 
-        <div class="version-info">v3.2.1</div>
+        <div class="version-info">v3.3.0</div>
     </div>
 
     <script src="src/js/storage.js"></script>
@@ -2453,6 +2736,12 @@
 
             try {
                 await RemoteControl.joinRoom(code);
+
+                // Setup game state listener for Colors and Counting games
+                RemoteControl.onGameStateUpdate = (gameState) => {
+                    updateGameStateDisplay(gameState);
+                };
+
                 showScreen(connectedScreen);
                 populateTaskCategories();
                 populatePuzzleGrid();
@@ -2463,6 +2752,304 @@
                 connectBtn.textContent = 'Verbinden';
             }
         });
+
+        // Game info for display
+        const gameInfo = {
+            puzzle: { name: 'Puzzel', emoji: '🧩', color: '#4CAF50' },
+            memory: { name: 'Memory', emoji: '🃏', color: '#9C27B0' },
+            drawing: { name: 'Pictionary', emoji: '🎨', color: '#E91E63' },
+            shapes: { name: 'Vormen', emoji: '🔷', color: '#2196F3' },
+            music: { name: 'Muziek', emoji: '🎹', color: '#FF5722' },
+            carwash: { name: 'Auto Wassen', emoji: '🚗', color: '#00BCD4' },
+            colors: { name: 'Kleuren', emoji: '🌈', color: '#673AB7' },
+            counting: { name: 'Tellen', emoji: '🔢', color: '#FF9800' },
+            shadow: { name: 'Schaduw', emoji: '🔍', color: '#607D8B' },
+            sizesort: { name: 'Grootte', emoji: '📏', color: '#795548' },
+            colorsort: { name: 'Kleuren Sorteren', emoji: '🎨', color: '#8BC34A' },
+            sorting: { name: 'Sorteren', emoji: '🗂️', color: '#3F51B5' },
+            farm: { name: 'Boerderij', emoji: '🚜', color: '#4CAF50' },
+            cooking: { name: 'Koken', emoji: '👨‍🍳', color: '#FF5722' }
+        };
+
+        // Update game state display (all games)
+        function updateGameStateDisplay(gameState) {
+            if (!gameState) return;
+
+            const puzzlePreview = document.getElementById('puzzle-preview');
+            const gamePreview = document.getElementById('game-preview');
+            const gamePreviewIcon = document.getElementById('game-preview-icon');
+            const gamePreviewName = document.getElementById('game-preview-name');
+            const gamePreviewContent = document.getElementById('game-preview-content');
+
+            // If it's puzzle game, show puzzle preview, hide game preview
+            if (gameState.game === 'puzzle' || !gameState.game) {
+                if (puzzlePreview) puzzlePreview.style.display = 'block';
+                if (gamePreview) gamePreview.style.display = 'none';
+                return;
+            }
+
+            // For other games, hide puzzle preview, show game preview
+            if (puzzlePreview) puzzlePreview.style.display = 'none';
+            if (gamePreview) {
+                gamePreview.style.display = 'block';
+                const info = gameInfo[gameState.game] || { name: 'Spel', emoji: '🎮', color: '#667eea' };
+                gamePreview.style.background = `linear-gradient(135deg, ${info.color} 0%, ${adjustColor(info.color, -30)} 100%)`;
+                if (gamePreviewIcon) gamePreviewIcon.textContent = info.emoji;
+                if (gamePreviewName) gamePreviewName.textContent = info.name;
+            }
+
+            // Generate game-specific content
+            let content = '';
+
+            switch (gameState.game) {
+                case 'memory':
+                    content = generateMemoryPreview(gameState);
+                    break;
+                case 'drawing':
+                    content = generateDrawingPreview(gameState);
+                    break;
+                case 'shapes':
+                    content = generateShapesPreview(gameState);
+                    break;
+                case 'carwash':
+                    content = generateCarwashPreview(gameState);
+                    break;
+                case 'colors':
+                    content = generateColorsPreview(gameState);
+                    break;
+                case 'counting':
+                    content = generateCountingPreview(gameState);
+                    break;
+                case 'shadow':
+                    content = generateShadowPreview(gameState);
+                    break;
+                case 'sizesort':
+                    content = generateSizeSortPreview(gameState);
+                    break;
+                case 'colorsort':
+                    content = generateColorSortPreview(gameState);
+                    break;
+                case 'sorting':
+                    content = generateSortingPreview(gameState);
+                    break;
+                case 'farm':
+                    content = generateFarmPreview(gameState);
+                    break;
+                case 'cooking':
+                    content = generateCookingPreview(gameState);
+                    break;
+                case 'music':
+                    content = '<div class="game-preview-emoji">🎵</div><div class="game-preview-info">Muziek maken!</div>';
+                    break;
+                default:
+                    content = '<div class="game-preview-info">Spel actief</div>';
+            }
+
+            if (gamePreviewContent) gamePreviewContent.innerHTML = content;
+
+            // Also update game-specific displays in games screen
+            updateGameScreenDisplays(gameState);
+
+            // Update Pictionary word display if in drawing game
+            if (gameState.game === 'drawing') {
+                updatePictionaryWordDisplay(gameState);
+            }
+        }
+
+        // Helper function to update Pictionary word display
+        function updatePictionaryWordDisplay(gameState) {
+            if (gameState?.currentPrompt) {
+                const wordEl = document.getElementById('pictionary-current-word');
+                if (wordEl) {
+                    wordEl.textContent = `${gameState.currentPrompt.emoji || ''} ${gameState.currentPrompt.text || '-'}`;
+                }
+            }
+        }
+
+        // Helper to darken/lighten color
+        function adjustColor(color, amount) {
+            const hex = color.replace('#', '');
+            const r = Math.max(0, Math.min(255, parseInt(hex.substr(0, 2), 16) + amount));
+            const g = Math.max(0, Math.min(255, parseInt(hex.substr(2, 2), 16) + amount));
+            const b = Math.max(0, Math.min(255, parseInt(hex.substr(4, 2), 16) + amount));
+            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+        }
+
+        // Game-specific preview generators
+        function generateMemoryPreview(state) {
+            const pairs = state.pairsFound || 0;
+            const total = state.totalPairs || 0;
+            const completed = state.completed;
+            if (completed) {
+                return `<div class="game-preview-emoji">🎉</div><div class="game-preview-info">Gewonnen!</div><div class="game-preview-progress">${pairs}/${total} paren</div>`;
+            }
+            return `<div class="game-preview-progress">${pairs}/${total} paren gevonden</div><div class="game-preview-hint">Zoek de paren!</div>`;
+        }
+
+        function generateDrawingPreview(state) {
+            const prompt = state.currentPrompt || {};
+            let html = `<div class="game-preview-emoji">${prompt.emoji || '🎨'}</div>`;
+
+            if (state.multiplayerMode) {
+                const drawer = state.drawer || 'kind';
+                html += `<div class="game-preview-info">${drawer === 'parent' ? '👨‍👩‍👧 Ouder tekent' : '👶 Kind tekent'}</div>`;
+                html += `<div class="game-preview-instruction">${prompt.text || 'Teken!'}</div>`;
+                html += `<div class="pictionary-controls">
+                    <button class="pictionary-new-word-btn" onclick="sendNewPictionaryWord()">🎲 Nieuw woord</button>
+                    <div class="pictionary-turn-btns" style="margin-top: 10px;">
+                        <button class="pictionary-turn-btn ${drawer === 'child' ? 'active' : ''}" onclick="setPictionaryDrawer('child')">👶 Kind tekent</button>
+                        <button class="pictionary-turn-btn ${drawer === 'parent' ? 'active' : ''}" onclick="setPictionaryDrawer('parent')">👨‍👩‍👧 Ouder tekent</button>
+                    </div>
+                </div>`;
+            } else {
+                html += `<div class="game-preview-instruction">${prompt.text || 'Laten we tekenen!'}</div>`;
+            }
+            return html;
+        }
+
+        function generateShapesPreview(state) {
+            const placed = state.placed || 0;
+            const total = state.total || 0;
+            const currentShape = state.currentShape || '';
+            return `<div class="game-preview-emoji">${currentShape || '🔷'}</div><div class="game-preview-progress">${placed}/${total} vormen</div>`;
+        }
+
+        function generateCarwashPreview(state) {
+            const progress = state.cleanProgress || 0;
+            const currentObject = state.currentObject || '🚗';
+            return `<div class="game-preview-emoji">${currentObject}</div><div class="game-preview-progress">${progress}% schoon</div>`;
+        }
+
+        function generateColorsPreview(state) {
+            const colorName = state.targetColorName || '-';
+            const colorHex = state.targetColorHex || '#ccc';
+            const found = state.found || 0;
+            const total = state.total || 0;
+            return `<div class="game-preview-info">Zoek kleur:</div>
+                <div style="background: ${colorHex}; padding: 15px; border-radius: 10px; margin: 10px 0; border: 3px solid white;">
+                    <span style="font-size: 24px; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">${colorName}</span>
+                </div>
+                <div class="game-preview-progress">${found}/${total} gevonden</div>`;
+        }
+
+        function generateCountingPreview(state) {
+            const emoji = state.emoji || '🔢';
+            const answer = state.correctAnswer || '?';
+            const itemName = state.itemName || 'items';
+            const round = state.round || 1;
+            const maxRounds = state.maxRounds || 5;
+            const score = state.score || 0;
+            return `<div class="game-preview-info">Hoeveel ${itemName}?</div>
+                <div class="game-preview-emoji">${emoji}</div>
+                <div class="game-preview-instruction">Antwoord: ${answer}</div>
+                <div class="game-preview-hint">Ronde ${round}/${maxRounds} | Score: ${score}</div>`;
+        }
+
+        function generateShadowPreview(state) {
+            const target = state.targetEmoji || '🔍';
+            const found = state.found || 0;
+            const total = state.total || 0;
+            return `<div class="game-preview-emoji">${target}</div><div class="game-preview-progress">${found}/${total} gevonden</div>`;
+        }
+
+        function generateSizeSortPreview(state) {
+            const sorted = state.sorted || 0;
+            const total = state.total || 5;
+            return `<div class="game-preview-emoji">📏</div><div class="game-preview-progress">${sorted}/${total} gesorteerd</div><div class="game-preview-hint">Klein → Groot</div>`;
+        }
+
+        function generateColorSortPreview(state) {
+            const sorted = state.sorted || 0;
+            const total = state.total || 0;
+            return `<div class="game-preview-emoji">🎨</div><div class="game-preview-progress">${sorted}/${total} gesorteerd</div>`;
+        }
+
+        function generateSortingPreview(state) {
+            const sorted = state.sorted || 0;
+            const total = state.total || 0;
+            const category = state.category || 'items';
+            return `<div class="game-preview-emoji">🗂️</div><div class="game-preview-progress">${sorted}/${total} gesorteerd</div><div class="game-preview-hint">${category}</div>`;
+        }
+
+        function generateFarmPreview(state) {
+            const fed = state.fed || 0;
+            const total = state.total || 0;
+            const currentAnimal = state.currentAnimal || '🐄';
+            return `<div class="game-preview-emoji">${currentAnimal}</div><div class="game-preview-progress">${fed}/${total} gevoerd</div>`;
+        }
+
+        function generateCookingPreview(state) {
+            const recipe = state.recipeName || 'Recept';
+            const recipeEmoji = state.recipeEmoji || '🍳';
+            const step = state.step || 0;
+            const totalSteps = state.totalSteps || 5;
+            const nextIngredient = state.nextIngredient || '';
+            const actionText = state.actionText || '';
+            return `<div class="game-preview-emoji">${recipeEmoji}</div>
+                <div class="game-preview-info">${recipe}</div>
+                <div class="game-preview-progress">Stap ${step + 1}/${totalSteps}</div>
+                ${nextIngredient ? `<div class="game-preview-instruction">${nextIngredient} ${actionText}</div>` : ''}`;
+        }
+
+        // Update game-specific displays in games screen (Colors, Counting settings panels)
+        function updateGameScreenDisplays(gameState) {
+            // Colors game display in settings
+            if (gameState.game === 'colors') {
+                const colorsDisplay = document.getElementById('colors-target-display');
+                const colorsBox = document.getElementById('colors-target-box');
+                const colorsName = document.getElementById('colors-target-name');
+                const colorsFound = document.getElementById('colors-found');
+                const colorsTotal = document.getElementById('colors-total');
+
+                if (colorsDisplay) {
+                    colorsDisplay.style.display = 'block';
+                    if (colorsBox && gameState.targetColorHex) colorsBox.style.background = gameState.targetColorHex;
+                    if (colorsName && gameState.targetColorName) colorsName.textContent = gameState.targetColorName;
+                    if (colorsFound) colorsFound.textContent = gameState.found || 0;
+                    if (colorsTotal) colorsTotal.textContent = gameState.total || 0;
+                }
+            }
+
+            // Counting game display in settings
+            if (gameState.game === 'counting') {
+                const countingDisplay = document.getElementById('counting-target-display');
+                const countingEmoji = document.getElementById('counting-emoji-display');
+                const countingAnswer = document.getElementById('counting-answer-display');
+                const countingItemName = document.getElementById('counting-item-name');
+                const countingRound = document.getElementById('counting-round');
+                const countingMaxRounds = document.getElementById('counting-max-rounds');
+                const countingScore = document.getElementById('counting-score');
+
+                if (countingDisplay) {
+                    countingDisplay.style.display = 'block';
+                    if (countingEmoji && gameState.emoji) countingEmoji.textContent = gameState.emoji;
+                    if (countingItemName && gameState.itemName) countingItemName.textContent = gameState.itemName;
+                    if (countingAnswer && gameState.correctAnswer !== undefined) countingAnswer.textContent = `Antwoord: ${gameState.correctAnswer}`;
+                    if (countingRound && gameState.round !== undefined) countingRound.textContent = gameState.round;
+                    if (countingMaxRounds && gameState.maxRounds !== undefined) countingMaxRounds.textContent = gameState.maxRounds;
+                    if (countingScore && gameState.score !== undefined) countingScore.textContent = gameState.score;
+                }
+            }
+        }
+
+        // Pictionary multiplayer functions
+        function sendNewPictionaryWord() {
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings').update({
+                    pictionaryNewWord: true,
+                    timestamp: Date.now()
+                });
+            }
+        }
+
+        function setPictionaryDrawer(drawer) {
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings').update({
+                    pictionaryDrawer: drawer,
+                    timestamp: Date.now()
+                });
+            }
+        }
 
         // Send piece
         async function sendPiece(btn) {
@@ -2643,6 +3230,49 @@
                     timestamp: Date.now()
                 });
             }
+        });
+
+        // Pictionary Multiplayer Controls
+        const pictionaryMultiplayerToggle = document.getElementById('pictionary-multiplayer-toggle');
+        const pictionaryMpOptions = document.getElementById('pictionary-mp-options');
+        const pictionaryWordBox = document.getElementById('pictionary-word-box');
+        const drawerChildBtn = document.getElementById('drawer-child-btn');
+        const drawerParentBtn = document.getElementById('drawer-parent-btn');
+
+        // Toggle multiplayer mode
+        pictionaryMultiplayerToggle?.addEventListener('change', (e) => {
+            const enabled = e.target.checked;
+            if (pictionaryMpOptions) {
+                pictionaryMpOptions.style.display = enabled ? 'block' : 'none';
+            }
+            // Send multiplayer mode to tablet
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings').update({
+                    pictionaryMultiplayer: enabled,
+                    pictionaryDrawer: 'child',
+                    timestamp: Date.now()
+                });
+            }
+        });
+
+        // Drawer selection buttons
+        drawerChildBtn?.addEventListener('click', () => {
+            drawerChildBtn.classList.add('active');
+            drawerParentBtn.classList.remove('active');
+            if (pictionaryWordBox) pictionaryWordBox.style.display = 'none';
+            setPictionaryDrawer('child');
+        });
+
+        drawerParentBtn?.addEventListener('click', () => {
+            drawerParentBtn.classList.add('active');
+            drawerChildBtn.classList.remove('active');
+            if (pictionaryWordBox) pictionaryWordBox.style.display = 'block';
+            setPictionaryDrawer('parent');
+        });
+
+        // New word button in settings
+        document.getElementById('pictionary-new-word-btn-settings')?.addEventListener('click', () => {
+            sendNewPictionaryWord();
         });
 
         // Library tabs
