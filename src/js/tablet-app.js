@@ -69,6 +69,9 @@ const TabletApp = {
         // Start visual timer animation
         this.startVisualTimerAnimation();
 
+        // Initialize game manager
+        GameManager.init();
+
         // Setup celebration button
         document.getElementById('next-puzzle-btn').addEventListener('click', () => {
             this.nextPuzzle();
@@ -225,6 +228,21 @@ const TabletApp = {
         if (settings.age !== undefined) {
             this.state.age = settings.age;
             console.log('Age set to:', settings.age, 'snap tolerance:', this.snapTolerances[settings.age]);
+        }
+
+        // Game switching
+        if (settings.currentGame !== undefined) {
+            GameManager.switchGame(settings.currentGame);
+            this.state.currentGame = settings.currentGame;
+        }
+
+        // Memory game settings
+        if (settings.memoryDifficulty !== undefined) {
+            GameManager.setMemoryDifficulty(settings.memoryDifficulty);
+        }
+
+        if (settings.memoryTheme !== undefined) {
+            GameManager.setMemoryTheme(settings.memoryTheme);
         }
 
         this.saveState();

@@ -290,6 +290,75 @@
             color: #E65100;
         }
 
+        /* Single button row */
+        .nav-grid.single {
+            grid-template-columns: 1fr;
+        }
+
+        /* Games Screen */
+        .games-screen {
+            display: none;
+        }
+
+        .games-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .game-select-btn {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 18px 20px;
+            background: white;
+            border: 3px solid #e0e0e0;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .game-select-btn:active {
+            transform: scale(0.98);
+        }
+
+        .game-select-btn.active {
+            border-color: #4CAF50;
+            background: #E8F5E9;
+        }
+
+        .game-emoji {
+            font-size: 40px;
+        }
+
+        .game-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            display: block;
+        }
+
+        .game-desc {
+            font-size: 13px;
+            color: #666;
+            display: block;
+        }
+
+        .memory-settings {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 12px;
+        }
+
+        .memory-settings h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
         /* Library Screen (Puzzelbieb) */
         .library-screen {
             display: none;
@@ -1522,17 +1591,74 @@
                 </button>
             </div>
 
-            <!-- Row 3: Pause + Settings -->
+            <!-- Row 3: Spellen + Pause -->
             <div class="nav-grid">
+                <button class="nav-btn secondary" id="show-games-btn">
+                    <span class="icon">🎮</span>
+                    <span class="label">Spellen</span>
+                </button>
                 <button class="nav-btn secondary" id="pause-btn">
                     <span class="icon">⏸️</span>
                     <span class="label">Pauzeer</span>
                 </button>
+            </div>
+
+            <!-- Row 4: Settings -->
+            <div class="nav-grid single">
                 <button class="nav-btn secondary" id="show-settings-btn">
                     <span class="icon">⚙️</span>
                     <span class="label">Instellingen</span>
                 </button>
             </div>
+        </div>
+
+        <!-- Games Screen -->
+        <div class="card games-screen" id="games-screen">
+            <h2>🎮 Kies een Spel</h2>
+            <p class="subtitle">Wissel tussen verschillende spelletjes</p>
+
+            <div class="games-grid">
+                <button class="game-select-btn active" data-game="puzzle">
+                    <span class="game-emoji">🧩</span>
+                    <span class="game-name">Puzzel</span>
+                    <span class="game-desc">Maak de puzzel af!</span>
+                </button>
+                <button class="game-select-btn" data-game="memory">
+                    <span class="game-emoji">🃏</span>
+                    <span class="game-name">Memory</span>
+                    <span class="game-desc">Vind alle paren!</span>
+                </button>
+                <button class="game-select-btn" data-game="drawing">
+                    <span class="game-emoji">🎨</span>
+                    <span class="game-name">Tekenen</span>
+                    <span class="game-desc">Teken iets moois!</span>
+                </button>
+            </div>
+
+            <!-- Memory Settings (shown when memory is selected) -->
+            <div class="memory-settings" id="memory-settings" style="display: none;">
+                <h3>Memory Instellingen</h3>
+                <div class="setting-row">
+                    <span class="setting-label">Moeilijkheid</span>
+                    <select class="setting-select" id="memory-difficulty">
+                        <option value="easy">Makkelijk (4 paar)</option>
+                        <option value="medium">Gemiddeld (6 paar)</option>
+                        <option value="hard">Moeilijk (8 paar)</option>
+                    </select>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Thema</span>
+                    <select class="setting-select" id="memory-theme">
+                        <option value="animals">Dieren</option>
+                        <option value="food">Eten</option>
+                        <option value="vehicles">Voertuigen</option>
+                        <option value="nature">Natuur</option>
+                        <option value="toys">Speelgoed</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="back-btn" id="games-back-btn">← Terug</button>
         </div>
 
         <!-- Queue Screen -->
@@ -1794,7 +1920,7 @@
             </div>
         </div>
 
-        <div class="version-info">v2.15.0</div>
+        <div class="version-info">v3.0.0</div>
     </div>
 
     <script src="src/js/storage.js"></script>
@@ -1971,6 +2097,7 @@
         const libraryScreen = document.getElementById('library-screen');
         const queueScreen = document.getElementById('queue-screen');
         const taskManageScreen = document.getElementById('task-manage-screen');
+        const gamesScreen = document.getElementById('games-screen');
 
         const connectBtn = document.getElementById('connect-btn');
         const errorMsg = document.getElementById('error-msg');
@@ -1992,6 +2119,7 @@
             libraryScreen.style.display = 'none';
             queueScreen.style.display = 'none';
             taskManageScreen.style.display = 'none';
+            gamesScreen.style.display = 'none';
             screen.style.display = 'block';
         }
 
@@ -2222,6 +2350,63 @@
 
         document.getElementById('library-back-btn').addEventListener('click', () => {
             showScreen(connectedScreen);
+        });
+
+        // Games screen
+        document.getElementById('show-games-btn').addEventListener('click', () => {
+            showScreen(gamesScreen);
+        });
+
+        document.getElementById('games-back-btn').addEventListener('click', () => {
+            showScreen(connectedScreen);
+        });
+
+        // Game selection
+        let currentGame = 'puzzle';
+
+        document.querySelectorAll('.game-select-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const game = btn.dataset.game;
+                currentGame = game;
+
+                // Update UI
+                document.querySelectorAll('.game-select-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                // Show/hide memory settings
+                const memorySettings = document.getElementById('memory-settings');
+                if (memorySettings) {
+                    memorySettings.style.display = game === 'memory' ? 'block' : 'none';
+                }
+
+                // Send to tablet
+                if (roomRef) {
+                    roomRef.child('settings').update({
+                        currentGame: game,
+                        timestamp: Date.now()
+                    });
+                }
+            });
+        });
+
+        // Memory difficulty
+        document.getElementById('memory-difficulty')?.addEventListener('change', (e) => {
+            if (roomRef) {
+                roomRef.child('settings').update({
+                    memoryDifficulty: e.target.value,
+                    timestamp: Date.now()
+                });
+            }
+        });
+
+        // Memory theme
+        document.getElementById('memory-theme')?.addEventListener('change', (e) => {
+            if (roomRef) {
+                roomRef.child('settings').update({
+                    memoryTheme: e.target.value,
+                    timestamp: Date.now()
+                });
+            }
         });
 
         // Library tabs
