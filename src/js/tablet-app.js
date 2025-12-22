@@ -450,51 +450,96 @@ const TabletApp = {
         return x - Math.floor(x);
     },
 
-    // Unique shapes path for preview - procedural blob matching PuzzleEngine
-    createUniqueShapePathForPreview(ctx, x, y, width, height, edges) {
-        const pieceIndex = edges.pieceIndex || 0;
-        const cx = x + width / 2;
-        const cy = y + height / 2;
-        const baseRadius = Math.min(width, height) * 0.42;
-
-        // Same seed calculation as PuzzleEngine for consistency
-        const seed = pieceIndex * 137 + 42;
-        const numPoints = 5 + Math.floor(this.seededRandom(seed) * 6);
-        const angleOffset = this.seededRandom(seed + 1) * Math.PI * 2;
-        const wobble = 0.15 + this.seededRandom(seed + 2) * 0.25;
-
-        // Generate control points
+    // Get edge curve for wavy edges (same algorithm as PuzzleEngine)
+    getEdgeCurve(edgeId, length, amplitude) {
+        const seed = edgeId * 137 + 42;
+        const numBumps = 2 + Math.floor(this.seededRandom(seed) * 3);
         const points = [];
-        for (let i = 0; i < numPoints; i++) {
-            const angle = angleOffset + (i / numPoints) * Math.PI * 2;
-            const radiusVar = 1 + (this.seededRandom(seed + i * 17 + 100) - 0.5) * wobble * 2;
-            const r = baseRadius * radiusVar;
-            points.push({
-                x: cx + Math.cos(angle) * r,
-                y: cy + Math.sin(angle) * r
-            });
+        for (let i = 0; i <= numBumps; i++) {
+            const t = i / numBumps;
+            const bumpSeed = seed + i * 23;
+            const amp = (this.seededRandom(bumpSeed) - 0.5) * amplitude * 2;
+            const offset = (this.seededRandom(bumpSeed + 1) - 0.5) * 0.2;
+            points.push({ t: t + offset * (i > 0 && i < numBumps ? 1 : 0), amp });
         }
+        return points;
+    },
 
-        // Draw smooth blob
-        ctx.beginPath();
-        const tension = 0.3 + this.seededRandom(seed + 50) * 0.3;
+    // Draw wavy edge for preview (same algorithm as PuzzleEngine)
+    drawWavyEdgeForPreview(ctx, x1, y1, x2, y2, edgeId, amplitude, invert) {
+        const curve = this.getEdgeCurve(edgeId, 1, amplitude);
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const px = -dy;
+        const py = dx;
+        const len = Math.sqrt(px * px + py * py);
+        const nx = px / len;
+        const ny = py / len;
 
-        for (let i = 0; i < numPoints; i++) {
-            const p0 = points[(i - 1 + numPoints) % numPoints];
-            const p1 = points[i];
-            const p2 = points[(i + 1) % numPoints];
-            const p3 = points[(i + 2) % numPoints];
+        const segments = 20;
+        for (let i = 1; i <= segments; i++) {
+            const t = i / segments;
+            const bx = x1 + dx * t;
+            const by = y1 + dy * t;
 
-            if (i === 0) {
-                ctx.moveTo(p1.x, p1.y);
+            let waveOffset = 0;
+            for (const point of curve) {
+                const dist = Math.abs(t - point.t);
+                const influence = Math.exp(-dist * dist * 20);
+                waveOffset += point.amp * influence;
             }
 
-            const cp1x = p1.x + (p2.x - p0.x) * tension;
-            const cp1y = p1.y + (p2.y - p0.y) * tension;
-            const cp2x = p2.x - (p3.x - p1.x) * tension;
-            const cp2y = p2.y - (p3.y - p1.y) * tension;
+            if (invert) waveOffset = -waveOffset;
 
-            ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+            const fx = bx + nx * waveOffset;
+            const fy = by + ny * waveOffset;
+
+            ctx.lineTo(fx, fy);
+        }
+    },
+
+    // Unique shapes path for preview - wavy edges that tile perfectly (same as PuzzleEngine)
+    createUniqueShapePathForPreview(ctx, x, y, width, height, edges) {
+        const pieceIndex = edges.pieceIndex || 0;
+        const cols = PuzzleEngine.cols;
+        const rows = PuzzleEngine.rows;
+        const col = pieceIndex % cols;
+        const row = Math.floor(pieceIndex / cols);
+        const amplitude = Math.min(width, height) * 0.08;
+
+        ctx.beginPath();
+
+        // Top edge
+        ctx.moveTo(x, y);
+        if (row === 0) {
+            ctx.lineTo(x + width, y);
+        } else {
+            const edgeId = row * 1000 + col;
+            this.drawWavyEdgeForPreview(ctx, x, y, x + width, y, edgeId, amplitude, false);
+        }
+
+        // Right edge
+        if (col === cols - 1) {
+            ctx.lineTo(x + width, y + height);
+        } else {
+            const edgeId = 50000 + row * 1000 + col + 1;
+            this.drawWavyEdgeForPreview(ctx, x + width, y, x + width, y + height, edgeId, amplitude, true);
+        }
+
+        // Bottom edge (reverse)
+        if (row === rows - 1) {
+            ctx.lineTo(x, y + height);
+        } else {
+            const edgeId = (row + 1) * 1000 + col;
+            this.drawWavyEdgeForPreview(ctx, x + width, y + height, x, y + height, edgeId, amplitude, true);
+        }
+
+        // Left edge (reverse)
+        if (col === 0) {
+            ctx.lineTo(x, y);
+        } else {
+            const edgeId = 50000 + row * 1000 + col;
+            this.drawWavyEdgeForPreview(ctx, x, y + height, x, y, edgeId, amplitude, false);
         }
 
         ctx.closePath();

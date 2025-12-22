@@ -1177,58 +1177,105 @@ const PuzzleEngine = {
         return x - Math.floor(x);
     },
 
-    // Unique shapes: each piece has a truly unique procedural blob shape
+    // Get unique edge curve for a specific edge between two pieces
+    // edgeId uniquely identifies each edge in the puzzle grid
+    getEdgeCurve(edgeId, length, amplitude) {
+        const seed = edgeId * 137 + 42;
+        const numBumps = 2 + Math.floor(this.seededRandom(seed) * 3); // 2-4 bumps
+        const points = [];
+
+        for (let i = 0; i <= numBumps; i++) {
+            const t = i / numBumps;
+            // Vary the amplitude and position of each bump
+            const bumpSeed = seed + i * 23;
+            const amp = (this.seededRandom(bumpSeed) - 0.5) * amplitude * 2;
+            const offset = (this.seededRandom(bumpSeed + 1) - 0.5) * 0.2; // slight position offset
+            points.push({ t: t + offset * (i > 0 && i < numBumps ? 1 : 0), amp });
+        }
+        return points;
+    },
+
+    // Unique shapes: pieces with shared wavy edges that tile perfectly
     createUniqueShapePath(x, y, width, height, edges) {
         const pieceIndex = edges.pieceIndex || 0;
-        const cx = x + width / 2;
-        const cy = y + height / 2;
-        const baseRadius = Math.min(width, height) * 0.42;
+        const col = pieceIndex % this.cols;
+        const row = Math.floor(pieceIndex / this.cols);
+        const amplitude = Math.min(width, height) * 0.08;
 
-        // Generate unique parameters for this piece using seeded random
-        const seed = pieceIndex * 137 + 42; // Different seed per piece
-        const numPoints = 5 + Math.floor(this.seededRandom(seed) * 6); // 5-10 points
-        const angleOffset = this.seededRandom(seed + 1) * Math.PI * 2;
-        const wobble = 0.15 + this.seededRandom(seed + 2) * 0.25; // How much radius varies
-
-        // Generate control points for unique blob shape
-        const points = [];
-        for (let i = 0; i < numPoints; i++) {
-            const angle = angleOffset + (i / numPoints) * Math.PI * 2;
-            // Each point has unique radius variation based on piece index and point index
-            const radiusVar = 1 + (this.seededRandom(seed + i * 17 + 100) - 0.5) * wobble * 2;
-            const r = baseRadius * radiusVar;
-            points.push({
-                x: cx + Math.cos(angle) * r,
-                y: cy + Math.sin(angle) * r
-            });
-        }
-
-        // Draw smooth blob using bezier curves through points
         this.ctx.beginPath();
 
-        // Calculate control points for smooth curve
-        const tension = 0.3 + this.seededRandom(seed + 50) * 0.3; // Curve smoothness varies per piece
+        // Top edge
+        this.ctx.moveTo(x, y);
+        if (row === 0) {
+            this.ctx.lineTo(x + width, y);
+        } else {
+            const edgeId = row * 1000 + col; // Horizontal edge above this piece
+            this.drawWavyEdge(x, y, x + width, y, edgeId, amplitude, false);
+        }
 
-        for (let i = 0; i < numPoints; i++) {
-            const p0 = points[(i - 1 + numPoints) % numPoints];
-            const p1 = points[i];
-            const p2 = points[(i + 1) % numPoints];
-            const p3 = points[(i + 2) % numPoints];
+        // Right edge
+        if (col === this.cols - 1) {
+            this.ctx.lineTo(x + width, y + height);
+        } else {
+            const edgeId = 50000 + row * 1000 + col + 1; // Vertical edge to the right
+            this.drawWavyEdge(x + width, y, x + width, y + height, edgeId, amplitude, true);
+        }
 
-            if (i === 0) {
-                this.ctx.moveTo(p1.x, p1.y);
-            }
+        // Bottom edge (reverse)
+        if (row === this.rows - 1) {
+            this.ctx.lineTo(x, y + height);
+        } else {
+            const edgeId = (row + 1) * 1000 + col; // Horizontal edge below
+            this.drawWavyEdge(x + width, y + height, x, y + height, edgeId, amplitude, true);
+        }
 
-            // Catmull-Rom to Bezier conversion for smooth curves
-            const cp1x = p1.x + (p2.x - p0.x) * tension;
-            const cp1y = p1.y + (p2.y - p0.y) * tension;
-            const cp2x = p2.x - (p3.x - p1.x) * tension;
-            const cp2y = p2.y - (p3.y - p1.y) * tension;
-
-            this.ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+        // Left edge (reverse)
+        if (col === 0) {
+            this.ctx.lineTo(x, y);
+        } else {
+            const edgeId = 50000 + row * 1000 + col; // Vertical edge to the left
+            this.drawWavyEdge(x, y + height, x, y, edgeId, amplitude, false);
         }
 
         this.ctx.closePath();
+    },
+
+    // Draw a wavy edge between two points
+    drawWavyEdge(x1, y1, x2, y2, edgeId, amplitude, invert) {
+        const curve = this.getEdgeCurve(edgeId, 1, amplitude);
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        // Perpendicular direction for the wave
+        const px = -dy;
+        const py = dx;
+        const len = Math.sqrt(px * px + py * py);
+        const nx = px / len;
+        const ny = py / len;
+
+        const segments = 20;
+        for (let i = 1; i <= segments; i++) {
+            const t = i / segments;
+
+            // Interpolate base position
+            const bx = x1 + dx * t;
+            const by = y1 + dy * t;
+
+            // Calculate wave offset at this point
+            let waveOffset = 0;
+            for (const point of curve) {
+                // Smooth bump contribution using gaussian-like falloff
+                const dist = Math.abs(t - point.t);
+                const influence = Math.exp(-dist * dist * 20);
+                waveOffset += point.amp * influence;
+            }
+
+            if (invert) waveOffset = -waveOffset;
+
+            const fx = bx + nx * waveOffset;
+            const fy = by + ny * waveOffset;
+
+            this.ctx.lineTo(fx, fy);
+        }
     },
 
     // Geometric style: rounded rectangles with semicircle bumps
