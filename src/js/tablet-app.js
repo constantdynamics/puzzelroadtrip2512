@@ -77,6 +77,15 @@ const TabletApp = {
             this.nextPuzzle();
         });
 
+        // Auto-enter fullscreen on first touch (required by browsers)
+        const enterFullscreenOnTouch = () => {
+            this.enterFullscreen();
+            document.removeEventListener('touchstart', enterFullscreenOnTouch);
+            document.removeEventListener('click', enterFullscreenOnTouch);
+        };
+        document.addEventListener('touchstart', enterFullscreenOnTouch, { once: true });
+        document.addEventListener('click', enterFullscreenOnTouch, { once: true });
+
         // Start remote control automatically
         this.startRemoteControl();
 
@@ -230,10 +239,28 @@ const TabletApp = {
             console.log('Age set to:', settings.age, 'snap tolerance:', this.snapTolerances[settings.age]);
         }
 
-        // Game switching
-        if (settings.currentGame !== undefined) {
+        // Game switching - triggered by switchGame flag from remote
+        if (settings.switchGame && settings.currentGame !== undefined) {
+            console.log('Switching to game:', settings.currentGame);
             GameManager.switchGame(settings.currentGame);
             this.state.currentGame = settings.currentGame;
+            // Clear the one-time action
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings/switchGame').remove();
+            }
+        }
+
+        // Screen off mode
+        if (settings.screenOff !== undefined) {
+            this.setScreenOff(settings.screenOff);
+        }
+
+        // Fullscreen toggle from remote
+        if (settings.enterFullscreen) {
+            this.enterFullscreen();
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings/enterFullscreen').remove();
+            }
         }
 
         // Memory game settings
@@ -1142,6 +1169,85 @@ const TabletApp = {
                 imageData: imageData,
                 timestamp: Date.now()
             });
+        }
+    },
+
+    // Screen off mode - black screen overlay
+    setScreenOff(isOff) {
+        let overlay = document.getElementById('screen-off-overlay');
+
+        if (isOff) {
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'screen-off-overlay';
+                overlay.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: black;
+                    z-index: 99999;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: none;
+                `;
+                overlay.innerHTML = '<div style="color: #333; font-size: 12px;">Tik om te activeren</div>';
+                document.body.appendChild(overlay);
+            }
+            overlay.style.display = 'flex';
+
+            // Pause timer when screen is off
+            if (!TimerManager.isPaused) {
+                TimerManager.pause();
+            }
+        } else {
+            if (overlay) {
+                overlay.style.display = 'none';
+            }
+        }
+
+        this.state.screenOff = isOff;
+    },
+
+    // Enter fullscreen mode
+    enterFullscreen() {
+        const elem = document.documentElement;
+
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+        } else if (elem.webkitRequestFullscreen) { // Safari
+            elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) { // IE11
+            elem.msRequestFullscreen();
+        }
+
+        // Also try to lock screen orientation to landscape
+        if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock('landscape').catch(() => {
+                // Orientation lock not supported or not allowed
+            });
+        }
+    },
+
+    // Exit fullscreen mode
+    exitFullscreen() {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        }
+    },
+
+    // Toggle fullscreen
+    toggleFullscreen() {
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+            this.enterFullscreen();
+        } else {
+            this.exitFullscreen();
         }
     }
 };

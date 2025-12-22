@@ -290,6 +290,29 @@
             color: #E65100;
         }
 
+        /* Danger button style */
+        .nav-btn.danger {
+            background: #ffebee;
+            border-color: #f44336;
+        }
+
+        .nav-btn.danger .icon {
+            background: #f44336;
+        }
+
+        .nav-btn.danger:active {
+            background: #ffcdd2;
+        }
+
+        .nav-btn.danger.active {
+            background: #333;
+            border-color: #333;
+        }
+
+        .nav-btn.danger.active .label {
+            color: white;
+        }
+
         /* Single button row */
         .nav-grid.single {
             grid-template-columns: 1fr;
@@ -1623,7 +1646,19 @@
                 </button>
             </div>
 
-            <!-- Row 4: Settings -->
+            <!-- Row 4: Fullscreen + Scherm uit -->
+            <div class="nav-grid">
+                <button class="nav-btn secondary" id="fullscreen-btn">
+                    <span class="icon">📺</span>
+                    <span class="label">Fullscreen</span>
+                </button>
+                <button class="nav-btn danger" id="screen-off-btn">
+                    <span class="icon">🌙</span>
+                    <span class="label">Scherm uit</span>
+                </button>
+            </div>
+
+            <!-- Row 5: Settings -->
             <div class="nav-grid single">
                 <button class="nav-btn secondary" id="show-settings-btn">
                     <span class="icon">⚙️</span>
@@ -2025,7 +2060,7 @@
             </div>
         </div>
 
-        <div class="version-info">v3.2.0</div>
+        <div class="version-info">v3.2.1</div>
     </div>
 
     <script src="src/js/storage.js"></script>
@@ -2464,6 +2499,36 @@
 
         document.getElementById('games-back-btn').addEventListener('click', () => {
             showScreen(connectedScreen);
+        });
+
+        // Fullscreen button
+        document.getElementById('fullscreen-btn').addEventListener('click', () => {
+            if (roomRef) {
+                roomRef.child('settings').update({
+                    enterFullscreen: true,
+                    timestamp: Date.now()
+                });
+            }
+        });
+
+        // Screen off button
+        let screenOffState = false;
+        const screenOffBtn = document.getElementById('screen-off-btn');
+
+        screenOffBtn.addEventListener('click', () => {
+            screenOffState = !screenOffState;
+
+            if (roomRef) {
+                roomRef.child('settings').update({
+                    screenOff: screenOffState,
+                    timestamp: Date.now()
+                });
+            }
+
+            // Update button appearance
+            screenOffBtn.classList.toggle('active', screenOffState);
+            screenOffBtn.querySelector('.label').textContent = screenOffState ? 'Scherm aan' : 'Scherm uit';
+            screenOffBtn.querySelector('.icon').textContent = screenOffState ? '☀️' : '🌙';
         });
 
         // Game selection
