@@ -346,6 +346,26 @@
             display: block;
         }
 
+        .start-game-btn {
+            width: 100%;
+            padding: 18px;
+            font-size: 20px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+            transition: all 0.2s;
+        }
+
+        .start-game-btn:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 10px rgba(76, 175, 80, 0.3);
+        }
+
         .memory-settings {
             margin-top: 15px;
             padding: 15px;
@@ -1650,6 +1670,34 @@
                     <span class="game-emoji">🔢</span>
                     <div><span class="game-name">Tellen</span><span class="game-desc">Hoeveel zijn er?</span></div>
                 </button>
+                <button class="game-select-btn" data-game="shadow">
+                    <span class="game-emoji">🔍</span>
+                    <div><span class="game-name">Schaduw</span><span class="game-desc">Zoek de schaduw!</span></div>
+                </button>
+                <button class="game-select-btn" data-game="sizesort">
+                    <span class="game-emoji">📏</span>
+                    <div><span class="game-name">Grootte</span><span class="game-desc">Sorteer groot naar klein!</span></div>
+                </button>
+                <button class="game-select-btn" data-game="colorsort">
+                    <span class="game-emoji">🎨</span>
+                    <div><span class="game-name">Kleuren Sorteren</span><span class="game-desc">Sorteer op kleur!</span></div>
+                </button>
+                <button class="game-select-btn" data-game="sorting">
+                    <span class="game-emoji">🗂️</span>
+                    <div><span class="game-name">Sorteren</span><span class="game-desc">Wat hoort waar?</span></div>
+                </button>
+                <button class="game-select-btn" data-game="farm">
+                    <span class="game-emoji">🚜</span>
+                    <div><span class="game-name">Boerderij</span><span class="game-desc">Voer de dieren!</span></div>
+                </button>
+                <button class="game-select-btn" data-game="dressup">
+                    <span class="game-emoji">👗</span>
+                    <div><span class="game-name">Aankleden</span><span class="game-desc">Kleed het poppetje aan!</span></div>
+                </button>
+                <button class="game-select-btn" data-game="cooking">
+                    <span class="game-emoji">👨‍🍳</span>
+                    <div><span class="game-name">Koken</span><span class="game-desc">Maak een recept!</span></div>
+                </button>
             </div>
 
             <!-- Memory Settings (shown when memory is selected) -->
@@ -1714,6 +1762,7 @@
                 </div>
             </div>
 
+            <button class="start-game-btn" id="start-game-btn">▶️ Start Spel</button>
             <button class="back-btn" id="games-back-btn">← Terug</button>
         </div>
 
@@ -1976,7 +2025,7 @@
             </div>
         </div>
 
-        <div class="version-info">v3.1.0</div>
+        <div class="version-info">v3.2.0</div>
     </div>
 
     <script src="src/js/storage.js"></script>
@@ -2418,14 +2467,14 @@
         });
 
         // Game selection
-        let currentGame = 'puzzle';
+        let selectedGame = 'puzzle';
 
         document.querySelectorAll('.game-select-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const game = btn.dataset.game;
-                currentGame = game;
+                selectedGame = game;
 
-                // Update UI
+                // Update UI - only visual selection, not activated yet
                 document.querySelectorAll('.game-select-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
 
@@ -2435,15 +2484,24 @@
                     const el = document.getElementById(`${panel}-settings`);
                     if (el) el.style.display = game === panel ? 'block' : 'none';
                 });
-
-                // Send to tablet
-                if (roomRef) {
-                    roomRef.child('settings').update({
-                        currentGame: game,
-                        timestamp: Date.now()
-                    });
-                }
             });
+        });
+
+        // Start Game button - actually switches the game on tablet
+        document.getElementById('start-game-btn').addEventListener('click', () => {
+            if (roomRef) {
+                roomRef.child('settings').update({
+                    currentGame: selectedGame,
+                    switchGame: true,
+                    timestamp: Date.now()
+                });
+
+                // Go back to main screen
+                showScreen(connectedScreen);
+
+                // Show confirmation
+                alert(`${selectedGame.charAt(0).toUpperCase() + selectedGame.slice(1)} gestart op tablet!`);
+            }
         });
 
         // Memory difficulty

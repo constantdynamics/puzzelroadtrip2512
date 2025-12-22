@@ -1378,3 +1378,1045 @@ html, body {
     font-weight: bold;
     cursor: pointer;
 }
+
+/* ==================== SHADOW MATCHING GAME ==================== */
+.shadow-game {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 20px;
+}
+
+.shadow-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.shadow-header h2 {
+    color: white;
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.shadow-score {
+    color: rgba(255,255,255,0.8);
+    font-size: 18px;
+}
+
+.shadow-play-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.shadow-targets {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.shadow-target {
+    width: 100px;
+    height: 100px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.shadow-silhouette {
+    font-size: 60px;
+    filter: brightness(0) opacity(0.5);
+}
+
+.shadow-target.matched .shadow-silhouette {
+    display: none;
+}
+
+.shadow-revealed {
+    font-size: 60px;
+    animation: revealPop 0.3s ease;
+}
+
+@keyframes revealPop {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.shadow-items {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    padding: 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+}
+
+.shadow-draggable {
+    width: 80px;
+    height: 80px;
+    background: white;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 50px;
+    cursor: grab;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    transition: transform 0.2s;
+}
+
+.shadow-draggable:active, .shadow-draggable.dragging {
+    cursor: grabbing;
+    transform: scale(1.1);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+
+.shadow-celebration {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.shadow-celebration-content {
+    text-align: center;
+    color: white;
+}
+
+.shadow-celebration h2 {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.shadow-celebration p {
+    font-size: 24px;
+    margin-bottom: 30px;
+}
+
+.shadow-play-again-btn {
+    padding: 15px 30px;
+    font-size: 18px;
+    border: none;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* ==================== SIZE SORTING GAME ==================== */
+.size-sort-game {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 20px;
+}
+
+.size-sort-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.size-sort-header h2 {
+    color: white;
+    font-size: 28px;
+    margin-bottom: 5px;
+}
+
+.size-sort-header p {
+    color: rgba(255,255,255,0.7);
+    font-size: 16px;
+}
+
+.size-sort-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.size-sort-slots {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+}
+
+.size-sort-slot {
+    width: 100px;
+    height: 120px;
+    background: rgba(255,255,255,0.2);
+    border: 3px dashed rgba(255,255,255,0.5);
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.size-sort-slot.filled {
+    border-style: solid;
+    border-color: #4CAF50;
+    background: rgba(76, 175, 80, 0.2);
+}
+
+.size-sort-slot.wrong {
+    animation: wrongShake 0.3s ease;
+    border-color: #FF6B6B;
+}
+
+.slot-label {
+    position: absolute;
+    top: -25px;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.slot-placeholder {
+    font-size: 40px;
+    color: rgba(255,255,255,0.3);
+}
+
+.size-sort-items {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 20px;
+}
+
+.size-sort-item {
+    background: white;
+    border-radius: 15px;
+    padding: 15px;
+    cursor: grab;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    transition: transform 0.2s;
+}
+
+.size-sort-item.draggable:active, .size-sort-item.dragging {
+    cursor: grabbing;
+    transform: scale(1.1);
+}
+
+.size-sort-item.placed {
+    cursor: default;
+}
+
+.size-sort-celebration {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.size-sort-celebration-content {
+    text-align: center;
+    color: white;
+}
+
+.size-sort-celebration h2 {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.size-sort-play-again-btn {
+    padding: 15px 30px;
+    font-size: 18px;
+    border: none;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #6BCB77 0%, #4D96FF 100%);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* ==================== COLOR SORTING GAME ==================== */
+.color-sort-game {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 20px;
+}
+
+.color-sort-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.color-sort-header h2 {
+    color: white;
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.color-sort-score {
+    color: rgba(255,255,255,0.8);
+    font-size: 18px;
+}
+
+.color-sort-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.color-sort-bins {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.color-sort-bin {
+    width: 140px;
+    min-height: 150px;
+    border: 4px solid;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.color-sort-bin.wrong {
+    animation: wrongShake 0.3s ease;
+}
+
+.color-sort-bin .bin-label {
+    padding: 10px;
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.color-sort-bin .bin-contents {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 10px;
+    align-content: flex-start;
+}
+
+.color-sort-bin .bin-item {
+    font-size: 24px;
+}
+
+.color-sort-items {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    padding: 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+}
+
+.color-sort-item {
+    width: 70px;
+    height: 70px;
+    background: white;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    cursor: grab;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.color-sort-item:active, .color-sort-item.dragging {
+    cursor: grabbing;
+    transform: scale(1.1);
+}
+
+.color-sort-celebration {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.color-sort-celebration-content {
+    text-align: center;
+    color: white;
+}
+
+.color-sort-celebration h2 {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.color-sort-play-again-btn {
+    padding: 15px 30px;
+    font-size: 18px;
+    border: none;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 50%, #6BCB77 100%);
+    color: #333;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* ==================== GENERAL SORTING GAME ==================== */
+.sorting-game {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 20px;
+}
+
+.sorting-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.sorting-header h2 {
+    color: white;
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.sorting-score {
+    color: rgba(255,255,255,0.8);
+    font-size: 18px;
+}
+
+.sorting-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.sorting-bins {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+}
+
+.sorting-bin {
+    width: 180px;
+    min-height: 180px;
+    border: 4px solid;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.sorting-bin.wrong {
+    animation: wrongShake 0.3s ease;
+}
+
+.sorting-bin .bin-header {
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: white;
+}
+
+.sorting-bin .bin-emoji {
+    font-size: 24px;
+}
+
+.sorting-bin .bin-name {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.sorting-bin .bin-contents {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 10px;
+    align-content: flex-start;
+}
+
+.sorting-bin .bin-item {
+    font-size: 28px;
+}
+
+.sorting-items {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    padding: 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+}
+
+.sorting-item {
+    width: 70px;
+    height: 70px;
+    background: white;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    cursor: grab;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.sorting-item:active, .sorting-item.dragging {
+    cursor: grabbing;
+    transform: scale(1.1);
+}
+
+.sorting-celebration {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.sorting-celebration-content {
+    text-align: center;
+    color: white;
+}
+
+.sorting-celebration h2 {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.sorting-play-again-btn {
+    padding: 15px 30px;
+    font-size: 18px;
+    border: none;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #A29BFE 0%, #6C5CE7 100%);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* ==================== FARM GAME ==================== */
+.farm-game {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 20px;
+    background: linear-gradient(180deg, #87CEEB 0%, #98FB98 100%);
+    border-radius: 20px;
+}
+
+.farm-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.farm-header h2 {
+    color: #654321;
+    font-size: 28px;
+    margin-bottom: 10px;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
+}
+
+.farm-score {
+    color: #654321;
+    font-size: 18px;
+}
+
+.farm-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.farm-animals {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.farm-animal {
+    width: 120px;
+    padding: 15px;
+    background: white;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    position: relative;
+    transition: transform 0.3s;
+}
+
+.farm-animal.wrong {
+    animation: wrongShake 0.3s ease;
+}
+
+.farm-animal.fed {
+    background: #E8F5E9;
+}
+
+.farm-animal.happy {
+    animation: happyBounce 0.5s ease;
+}
+
+@keyframes happyBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.farm-animal .animal-emoji {
+    font-size: 50px;
+}
+
+.farm-animal .animal-name {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    margin-top: 5px;
+}
+
+.farm-animal .animal-hungry {
+    font-size: 12px;
+    color: #FF6B6B;
+    margin-top: 5px;
+}
+
+.farm-animal .animal-speech {
+    position: absolute;
+    top: -20px;
+    right: -10px;
+    background: white;
+    padding: 5px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.farm-animal .animal-food-eaten {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    font-size: 20px;
+}
+
+.farm-foods {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    padding: 20px;
+    background: rgba(139, 90, 43, 0.2);
+    border-radius: 20px;
+}
+
+.farm-food {
+    background: white;
+    border-radius: 15px;
+    padding: 10px 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    cursor: grab;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.farm-food:active, .farm-food.dragging {
+    cursor: grabbing;
+    transform: scale(1.1);
+}
+
+.farm-food .food-emoji {
+    font-size: 35px;
+}
+
+.farm-food .food-name {
+    font-size: 12px;
+    color: #666;
+}
+
+.farm-celebration {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.farm-celebration-content {
+    text-align: center;
+    color: white;
+}
+
+.farm-celebration h2 {
+    font-size: 40px;
+    margin-bottom: 20px;
+}
+
+.farm-animals-happy {
+    font-size: 50px;
+    margin-bottom: 20px;
+}
+
+.farm-play-again-btn {
+    padding: 15px 30px;
+    font-size: 18px;
+    border: none;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #8B5A2B 0%, #6BCB77 100%);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* ==================== DRESS UP GAME ==================== */
+.dressup-game {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 20px;
+}
+
+.dressup-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.dressup-header h2 {
+    color: white;
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.dressup-score {
+    color: rgba(255,255,255,0.8);
+    font-size: 18px;
+}
+
+.dressup-area {
+    flex: 1;
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    align-items: center;
+}
+
+.dressup-character {
+    width: 250px;
+    height: 400px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 30px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.character-figure {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+}
+
+.character-body {
+    position: relative;
+}
+
+.character-emoji {
+    font-size: 80px;
+}
+
+.character-figure .slot {
+    min-width: 60px;
+    min-height: 40px;
+    background: rgba(255,255,255,0.3);
+    border: 2px dashed rgba(255,255,255,0.5);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 35px;
+}
+
+.character-figure .slot.filled {
+    border-style: solid;
+    border-color: #4CAF50;
+    background: rgba(255,255,255,0.5);
+}
+
+.character-figure .slot-head {
+    font-size: 40px;
+}
+
+.character-figure .slot-hand {
+    position: absolute;
+    right: -70px;
+    top: 50%;
+}
+
+.dressup-clothes {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.dressup-item {
+    background: white;
+    border-radius: 15px;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: grab;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.dressup-item:active, .dressup-item.dragging {
+    cursor: grabbing;
+    transform: scale(1.05);
+}
+
+.dressup-item .item-emoji {
+    font-size: 40px;
+}
+
+.dressup-item .item-name {
+    font-size: 16px;
+    color: #333;
+}
+
+.dressup-celebration {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.dressup-celebration-content {
+    text-align: center;
+    color: white;
+}
+
+.dressup-celebration h2 {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.dressup-result {
+    font-size: 50px;
+    margin-bottom: 20px;
+}
+
+.dressup-play-again-btn {
+    padding: 15px 30px;
+    font-size: 18px;
+    border: none;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 100%);
+    color: #333;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* ==================== COOKING GAME ==================== */
+.cooking-game {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 20px;
+    background: linear-gradient(180deg, #FFECD2 0%, #FCB69F 100%);
+    border-radius: 20px;
+}
+
+.cooking-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.cooking-header h2 {
+    color: #8B4513;
+    font-size: 26px;
+    margin-bottom: 10px;
+}
+
+.cooking-progress {
+    color: #A0522D;
+    font-size: 16px;
+}
+
+.cooking-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    align-items: center;
+}
+
+.cooking-bowl {
+    width: 250px;
+    height: 200px;
+    background: white;
+    border-radius: 0 0 50% 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+.cooking-bowl.wrong {
+    animation: wrongShake 0.3s ease;
+}
+
+.cooking-bowl .bowl-emoji {
+    font-size: 60px;
+}
+
+.cooking-bowl .bowl-contents {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.cooking-bowl .added-ingredient {
+    font-size: 30px;
+    animation: ingredientDrop 0.3s ease;
+}
+
+@keyframes ingredientDrop {
+    0% { transform: translateY(-20px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+.cooking-instruction {
+    position: absolute;
+    bottom: -40px;
+    background: #8B4513;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 16px;
+    white-space: nowrap;
+}
+
+.cooking-ingredients {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    padding: 20px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 20px;
+}
+
+.cooking-ingredient {
+    background: white;
+    border-radius: 15px;
+    padding: 10px 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    cursor: grab;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border: 3px solid transparent;
+}
+
+.cooking-ingredient.correct-next {
+    border-color: #4CAF50;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); }
+    50% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
+}
+
+.cooking-ingredient:active, .cooking-ingredient.dragging {
+    cursor: grabbing;
+    transform: scale(1.1);
+}
+
+.cooking-ingredient .ingredient-emoji {
+    font-size: 40px;
+}
+
+.cooking-ingredient .ingredient-name {
+    font-size: 12px;
+    color: #666;
+}
+
+.cooking-celebration {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.cooking-celebration-content {
+    text-align: center;
+    color: white;
+}
+
+.cooking-celebration h2 {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.cooking-result {
+    font-size: 100px;
+    margin-bottom: 20px;
+}
+
+.cooking-play-again-btn {
+    padding: 15px 30px;
+    font-size: 18px;
+    border: none;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #FCB69F 0%, #FFECD2 100%);
+    color: #8B4513;
+    font-weight: bold;
+    cursor: pointer;
+}

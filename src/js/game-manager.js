@@ -1,5 +1,6 @@
 // Game Manager - Handles switching between different games
-// Supports: Puzzle, Memory, Drawing, Shapes, Music, CarWash, Colors, Counting
+// Supports: Puzzle, Memory, Drawing, Shapes, Music, CarWash, Colors, Counting,
+//           Shadow, SizeSort, ColorSort, Sorting, Farm, DressUp, Cooking
 
 const GameManager = {
     currentGame: 'puzzle',
@@ -38,13 +39,48 @@ const GameManager = {
         },
         colors: {
             name: 'Kleuren',
-            emoji: '🎨',
+            emoji: '🌈',
             description: 'Zoek de juiste kleur!'
         },
         counting: {
             name: 'Tellen',
             emoji: '🔢',
             description: 'Hoeveel zijn er?'
+        },
+        shadow: {
+            name: 'Schaduw',
+            emoji: '🔍',
+            description: 'Zoek de schaduw!'
+        },
+        sizesort: {
+            name: 'Grootte',
+            emoji: '📏',
+            description: 'Sorteer groot naar klein!'
+        },
+        colorsort: {
+            name: 'Kleuren Sorteren',
+            emoji: '🎨',
+            description: 'Sorteer op kleur!'
+        },
+        sorting: {
+            name: 'Sorteren',
+            emoji: '🗂️',
+            description: 'Wat hoort waar?'
+        },
+        farm: {
+            name: 'Boerderij',
+            emoji: '🚜',
+            description: 'Voer de dieren!'
+        },
+        dressup: {
+            name: 'Aankleden',
+            emoji: '👗',
+            description: 'Kleed het poppetje aan!'
+        },
+        cooking: {
+            name: 'Koken',
+            emoji: '👨‍🍳',
+            description: 'Maak een recept!'
         }
     },
 
@@ -63,7 +99,8 @@ const GameManager = {
 
                 // Create containers for all games
                 const gameContainers = [
-                    'memory', 'drawing', 'shapes', 'music', 'carwash', 'colors', 'counting'
+                    'memory', 'drawing', 'shapes', 'music', 'carwash', 'colors', 'counting',
+                    'shadow', 'sizesort', 'colorsort', 'sorting', 'farm', 'dressup', 'cooking'
                 ];
 
                 gameContainers.forEach(game => {
@@ -94,7 +131,10 @@ const GameManager = {
         if (pieceTray) pieceTray.style.display = 'none';
 
         // Hide all game containers
-        const allContainers = ['memory', 'drawing', 'shapes', 'music', 'carwash', 'colors', 'counting'];
+        const allContainers = [
+            'memory', 'drawing', 'shapes', 'music', 'carwash', 'colors', 'counting',
+            'shadow', 'sizesort', 'colorsort', 'sorting', 'farm', 'dressup', 'cooking'
+        ];
         allContainers.forEach(game => {
             const container = document.getElementById(`${game}-container`);
             if (container) container.style.display = 'none';
@@ -148,6 +188,48 @@ const GameManager = {
             case 'counting':
                 this.showGameContainer('counting', () => {
                     if (typeof CountingGame !== 'undefined') CountingGame.init('counting-container');
+                });
+                break;
+
+            case 'shadow':
+                this.showGameContainer('shadow', () => {
+                    if (typeof ShadowGame !== 'undefined') ShadowGame.init('shadow-container');
+                });
+                break;
+
+            case 'sizesort':
+                this.showGameContainer('sizesort', () => {
+                    if (typeof SizeSortGame !== 'undefined') SizeSortGame.init('sizesort-container');
+                });
+                break;
+
+            case 'colorsort':
+                this.showGameContainer('colorsort', () => {
+                    if (typeof ColorSortGame !== 'undefined') ColorSortGame.init('colorsort-container');
+                });
+                break;
+
+            case 'sorting':
+                this.showGameContainer('sorting', () => {
+                    if (typeof SortingGame !== 'undefined') SortingGame.init('sorting-container');
+                });
+                break;
+
+            case 'farm':
+                this.showGameContainer('farm', () => {
+                    if (typeof FarmGame !== 'undefined') FarmGame.init('farm-container');
+                });
+                break;
+
+            case 'dressup':
+                this.showGameContainer('dressup', () => {
+                    if (typeof DressUpGame !== 'undefined') DressUpGame.init('dressup-container');
+                });
+                break;
+
+            case 'cooking':
+                this.showGameContainer('cooking', () => {
+                    if (typeof CookingGame !== 'undefined') CookingGame.init('cooking-container');
                 });
                 break;
         }
@@ -234,6 +316,76 @@ const GameManager = {
         }
     },
 
+    // Settings for shadow game
+    setShadowDifficulty(level) {
+        if (typeof ShadowGame !== 'undefined') {
+            ShadowGame.setDifficulty(level);
+            if (this.currentGame === 'shadow') {
+                ShadowGame.reset();
+            }
+        }
+    },
+
+    // Settings for size sort game
+    setSizeSortDifficulty(level) {
+        if (typeof SizeSortGame !== 'undefined') {
+            SizeSortGame.setDifficulty(level);
+            if (this.currentGame === 'sizesort') {
+                SizeSortGame.reset();
+            }
+        }
+    },
+
+    // Settings for color sort game
+    setColorSortDifficulty(level) {
+        if (typeof ColorSortGame !== 'undefined') {
+            ColorSortGame.setDifficulty(level);
+            if (this.currentGame === 'colorsort') {
+                ColorSortGame.reset();
+            }
+        }
+    },
+
+    // Settings for sorting game
+    setSortingDifficulty(level) {
+        if (typeof SortingGame !== 'undefined') {
+            SortingGame.setDifficulty(level);
+            if (this.currentGame === 'sorting') {
+                SortingGame.reset();
+            }
+        }
+    },
+
+    // Settings for farm game
+    setFarmDifficulty(level) {
+        if (typeof FarmGame !== 'undefined') {
+            FarmGame.setDifficulty(level);
+            if (this.currentGame === 'farm') {
+                FarmGame.reset();
+            }
+        }
+    },
+
+    // Settings for dress up game
+    setDressUpDifficulty(level) {
+        if (typeof DressUpGame !== 'undefined') {
+            DressUpGame.setDifficulty(level);
+            if (this.currentGame === 'dressup') {
+                DressUpGame.reset();
+            }
+        }
+    },
+
+    // Settings for cooking game
+    setCookingDifficulty(level) {
+        if (typeof CookingGame !== 'undefined') {
+            CookingGame.setDifficulty(level);
+            if (this.currentGame === 'cooking') {
+                CookingGame.reset();
+            }
+        }
+    },
+
     resetCurrentGame() {
         switch (this.currentGame) {
             case 'puzzle':
@@ -262,6 +414,27 @@ const GameManager = {
                 break;
             case 'counting':
                 if (typeof CountingGame !== 'undefined') CountingGame.reset();
+                break;
+            case 'shadow':
+                if (typeof ShadowGame !== 'undefined') ShadowGame.reset();
+                break;
+            case 'sizesort':
+                if (typeof SizeSortGame !== 'undefined') SizeSortGame.reset();
+                break;
+            case 'colorsort':
+                if (typeof ColorSortGame !== 'undefined') ColorSortGame.reset();
+                break;
+            case 'sorting':
+                if (typeof SortingGame !== 'undefined') SortingGame.reset();
+                break;
+            case 'farm':
+                if (typeof FarmGame !== 'undefined') FarmGame.reset();
+                break;
+            case 'dressup':
+                if (typeof DressUpGame !== 'undefined') DressUpGame.reset();
+                break;
+            case 'cooking':
+                if (typeof CookingGame !== 'undefined') CookingGame.reset();
                 break;
         }
     }
