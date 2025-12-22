@@ -1146,6 +1146,15 @@
             margin-top: 8px;
         }
 
+        .game-preview-screenshot {
+            width: 100%;
+            max-height: 200px;
+            object-fit: contain;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background: rgba(255,255,255,0.1);
+        }
+
         /* Pictionary multiplayer controls */
         .pictionary-controls {
             margin-top: 15px;
@@ -1877,6 +1886,8 @@
                     <span class="game-preview-icon" id="game-preview-icon">🎮</span>
                     <span class="game-preview-name" id="game-preview-name">Spel</span>
                 </div>
+                <!-- Live screenshot from tablet -->
+                <img class="game-preview-screenshot" id="game-screenshot" src="" alt="Game preview" style="display: none;">
                 <div class="game-preview-content" id="game-preview-content">
                     <!-- Dynamic game content will be inserted here -->
                 </div>
@@ -2397,7 +2408,7 @@
             </div>
         </div>
 
-        <div class="version-info">v3.4.0</div>
+        <div class="version-info">v3.5.0</div>
     </div>
 
     <script src="src/js/storage.js"></script>
@@ -2780,6 +2791,11 @@
                     updateGameStateDisplay(gameState);
                 };
 
+                // Setup game screenshot listener for live view
+                RemoteControl.onGameScreenshotUpdate = (screenshotData) => {
+                    updateGameScreenshot(screenshotData);
+                };
+
                 showScreen(connectedScreen);
                 populateTaskCategories();
                 populatePuzzleGrid();
@@ -2823,6 +2839,9 @@
             if (gameState.game === 'puzzle' || !gameState.game) {
                 if (puzzlePreview) puzzlePreview.style.display = 'block';
                 if (gamePreview) gamePreview.style.display = 'none';
+                // Hide game screenshot
+                const gameScreenshot = document.getElementById('game-screenshot');
+                if (gameScreenshot) gameScreenshot.style.display = 'none';
                 return;
             }
 
@@ -2901,6 +2920,17 @@
                 if (wordEl) {
                     wordEl.textContent = `${gameState.currentPrompt.emoji || ''} ${gameState.currentPrompt.text || '-'}`;
                 }
+            }
+        }
+
+        // Update game screenshot (live view from tablet)
+        function updateGameScreenshot(screenshotData) {
+            if (!screenshotData || !screenshotData.imageData) return;
+
+            const gameScreenshot = document.getElementById('game-screenshot');
+            if (gameScreenshot) {
+                gameScreenshot.src = screenshotData.imageData;
+                gameScreenshot.style.display = 'block';
             }
         }
 

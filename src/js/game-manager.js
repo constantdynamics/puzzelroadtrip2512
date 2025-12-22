@@ -161,6 +161,14 @@ const GameManager = {
 
         // Update header
         this.updateHeader();
+
+        // Start screenshot sync for non-puzzle games
+        if (gameName === 'puzzle') {
+            this.stopScreenshotSync();
+        } else {
+            this.startScreenshotSync();
+        }
+
         console.log('=== GameManager.switchGame END ===');
     },
 
@@ -351,6 +359,77 @@ const GameManager = {
             if (this.currentGame === 'drawing') {
                 DrawingGame.newPrompt();
             }
+        }
+    },
+
+    // Screenshot system for remote live view
+    screenshotInterval: null,
+
+    startScreenshotSync() {
+        // Stop any existing interval
+        this.stopScreenshotSync();
+
+        // Only sync if not puzzle (puzzle has its own system)
+        if (this.currentGame === 'puzzle') return;
+
+        // Capture and sync every 1.5 seconds
+        this.screenshotInterval = setInterval(() => {
+            this.captureAndSyncScreenshot();
+        }, 1500);
+
+        // Capture immediately
+        this.captureAndSyncScreenshot();
+    },
+
+    stopScreenshotSync() {
+        if (this.screenshotInterval) {
+            clearInterval(this.screenshotInterval);
+            this.screenshotInterval = null;
+        }
+    },
+
+    async captureAndSyncScreenshot() {
+        if (!this.gameContainer || this.currentGame === 'puzzle') return;
+
+        // Get the active game container
+        const containerId = `${this.currentGame}-container`;
+        const container = document.getElementById(containerId);
+        if (!container || container.style.display === 'none') return;
+
+        // Check if Firebase is available
+        if (typeof RemoteControl === 'undefined' || !RemoteControl.roomRef) return;
+
+        try {
+            // Use html2canvas to capture the game area
+            if (typeof html2canvas !== 'undefined') {
+                const canvas = await html2canvas(container, {
+                    backgroundColor: null,
+                    scale: 0.5, // Smaller for faster sync
+                    logging: false,
+                    useCORS: true,
+                    allowTaint: true
+                });
+
+                // Create a smaller thumbnail (max 300px wide)
+                const maxWidth = 300;
+                const scale = Math.min(maxWidth / canvas.width, 1);
+                const thumbCanvas = document.createElement('canvas');
+                thumbCanvas.width = canvas.width * scale;
+                thumbCanvas.height = canvas.height * scale;
+                const ctx = thumbCanvas.getContext('2d');
+                ctx.drawImage(canvas, 0, 0, thumbCanvas.width, thumbCanvas.height);
+
+                // Convert to base64 and sync
+                const imageData = thumbCanvas.toDataURL('image/jpeg', 0.6);
+
+                RemoteControl.roomRef.child('gameScreenshot').set({
+                    game: this.currentGame,
+                    imageData: imageData,
+                    timestamp: Date.now()
+                });
+            }
+        } catch (e) {
+            console.log('Screenshot capture failed:', e);
         }
     },
 

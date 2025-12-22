@@ -158,6 +158,14 @@ const RemoteControl = {
                     this.onGameStateUpdate(gameState);
                 }
             });
+
+            // Listen for game screenshots (live view for non-puzzle games)
+            this.roomRef.child('gameScreenshot').on('value', (snapshot) => {
+                const screenshotData = snapshot.val();
+                if (screenshotData && this.onGameScreenshotUpdate) {
+                    this.onGameScreenshotUpdate(screenshotData);
+                }
+            });
         }
 
         console.log('RemoteControl: Joined room', code);
@@ -166,6 +174,9 @@ const RemoteControl = {
 
     // Callback for game state updates
     onGameStateUpdate: null,
+
+    // Callback for game screenshot updates (live view)
+    onGameScreenshotUpdate: null,
 
     // Send a piece command (called by parent)
     async sendPiece() {
