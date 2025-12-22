@@ -245,6 +245,21 @@ const TabletApp = {
             GameManager.setMemoryTheme(settings.memoryTheme);
         }
 
+        // Shapes game settings
+        if (settings.shapesDifficulty !== undefined) {
+            GameManager.setShapesDifficulty(settings.shapesDifficulty);
+        }
+
+        // Colors game settings
+        if (settings.colorsDifficulty !== undefined) {
+            GameManager.setColorsDifficulty(settings.colorsDifficulty);
+        }
+
+        // Counting game settings
+        if (settings.countingDifficulty !== undefined) {
+            GameManager.setCountingDifficulty(settings.countingDifficulty);
+        }
+
         this.saveState();
     },
 

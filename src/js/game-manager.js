@@ -1,8 +1,8 @@
 // Game Manager - Handles switching between different games
-// Supports: Puzzle, Memory, Drawing
+// Supports: Puzzle, Memory, Drawing, Shapes, Music, CarWash, Colors, Counting
 
 const GameManager = {
-    currentGame: 'puzzle', // 'puzzle', 'memory', 'drawing'
+    currentGame: 'puzzle',
     gameContainer: null,
 
     games: {
@@ -20,6 +20,31 @@ const GameManager = {
             name: 'Tekenen',
             emoji: '🎨',
             description: 'Teken iets moois!'
+        },
+        shapes: {
+            name: 'Vormen',
+            emoji: '🔷',
+            description: 'Sorteer de vormen!'
+        },
+        music: {
+            name: 'Muziek',
+            emoji: '🎹',
+            description: 'Maak muziek!'
+        },
+        carwash: {
+            name: 'Auto wassen',
+            emoji: '🚗',
+            description: 'Was de auto schoon!'
+        },
+        colors: {
+            name: 'Kleuren',
+            emoji: '🎨',
+            description: 'Zoek de juiste kleur!'
+        },
+        counting: {
+            name: 'Tellen',
+            emoji: '🔢',
+            description: 'Hoeveel zijn er?'
         }
     },
 
@@ -36,18 +61,18 @@ const GameManager = {
                 puzzleArea.parentNode.insertBefore(this.gameContainer, puzzleArea);
                 this.gameContainer.appendChild(puzzleArea);
 
-                // Create other game containers
-                const memoryContainer = document.createElement('div');
-                memoryContainer.id = 'memory-container';
-                memoryContainer.className = 'game-screen memory-container';
-                memoryContainer.style.display = 'none';
-                this.gameContainer.appendChild(memoryContainer);
+                // Create containers for all games
+                const gameContainers = [
+                    'memory', 'drawing', 'shapes', 'music', 'carwash', 'colors', 'counting'
+                ];
 
-                const drawingContainer = document.createElement('div');
-                drawingContainer.id = 'drawing-container';
-                drawingContainer.className = 'game-screen drawing-container';
-                drawingContainer.style.display = 'none';
-                this.gameContainer.appendChild(drawingContainer);
+                gameContainers.forEach(game => {
+                    const container = document.createElement('div');
+                    container.id = `${game}-container`;
+                    container.className = `game-screen ${game}-container`;
+                    container.style.display = 'none';
+                    this.gameContainer.appendChild(container);
+                });
             }
         }
     },
@@ -64,40 +89,66 @@ const GameManager = {
         // Hide all game screens
         const puzzleArea = document.querySelector('.puzzle-area');
         const pieceTray = document.getElementById('piece-tray');
-        const memoryContainer = document.getElementById('memory-container');
-        const drawingContainer = document.getElementById('drawing-container');
 
         if (puzzleArea) puzzleArea.style.display = 'none';
         if (pieceTray) pieceTray.style.display = 'none';
-        if (memoryContainer) memoryContainer.style.display = 'none';
-        if (drawingContainer) drawingContainer.style.display = 'none';
+
+        // Hide all game containers
+        const allContainers = ['memory', 'drawing', 'shapes', 'music', 'carwash', 'colors', 'counting'];
+        allContainers.forEach(game => {
+            const container = document.getElementById(`${game}-container`);
+            if (container) container.style.display = 'none';
+        });
 
         // Show selected game
         switch (gameName) {
             case 'puzzle':
                 if (puzzleArea) puzzleArea.style.display = 'flex';
-                // Show piece tray if in manual mode
                 if (typeof TabletApp !== 'undefined' && TabletApp.state?.puzzleMode === 'manual') {
                     if (pieceTray) pieceTray.style.display = 'block';
                 }
                 break;
 
             case 'memory':
-                if (memoryContainer) {
-                    memoryContainer.style.display = 'flex';
-                    if (typeof MemoryGame !== 'undefined') {
-                        MemoryGame.init('memory-container');
-                    }
-                }
+                this.showGameContainer('memory', () => {
+                    if (typeof MemoryGame !== 'undefined') MemoryGame.init('memory-container');
+                });
                 break;
 
             case 'drawing':
-                if (drawingContainer) {
-                    drawingContainer.style.display = 'flex';
-                    if (typeof DrawingGame !== 'undefined') {
-                        DrawingGame.init('drawing-container');
-                    }
-                }
+                this.showGameContainer('drawing', () => {
+                    if (typeof DrawingGame !== 'undefined') DrawingGame.init('drawing-container');
+                });
+                break;
+
+            case 'shapes':
+                this.showGameContainer('shapes', () => {
+                    if (typeof ShapesGame !== 'undefined') ShapesGame.init('shapes-container');
+                });
+                break;
+
+            case 'music':
+                this.showGameContainer('music', () => {
+                    if (typeof MusicGame !== 'undefined') MusicGame.init('music-container');
+                });
+                break;
+
+            case 'carwash':
+                this.showGameContainer('carwash', () => {
+                    if (typeof CarWashGame !== 'undefined') CarWashGame.init('carwash-container');
+                });
+                break;
+
+            case 'colors':
+                this.showGameContainer('colors', () => {
+                    if (typeof ColorsGame !== 'undefined') ColorsGame.init('colors-container');
+                });
+                break;
+
+            case 'counting':
+                this.showGameContainer('counting', () => {
+                    if (typeof CountingGame !== 'undefined') CountingGame.init('counting-container');
+                });
                 break;
         }
 
@@ -106,8 +157,16 @@ const GameManager = {
             AudioManager.playClick();
         }
 
-        // Update header if exists
+        // Update header
         this.updateHeader();
+    },
+
+    showGameContainer(gameName, initCallback) {
+        const container = document.getElementById(`${gameName}-container`);
+        if (container) {
+            container.style.display = 'flex';
+            if (initCallback) initCallback();
+        }
     },
 
     updateHeader() {
@@ -145,23 +204,64 @@ const GameManager = {
         }
     },
 
+    // Settings for shapes game
+    setShapesDifficulty(level) {
+        if (typeof ShapesGame !== 'undefined') {
+            ShapesGame.setDifficulty(level);
+            if (this.currentGame === 'shapes') {
+                ShapesGame.reset();
+            }
+        }
+    },
+
+    // Settings for colors game
+    setColorsDifficulty(level) {
+        if (typeof ColorsGame !== 'undefined') {
+            ColorsGame.setDifficulty(level);
+            if (this.currentGame === 'colors') {
+                ColorsGame.reset();
+            }
+        }
+    },
+
+    // Settings for counting game
+    setCountingDifficulty(level) {
+        if (typeof CountingGame !== 'undefined') {
+            CountingGame.setDifficulty(level);
+            if (this.currentGame === 'counting') {
+                CountingGame.reset();
+            }
+        }
+    },
+
     resetCurrentGame() {
         switch (this.currentGame) {
             case 'puzzle':
-                if (typeof TabletApp !== 'undefined') {
-                    TabletApp.resetCurrentPuzzle();
-                }
+                if (typeof TabletApp !== 'undefined') TabletApp.resetCurrentPuzzle();
                 break;
             case 'memory':
-                if (typeof MemoryGame !== 'undefined') {
-                    MemoryGame.reset();
-                }
+                if (typeof MemoryGame !== 'undefined') MemoryGame.reset();
                 break;
             case 'drawing':
                 if (typeof DrawingGame !== 'undefined') {
                     DrawingGame.clear();
                     DrawingGame.newPrompt();
                 }
+                break;
+            case 'shapes':
+                if (typeof ShapesGame !== 'undefined') ShapesGame.reset();
+                break;
+            case 'music':
+                // Music doesn't need reset
+                break;
+            case 'carwash':
+                if (typeof CarWashGame !== 'undefined') CarWashGame.reset();
+                break;
+            case 'colors':
+                if (typeof ColorsGame !== 'undefined') ColorsGame.reset();
+                break;
+            case 'counting':
+                if (typeof CountingGame !== 'undefined') CountingGame.reset();
                 break;
         }
     }

@@ -1617,26 +1617,43 @@
             <h2>🎮 Kies een Spel</h2>
             <p class="subtitle">Wissel tussen verschillende spelletjes</p>
 
-            <div class="games-grid">
+            <div class="games-grid" style="max-height: 400px; overflow-y: auto;">
                 <button class="game-select-btn active" data-game="puzzle">
                     <span class="game-emoji">🧩</span>
-                    <span class="game-name">Puzzel</span>
-                    <span class="game-desc">Maak de puzzel af!</span>
+                    <div><span class="game-name">Puzzel</span><span class="game-desc">Maak de puzzel af!</span></div>
                 </button>
                 <button class="game-select-btn" data-game="memory">
                     <span class="game-emoji">🃏</span>
-                    <span class="game-name">Memory</span>
-                    <span class="game-desc">Vind alle paren!</span>
+                    <div><span class="game-name">Memory</span><span class="game-desc">Vind alle paren!</span></div>
                 </button>
                 <button class="game-select-btn" data-game="drawing">
                     <span class="game-emoji">🎨</span>
-                    <span class="game-name">Tekenen</span>
-                    <span class="game-desc">Teken iets moois!</span>
+                    <div><span class="game-name">Tekenen</span><span class="game-desc">Teken iets moois!</span></div>
+                </button>
+                <button class="game-select-btn" data-game="shapes">
+                    <span class="game-emoji">🔷</span>
+                    <div><span class="game-name">Vormen</span><span class="game-desc">Sorteer de vormen!</span></div>
+                </button>
+                <button class="game-select-btn" data-game="music">
+                    <span class="game-emoji">🎹</span>
+                    <div><span class="game-name">Muziek</span><span class="game-desc">Maak muziek!</span></div>
+                </button>
+                <button class="game-select-btn" data-game="carwash">
+                    <span class="game-emoji">🚗</span>
+                    <div><span class="game-name">Auto wassen</span><span class="game-desc">Was de auto schoon!</span></div>
+                </button>
+                <button class="game-select-btn" data-game="colors">
+                    <span class="game-emoji">🌈</span>
+                    <div><span class="game-name">Kleuren</span><span class="game-desc">Zoek dezelfde kleur!</span></div>
+                </button>
+                <button class="game-select-btn" data-game="counting">
+                    <span class="game-emoji">🔢</span>
+                    <div><span class="game-name">Tellen</span><span class="game-desc">Hoeveel zijn er?</span></div>
                 </button>
             </div>
 
             <!-- Memory Settings (shown when memory is selected) -->
-            <div class="memory-settings" id="memory-settings" style="display: none;">
+            <div class="game-settings" id="memory-settings" style="display: none;">
                 <h3>Memory Instellingen</h3>
                 <div class="setting-row">
                     <span class="setting-label">Moeilijkheid</span>
@@ -1654,6 +1671,45 @@
                         <option value="vehicles">Voertuigen</option>
                         <option value="nature">Natuur</option>
                         <option value="toys">Speelgoed</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Shapes Settings -->
+            <div class="game-settings" id="shapes-settings" style="display: none;">
+                <h3>Vormen Instellingen</h3>
+                <div class="setting-row">
+                    <span class="setting-label">Moeilijkheid</span>
+                    <select class="setting-select" id="shapes-difficulty">
+                        <option value="easy">Makkelijk (3 vormen)</option>
+                        <option value="medium">Gemiddeld (4 vormen)</option>
+                        <option value="hard">Moeilijk (6 vormen)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Colors Settings -->
+            <div class="game-settings" id="colors-settings" style="display: none;">
+                <h3>Kleuren Instellingen</h3>
+                <div class="setting-row">
+                    <span class="setting-label">Moeilijkheid</span>
+                    <select class="setting-select" id="colors-difficulty">
+                        <option value="easy">Makkelijk</option>
+                        <option value="medium">Gemiddeld</option>
+                        <option value="hard">Moeilijk</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Counting Settings -->
+            <div class="game-settings" id="counting-settings" style="display: none;">
+                <h3>Tellen Instellingen</h3>
+                <div class="setting-row">
+                    <span class="setting-label">Moeilijkheid</span>
+                    <select class="setting-select" id="counting-difficulty">
+                        <option value="easy">Makkelijk (1-3)</option>
+                        <option value="medium">Gemiddeld (1-5)</option>
+                        <option value="hard">Moeilijk (3-7)</option>
                     </select>
                 </div>
             </div>
@@ -1920,7 +1976,7 @@
             </div>
         </div>
 
-        <div class="version-info">v3.0.0</div>
+        <div class="version-info">v3.1.0</div>
     </div>
 
     <script src="src/js/storage.js"></script>
@@ -2373,11 +2429,12 @@
                 document.querySelectorAll('.game-select-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
 
-                // Show/hide memory settings
-                const memorySettings = document.getElementById('memory-settings');
-                if (memorySettings) {
-                    memorySettings.style.display = game === 'memory' ? 'block' : 'none';
-                }
+                // Show/hide game-specific settings
+                const settingsPanels = ['memory', 'shapes', 'colors', 'counting'];
+                settingsPanels.forEach(panel => {
+                    const el = document.getElementById(`${panel}-settings`);
+                    if (el) el.style.display = game === panel ? 'block' : 'none';
+                });
 
                 // Send to tablet
                 if (roomRef) {
@@ -2404,6 +2461,36 @@
             if (roomRef) {
                 roomRef.child('settings').update({
                     memoryTheme: e.target.value,
+                    timestamp: Date.now()
+                });
+            }
+        });
+
+        // Shapes difficulty
+        document.getElementById('shapes-difficulty')?.addEventListener('change', (e) => {
+            if (roomRef) {
+                roomRef.child('settings').update({
+                    shapesDifficulty: e.target.value,
+                    timestamp: Date.now()
+                });
+            }
+        });
+
+        // Colors difficulty
+        document.getElementById('colors-difficulty')?.addEventListener('change', (e) => {
+            if (roomRef) {
+                roomRef.child('settings').update({
+                    colorsDifficulty: e.target.value,
+                    timestamp: Date.now()
+                });
+            }
+        });
+
+        // Counting difficulty
+        document.getElementById('counting-difficulty')?.addEventListener('change', (e) => {
+            if (roomRef) {
+                roomRef.child('settings').update({
+                    countingDifficulty: e.target.value,
                     timestamp: Date.now()
                 });
             }
