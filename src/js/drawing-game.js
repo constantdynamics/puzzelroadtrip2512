@@ -1,5 +1,5 @@
-// Drawing Game for Toddlers
-// Simple drawing app with prompts for 2-year-olds
+// Pictionary / Drawing Game for Toddlers
+// Drawing app with categorized prompts for 2-5 year-olds
 
 const DrawingGame = {
     canvas: null,
@@ -11,25 +11,91 @@ const DrawingGame = {
     brushSize: 15,
     container: null,
     currentPrompt: null,
+    currentCategory: 'all',
 
-    // Drawing prompts suitable for toddlers
-    prompts: [
-        { emoji: '☀️', text: 'Teken een zon!' },
-        { emoji: '🌈', text: 'Teken een regenboog!' },
-        { emoji: '🏠', text: 'Teken een huis!' },
-        { emoji: '🌳', text: 'Teken een boom!' },
-        { emoji: '🌸', text: 'Teken een bloem!' },
-        { emoji: '🐱', text: 'Teken een kat!' },
-        { emoji: '🐶', text: 'Teken een hond!' },
-        { emoji: '🐟', text: 'Teken een vis!' },
-        { emoji: '⭐', text: 'Teken sterren!' },
-        { emoji: '❤️', text: 'Teken een hartje!' },
-        { emoji: '🚗', text: 'Teken een auto!' },
-        { emoji: '🌙', text: 'Teken de maan!' },
-        { emoji: '⚽', text: 'Teken een bal!' },
-        { emoji: '🎈', text: 'Teken ballonnen!' },
-        { emoji: '🦋', text: 'Teken een vlinder!' }
-    ],
+    // Drawing prompts organized by category
+    categories: {
+        animals: {
+            name: 'Dieren',
+            emoji: '🐾',
+            prompts: [
+                { emoji: '🐱', text: 'Teken een kat!' },
+                { emoji: '🐶', text: 'Teken een hond!' },
+                { emoji: '🐟', text: 'Teken een vis!' },
+                { emoji: '🦋', text: 'Teken een vlinder!' },
+                { emoji: '🐰', text: 'Teken een konijn!' },
+                { emoji: '🐸', text: 'Teken een kikker!' },
+                { emoji: '🐢', text: 'Teken een schildpad!' },
+                { emoji: '🦁', text: 'Teken een leeuw!' },
+                { emoji: '🐘', text: 'Teken een olifant!' },
+                { emoji: '🐦', text: 'Teken een vogel!' }
+            ]
+        },
+        nature: {
+            name: 'Natuur',
+            emoji: '🌿',
+            prompts: [
+                { emoji: '☀️', text: 'Teken een zon!' },
+                { emoji: '🌈', text: 'Teken een regenboog!' },
+                { emoji: '🌳', text: 'Teken een boom!' },
+                { emoji: '🌸', text: 'Teken een bloem!' },
+                { emoji: '🌙', text: 'Teken de maan!' },
+                { emoji: '⭐', text: 'Teken sterren!' },
+                { emoji: '☁️', text: 'Teken wolken!' },
+                { emoji: '🌊', text: 'Teken golven!' },
+                { emoji: '🍎', text: 'Teken een appel!' },
+                { emoji: '🌻', text: 'Teken een zonnebloem!' }
+            ]
+        },
+        things: {
+            name: 'Dingen',
+            emoji: '🎁',
+            prompts: [
+                { emoji: '🏠', text: 'Teken een huis!' },
+                { emoji: '🚗', text: 'Teken een auto!' },
+                { emoji: '⚽', text: 'Teken een bal!' },
+                { emoji: '🎈', text: 'Teken ballonnen!' },
+                { emoji: '❤️', text: 'Teken een hartje!' },
+                { emoji: '🍰', text: 'Teken een taart!' },
+                { emoji: '🚀', text: 'Teken een raket!' },
+                { emoji: '✈️', text: 'Teken een vliegtuig!' },
+                { emoji: '⛵', text: 'Teken een boot!' },
+                { emoji: '🎄', text: 'Teken een kerstboom!' }
+            ]
+        },
+        people: {
+            name: 'Mensen',
+            emoji: '👨‍👩‍👧',
+            prompts: [
+                { emoji: '👦', text: 'Teken een jongen!' },
+                { emoji: '👧', text: 'Teken een meisje!' },
+                { emoji: '👨', text: 'Teken papa!' },
+                { emoji: '👩', text: 'Teken mama!' },
+                { emoji: '👶', text: 'Teken een baby!' },
+                { emoji: '🤴', text: 'Teken een prins!' },
+                { emoji: '👸', text: 'Teken een prinses!' },
+                { emoji: '🧙', text: 'Teken een tovenaar!' },
+                { emoji: '👨‍🚒', text: 'Teken een brandweerman!' },
+                { emoji: '🧑‍🍳', text: 'Teken een kok!' }
+            ]
+        },
+        shapes: {
+            name: 'Vormen',
+            emoji: '🔵',
+            prompts: [
+                { emoji: '⭕', text: 'Teken een cirkel!' },
+                { emoji: '⬛', text: 'Teken een vierkant!' },
+                { emoji: '🔺', text: 'Teken een driehoek!' },
+                { emoji: '⬜', text: 'Teken een rechthoek!' },
+                { emoji: '💎', text: 'Teken een ruit!' },
+                { emoji: '⭐', text: 'Teken een ster!' },
+                { emoji: '💗', text: 'Teken een hart!' },
+                { emoji: '🌙', text: 'Teken een halve maan!' },
+                { emoji: '➕', text: 'Teken een plus!' },
+                { emoji: '🔷', text: 'Teken vormen!' }
+            ]
+        }
+    },
 
     // Kid-friendly color palette
     colors: [
@@ -45,6 +111,10 @@ const DrawingGame = {
         '#FFFFFF'  // White (eraser)
     ],
 
+    // Brush sizes
+    brushSizes: [8, 15, 25],
+    currentBrushIndex: 1,
+
     init(containerId) {
         this.container = document.getElementById(containerId);
         if (!this.container) {
@@ -54,6 +124,23 @@ const DrawingGame = {
         this.render();
         this.setupCanvas();
         this.newPrompt();
+    },
+
+    setCategory(category) {
+        this.currentCategory = category;
+        this.newPrompt();
+    },
+
+    getAllPrompts() {
+        if (this.currentCategory === 'all') {
+            // Return all prompts from all categories
+            const allPrompts = [];
+            Object.values(this.categories).forEach(cat => {
+                allPrompts.push(...cat.prompts);
+            });
+            return allPrompts;
+        }
+        return this.categories[this.currentCategory]?.prompts || [];
     },
 
     render() {
@@ -79,9 +166,17 @@ const DrawingGame = {
                             </button>
                         `).join('')}
                     </div>
+                    <div class="brush-sizes" id="brush-sizes">
+                        ${this.brushSizes.map((size, i) => `
+                            <button class="brush-btn ${i === this.currentBrushIndex ? 'active' : ''}"
+                                    data-index="${i}">
+                                <span class="brush-dot" style="width: ${size}px; height: ${size}px;"></span>
+                            </button>
+                        `).join('')}
+                    </div>
                     <div class="drawing-actions">
-                        <button class="action-btn" id="clear-btn">🗑️ Wissen</button>
-                        <button class="action-btn" id="new-prompt-btn">🎲 Nieuwe opdracht</button>
+                        <button class="action-btn" id="clear-btn">🗑️</button>
+                        <button class="action-btn" id="new-prompt-btn">🎲</button>
                     </div>
                 </div>
             </div>
@@ -114,6 +209,16 @@ const DrawingGame = {
             btn.addEventListener('click', () => {
                 this.setColor(btn.dataset.color);
                 document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+
+        // Brush size selection
+        document.querySelectorAll('.brush-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.currentBrushIndex = parseInt(btn.dataset.index);
+                this.brushSize = this.brushSizes[this.currentBrushIndex];
+                document.querySelectorAll('.brush-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
             });
         });
@@ -196,11 +301,11 @@ const DrawingGame = {
     setColor(color) {
         this.currentColor = color;
 
-        // White is the eraser
+        // White is the eraser - make it bigger
         if (color === '#FFFFFF') {
-            this.brushSize = 30; // Bigger eraser
+            this.brushSize = 30;
         } else {
-            this.brushSize = 15;
+            this.brushSize = this.brushSizes[this.currentBrushIndex];
         }
     },
 
@@ -216,8 +321,11 @@ const DrawingGame = {
     },
 
     newPrompt() {
-        const randomIndex = Math.floor(Math.random() * this.prompts.length);
-        this.currentPrompt = this.prompts[randomIndex];
+        const prompts = this.getAllPrompts();
+        if (prompts.length === 0) return;
+
+        const randomIndex = Math.floor(Math.random() * prompts.length);
+        this.currentPrompt = prompts[randomIndex];
 
         const promptEl = document.getElementById('drawing-prompt');
         if (promptEl) {
@@ -230,9 +338,6 @@ const DrawingGame = {
             promptEl.classList.add('bounce');
             setTimeout(() => promptEl.classList.remove('bounce'), 500);
         }
-
-        // Optionally clear canvas for new prompt
-        // this.clear();
 
         if (typeof AudioManager !== 'undefined') {
             AudioManager.playTaskComplete();

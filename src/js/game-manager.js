@@ -1,10 +1,11 @@
 // Game Manager - Handles switching between different games
-// Supports: Puzzle, Memory, Drawing, Shapes, Music, CarWash, Colors, Counting,
+// Supports: Puzzle, Memory, Drawing/Pictionary, Shapes, Music, CarWash, Colors, Counting,
 //           Shadow, SizeSort, ColorSort, Sorting, Farm, DressUp, Cooking
 
 const GameManager = {
     currentGame: 'puzzle',
     gameContainer: null,
+    initialized: {},
 
     games: {
         puzzle: {
@@ -18,9 +19,9 @@ const GameManager = {
             description: 'Vind alle paren!'
         },
         drawing: {
-            name: 'Tekenen',
+            name: 'Pictionary',
             emoji: '🎨',
-            description: 'Teken iets moois!'
+            description: 'Teken en raad!'
         },
         shapes: {
             name: 'Vormen',
@@ -85,153 +86,77 @@ const GameManager = {
     },
 
     init() {
-        // Create game container if it doesn't exist
+        console.log('GameManager initializing...');
         this.gameContainer = document.getElementById('game-container');
+
         if (!this.gameContainer) {
-            // Wrap puzzle area in game container
-            const puzzleArea = document.querySelector('.puzzle-area');
-            if (puzzleArea) {
-                this.gameContainer = document.createElement('div');
-                this.gameContainer.id = 'game-container';
-                this.gameContainer.className = 'game-container';
-                puzzleArea.parentNode.insertBefore(this.gameContainer, puzzleArea);
-                this.gameContainer.appendChild(puzzleArea);
-
-                // Create containers for all games
-                const gameContainers = [
-                    'memory', 'drawing', 'shapes', 'music', 'carwash', 'colors', 'counting',
-                    'shadow', 'sizesort', 'colorsort', 'sorting', 'farm', 'dressup', 'cooking'
-                ];
-
-                gameContainers.forEach(game => {
-                    const container = document.createElement('div');
-                    container.id = `${game}-container`;
-                    container.className = `game-screen ${game}-container`;
-                    container.style.display = 'none';
-                    this.gameContainer.appendChild(container);
-                });
-            }
+            console.error('Game container not found!');
+            return;
         }
+
+        console.log('GameManager initialized, container found');
     },
 
     switchGame(gameName) {
+        console.log('=== GameManager.switchGame START ===');
+        console.log('Switching to game:', gameName);
+
         if (!this.games[gameName]) {
             console.error('Unknown game:', gameName);
             return;
         }
 
         this.currentGame = gameName;
-        console.log('Switching to game:', gameName);
 
-        // Hide all game screens
-        const puzzleArea = document.querySelector('.puzzle-area');
+        // Hide ALL game screens
+        const puzzleScreen = document.getElementById('puzzle-screen');
         const pieceTray = document.getElementById('piece-tray');
 
-        if (puzzleArea) puzzleArea.style.display = 'none';
-        if (pieceTray) pieceTray.style.display = 'none';
+        console.log('Found puzzle-screen:', !!puzzleScreen);
 
-        // Hide all game containers
-        const allContainers = [
+        // Hide puzzle screen
+        if (puzzleScreen) {
+            puzzleScreen.style.display = 'none';
+            console.log('Puzzle screen hidden');
+        }
+        if (pieceTray) {
+            pieceTray.style.display = 'none';
+        }
+
+        // Hide all other game containers
+        const allGames = [
             'memory', 'drawing', 'shapes', 'music', 'carwash', 'colors', 'counting',
             'shadow', 'sizesort', 'colorsort', 'sorting', 'farm', 'dressup', 'cooking'
         ];
-        allContainers.forEach(game => {
+
+        allGames.forEach(game => {
             const container = document.getElementById(`${game}-container`);
-            if (container) container.style.display = 'none';
+            if (container) {
+                container.style.display = 'none';
+            }
         });
 
         // Show selected game
-        switch (gameName) {
-            case 'puzzle':
-                if (puzzleArea) puzzleArea.style.display = 'flex';
-                if (typeof TabletApp !== 'undefined' && TabletApp.state?.puzzleMode === 'manual') {
-                    if (pieceTray) pieceTray.style.display = 'block';
-                }
-                break;
+        console.log('Now showing game:', gameName);
 
-            case 'memory':
-                this.showGameContainer('memory', () => {
-                    if (typeof MemoryGame !== 'undefined') MemoryGame.init('memory-container');
-                });
-                break;
-
-            case 'drawing':
-                this.showGameContainer('drawing', () => {
-                    if (typeof DrawingGame !== 'undefined') DrawingGame.init('drawing-container');
-                });
-                break;
-
-            case 'shapes':
-                this.showGameContainer('shapes', () => {
-                    if (typeof ShapesGame !== 'undefined') ShapesGame.init('shapes-container');
-                });
-                break;
-
-            case 'music':
-                this.showGameContainer('music', () => {
-                    if (typeof MusicGame !== 'undefined') MusicGame.init('music-container');
-                });
-                break;
-
-            case 'carwash':
-                this.showGameContainer('carwash', () => {
-                    if (typeof CarWashGame !== 'undefined') CarWashGame.init('carwash-container');
-                });
-                break;
-
-            case 'colors':
-                this.showGameContainer('colors', () => {
-                    if (typeof ColorsGame !== 'undefined') ColorsGame.init('colors-container');
-                });
-                break;
-
-            case 'counting':
-                this.showGameContainer('counting', () => {
-                    if (typeof CountingGame !== 'undefined') CountingGame.init('counting-container');
-                });
-                break;
-
-            case 'shadow':
-                this.showGameContainer('shadow', () => {
-                    if (typeof ShadowGame !== 'undefined') ShadowGame.init('shadow-container');
-                });
-                break;
-
-            case 'sizesort':
-                this.showGameContainer('sizesort', () => {
-                    if (typeof SizeSortGame !== 'undefined') SizeSortGame.init('sizesort-container');
-                });
-                break;
-
-            case 'colorsort':
-                this.showGameContainer('colorsort', () => {
-                    if (typeof ColorSortGame !== 'undefined') ColorSortGame.init('colorsort-container');
-                });
-                break;
-
-            case 'sorting':
-                this.showGameContainer('sorting', () => {
-                    if (typeof SortingGame !== 'undefined') SortingGame.init('sorting-container');
-                });
-                break;
-
-            case 'farm':
-                this.showGameContainer('farm', () => {
-                    if (typeof FarmGame !== 'undefined') FarmGame.init('farm-container');
-                });
-                break;
-
-            case 'dressup':
-                this.showGameContainer('dressup', () => {
-                    if (typeof DressUpGame !== 'undefined') DressUpGame.init('dressup-container');
-                });
-                break;
-
-            case 'cooking':
-                this.showGameContainer('cooking', () => {
-                    if (typeof CookingGame !== 'undefined') CookingGame.init('cooking-container');
-                });
-                break;
+        if (gameName === 'puzzle') {
+            if (puzzleScreen) {
+                puzzleScreen.style.display = 'flex';
+                console.log('Puzzle screen shown');
+            }
+            if (typeof TabletApp !== 'undefined' && TabletApp.state?.puzzleMode === 'manual') {
+                if (pieceTray) pieceTray.style.display = 'block';
+            }
+        } else {
+            const container = document.getElementById(`${gameName}-container`);
+            console.log(`Looking for container: ${gameName}-container, found:`, !!container);
+            if (container) {
+                container.style.display = 'flex';
+                console.log(`Container ${gameName}-container shown`);
+                this.initGame(gameName, container.id);
+            } else {
+                console.error('Container not found for game:', gameName);
+            }
         }
 
         // Play sound
@@ -241,21 +166,72 @@ const GameManager = {
 
         // Update header
         this.updateHeader();
+        console.log('=== GameManager.switchGame END ===');
     },
 
-    showGameContainer(gameName, initCallback) {
-        const container = document.getElementById(`${gameName}-container`);
-        if (container) {
-            container.style.display = 'flex';
-            if (initCallback) initCallback();
+    initGame(gameName, containerId) {
+        console.log('Initializing game:', gameName, 'in container:', containerId);
+
+        // Only init once per session, or re-init if needed
+        switch (gameName) {
+            case 'memory':
+                if (typeof MemoryGame !== 'undefined') MemoryGame.init(containerId);
+                break;
+            case 'drawing':
+                if (typeof DrawingGame !== 'undefined') DrawingGame.init(containerId);
+                break;
+            case 'shapes':
+                if (typeof ShapesGame !== 'undefined') ShapesGame.init(containerId);
+                break;
+            case 'music':
+                if (typeof MusicGame !== 'undefined') MusicGame.init(containerId);
+                break;
+            case 'carwash':
+                if (typeof CarWashGame !== 'undefined') CarWashGame.init(containerId);
+                break;
+            case 'colors':
+                if (typeof ColorsGame !== 'undefined') ColorsGame.init(containerId);
+                break;
+            case 'counting':
+                if (typeof CountingGame !== 'undefined') CountingGame.init(containerId);
+                break;
+            case 'shadow':
+                if (typeof ShadowGame !== 'undefined') ShadowGame.init(containerId);
+                break;
+            case 'sizesort':
+                if (typeof SizeSortGame !== 'undefined') SizeSortGame.init(containerId);
+                break;
+            case 'colorsort':
+                if (typeof ColorSortGame !== 'undefined') ColorSortGame.init(containerId);
+                break;
+            case 'sorting':
+                if (typeof SortingGame !== 'undefined') SortingGame.init(containerId);
+                break;
+            case 'farm':
+                if (typeof FarmGame !== 'undefined') FarmGame.init(containerId);
+                break;
+            case 'dressup':
+                if (typeof DressUpGame !== 'undefined') DressUpGame.init(containerId);
+                break;
+            case 'cooking':
+                if (typeof CookingGame !== 'undefined') CookingGame.init(containerId);
+                break;
         }
+
+        this.initialized[gameName] = true;
     },
 
     updateHeader() {
         const game = this.games[this.currentGame];
         const indicator = document.getElementById('puzzle-indicator');
-        if (indicator && this.currentGame !== 'puzzle') {
-            indicator.textContent = `${game.emoji} ${game.name}`;
+        if (indicator) {
+            if (this.currentGame === 'puzzle') {
+                // Reset to puzzle indicator
+                const puzzleIndex = TabletApp?.state?.currentPuzzleIndex || 0;
+                indicator.textContent = `Puzzel ${puzzleIndex + 1}/25`;
+            } else {
+                indicator.textContent = `${game.emoji} ${game.name}`;
+            }
         }
     },
 
@@ -382,6 +358,16 @@ const GameManager = {
             CookingGame.setDifficulty(level);
             if (this.currentGame === 'cooking') {
                 CookingGame.reset();
+            }
+        }
+    },
+
+    // Settings for drawing/pictionary game
+    setDrawingCategory(category) {
+        if (typeof DrawingGame !== 'undefined') {
+            DrawingGame.setCategory(category);
+            if (this.currentGame === 'drawing') {
+                DrawingGame.newPrompt();
             }
         }
     },

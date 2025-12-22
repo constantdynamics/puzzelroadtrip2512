@@ -30,18 +30,37 @@
             </div>
         </div>
 
-        <!-- Puzzle Area - Full Screen -->
-        <main class="puzzle-area">
-            <div class="puzzle-container">
-                <canvas id="puzzle-canvas"></canvas>
-            </div>
-            <div class="progress-container">
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progress-fill"></div>
+        <!-- Game Container - holds all games -->
+        <div id="game-container" class="game-container">
+            <!-- Puzzle Area -->
+            <main class="puzzle-area game-screen" id="puzzle-screen">
+                <div class="puzzle-container">
+                    <canvas id="puzzle-canvas"></canvas>
                 </div>
-                <div class="progress-text" id="progress-text">0/40 stukjes</div>
-            </div>
-        </main>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="progress-text" id="progress-text">0/40 stukjes</div>
+                </div>
+            </main>
+
+            <!-- Other game containers (created by GameManager, but also pre-defined) -->
+            <div id="memory-container" class="game-screen" style="display:none;"></div>
+            <div id="drawing-container" class="game-screen" style="display:none;"></div>
+            <div id="shapes-container" class="game-screen" style="display:none;"></div>
+            <div id="music-container" class="game-screen" style="display:none;"></div>
+            <div id="carwash-container" class="game-screen" style="display:none;"></div>
+            <div id="colors-container" class="game-screen" style="display:none;"></div>
+            <div id="counting-container" class="game-screen" style="display:none;"></div>
+            <div id="shadow-container" class="game-screen" style="display:none;"></div>
+            <div id="sizesort-container" class="game-screen" style="display:none;"></div>
+            <div id="colorsort-container" class="game-screen" style="display:none;"></div>
+            <div id="sorting-container" class="game-screen" style="display:none;"></div>
+            <div id="farm-container" class="game-screen" style="display:none;"></div>
+            <div id="dressup-container" class="game-screen" style="display:none;"></div>
+            <div id="cooking-container" class="game-screen" style="display:none;"></div>
+        </div>
 
         <!-- Piece Collection Tray (for manual mode) -->
         <div class="piece-tray" id="piece-tray" style="display:none;">
@@ -75,7 +94,7 @@
         </div>
 
         <!-- Version info -->
-        <div class="version-info">v3.2.1</div>
+        <div class="version-info">v3.2.2</div>
     </div>
 
     <script src="src/js/audio.js"></script>

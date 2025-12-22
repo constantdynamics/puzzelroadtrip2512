@@ -1683,7 +1683,7 @@
                 </button>
                 <button class="game-select-btn" data-game="drawing">
                     <span class="game-emoji">🎨</span>
-                    <div><span class="game-name">Tekenen</span><span class="game-desc">Teken iets moois!</span></div>
+                    <div><span class="game-name">Pictionary</span><span class="game-desc">Teken en raad!</span></div>
                 </button>
                 <button class="game-select-btn" data-game="shapes">
                     <span class="game-emoji">🔷</span>
@@ -1754,6 +1754,22 @@
                         <option value="vehicles">Voertuigen</option>
                         <option value="nature">Natuur</option>
                         <option value="toys">Speelgoed</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Drawing/Pictionary Settings -->
+            <div class="game-settings" id="drawing-settings" style="display: none;">
+                <h3>Pictionary Instellingen</h3>
+                <div class="setting-row">
+                    <span class="setting-label">Categorie</span>
+                    <select class="setting-select" id="drawing-category">
+                        <option value="all">Alles</option>
+                        <option value="animals">Dieren</option>
+                        <option value="nature">Natuur</option>
+                        <option value="things">Dingen</option>
+                        <option value="people">Mensen</option>
+                        <option value="shapes">Vormen</option>
                     </select>
                 </div>
             </div>
@@ -2544,7 +2560,7 @@
                 btn.classList.add('active');
 
                 // Show/hide game-specific settings
-                const settingsPanels = ['memory', 'shapes', 'colors', 'counting'];
+                const settingsPanels = ['memory', 'drawing', 'shapes', 'colors', 'counting'];
                 settingsPanels.forEach(panel => {
                     const el = document.getElementById(`${panel}-settings`);
                     if (el) el.style.display = game === panel ? 'block' : 'none';
@@ -2614,6 +2630,16 @@
             if (roomRef) {
                 roomRef.child('settings').update({
                     countingDifficulty: e.target.value,
+                    timestamp: Date.now()
+                });
+            }
+        });
+
+        // Drawing/Pictionary category
+        document.getElementById('drawing-category')?.addEventListener('change', (e) => {
+            if (roomRef) {
+                roomRef.child('settings').update({
+                    drawingCategory: e.target.value,
                     timestamp: Date.now()
                 });
             }

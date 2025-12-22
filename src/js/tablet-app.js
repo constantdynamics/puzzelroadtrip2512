@@ -130,18 +130,26 @@ const TabletApp = {
 
     // Listen for state updates from remote via Firebase
     listenForRemoteUpdates() {
-        // Poll for settings changes every 2 seconds
-        setInterval(() => {
+        // Use real-time listener instead of polling for better responsiveness
+        const setupListener = () => {
             if (RemoteControl.roomRef) {
-                RemoteControl.roomRef.child('settings').once('value', (snapshot) => {
+                console.log('Setting up real-time settings listener');
+                RemoteControl.roomRef.child('settings').on('value', (snapshot) => {
                     const settings = snapshot.val();
                     if (settings && settings.timestamp > (this.lastSettingsTimestamp || 0)) {
+                        console.log('New settings received:', settings);
                         this.lastSettingsTimestamp = settings.timestamp;
                         this.applyRemoteSettings(settings);
                     }
                 });
+            } else {
+                // Retry until roomRef is available
+                setTimeout(setupListener, 1000);
             }
-        }, 2000);
+        };
+
+        // Start after a short delay to ensure Firebase is ready
+        setTimeout(setupListener, 2000);
     },
 
     // Apply settings received from remote
@@ -285,6 +293,11 @@ const TabletApp = {
         // Counting game settings
         if (settings.countingDifficulty !== undefined) {
             GameManager.setCountingDifficulty(settings.countingDifficulty);
+        }
+
+        // Drawing/Pictionary category
+        if (settings.drawingCategory !== undefined) {
+            GameManager.setDrawingCategory(settings.drawingCategory);
         }
 
         this.saveState();
