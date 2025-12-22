@@ -343,6 +343,16 @@ const TabletApp = {
             }
         }
 
+        // Counting game answer from remote
+        if (settings.countingAnswer !== undefined) {
+            if (typeof CountingGame !== 'undefined') {
+                CountingGame.submitAnswer(settings.countingAnswer);
+            }
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings/countingAnswer').remove();
+            }
+        }
+
         this.saveState();
     },
 

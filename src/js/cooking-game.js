@@ -381,26 +381,13 @@ const CookingGame = {
             AudioManager.playPuzzleComplete();
         }
 
-        // Visual-only celebration (no text)
-        const celebrationEl = document.createElement('div');
-        celebrationEl.className = 'cooking-celebration';
-        celebrationEl.innerHTML = `
-            <div class="cooking-celebration-content">
-                <div class="celebration-emoji">🎉👨‍🍳🎉</div>
-                <div class="cooking-result">
-                    ${this.currentRecipe.result}
-                </div>
-                <div class="cooking-ingredients-used">
-                    ${this.addedIngredients.join(' ')}
-                </div>
-                <button class="cooking-play-again-btn" id="cooking-play-again">🔄</button>
-            </div>
-        `;
-        this.container.appendChild(celebrationEl);
+        // Sync completion to remote (no popup on tablet - child can't read)
+        this.syncGameState();
 
-        document.getElementById('cooking-play-again').addEventListener('click', () => {
+        // Auto-reset after brief celebration
+        setTimeout(() => {
             this.reset();
-        });
+        }, 2000);
     }
 };
 

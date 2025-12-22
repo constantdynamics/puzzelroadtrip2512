@@ -348,26 +348,14 @@ const CarWashGame = {
             AudioManager.playPuzzleComplete();
         }
 
-        setTimeout(() => {
-            if (this.container) {
-                const celebrationEl = document.createElement('div');
-                celebrationEl.className = 'carwash-celebration';
-                celebrationEl.innerHTML = `
-                    <div class="carwash-celebration-content">
-                        <h2>✨ Blinkt! ✨</h2>
-                        <p>Helemaal schoon!</p>
-                        <div class="clean-object">${this.currentObject.emoji}</div>
-                        <button class="carwash-play-again-btn" id="carwash-play-again">Nog iets wassen</button>
-                    </div>
-                `;
-                this.container.appendChild(celebrationEl);
+        // Sync completion to remote (no popup on tablet - child can't read)
+        this.syncGameState();
 
-                document.getElementById('carwash-play-again').addEventListener('click', () => {
-                    this.completed = false;
-                    this.reset();
-                });
-            }
-        }, 500);
+        // Auto-reset after brief celebration
+        setTimeout(() => {
+            this.completed = false;
+            this.reset();
+        }, 2000);
     }
 };
 

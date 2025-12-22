@@ -234,33 +234,19 @@ const ColorsGame = {
             AudioManager.playPuzzleComplete();
         }
 
-        // Sync completion to remote
+        // Sync completion to remote (no popup on tablet - child can't read)
         if (typeof TabletApp !== 'undefined' && TabletApp.roomRef) {
             TabletApp.roomRef.child('gameState').update({
+                game: 'colors',
                 completed: true,
                 timestamp: Date.now()
             });
         }
 
+        // Auto-reset after brief celebration
         setTimeout(() => {
-            if (this.container) {
-                const celebrationEl = document.createElement('div');
-                celebrationEl.className = 'colors-celebration';
-                // Visual-only celebration (no text)
-                celebrationEl.innerHTML = `
-                    <div class="colors-celebration-content">
-                        <div class="celebration-emoji">🎨🌟🎨</div>
-                        <div class="celebration-color" style="background: ${this.targetColor.hex}; width: 120px; height: 120px; border-radius: 50%; margin: 20px auto; border: 6px solid white;"></div>
-                        <button class="colors-play-again-btn" id="colors-play-again">🔄</button>
-                    </div>
-                `;
-                this.container.appendChild(celebrationEl);
-
-                document.getElementById('colors-play-again').addEventListener('click', () => {
-                    this.reset();
-                });
-            }
-        }, 500);
+            this.reset();
+        }, 2000);
     }
 };
 

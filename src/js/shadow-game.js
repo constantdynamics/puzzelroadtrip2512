@@ -333,20 +333,13 @@ const ShadowGame = {
             AudioManager.playPuzzleComplete();
         }
 
-        const celebrationEl = document.createElement('div');
-        celebrationEl.className = 'shadow-celebration';
-        celebrationEl.innerHTML = `
-            <div class="shadow-celebration-content">
-                <h2>🌟 Super! 🌟</h2>
-                <p>Alle schaduwen gevonden!</p>
-                <button class="shadow-play-again-btn" id="shadow-play-again">Opnieuw</button>
-            </div>
-        `;
-        this.container.appendChild(celebrationEl);
+        // Sync completion to remote (no popup on tablet - child can't read)
+        this.syncGameState();
 
-        document.getElementById('shadow-play-again').addEventListener('click', () => {
+        // Auto-reset after brief celebration
+        setTimeout(() => {
             this.reset();
-        });
+        }, 2000);
     }
 };
 

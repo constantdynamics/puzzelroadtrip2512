@@ -300,20 +300,13 @@ const SortingGame = {
             AudioManager.playPuzzleComplete();
         }
 
-        const celebrationEl = document.createElement('div');
-        celebrationEl.className = 'sorting-celebration';
-        celebrationEl.innerHTML = `
-            <div class="sorting-celebration-content">
-                <h2>🎊 Knap gedaan! 🎊</h2>
-                <p>Je hebt alles goed gesorteerd!</p>
-                <button class="sorting-play-again-btn" id="sorting-play-again">Nieuw spel</button>
-            </div>
-        `;
-        this.container.appendChild(celebrationEl);
+        // Sync completion to remote (no popup on tablet - child can't read)
+        this.syncGameState();
 
-        document.getElementById('sorting-play-again').addEventListener('click', () => {
+        // Auto-reset after brief celebration
+        setTimeout(() => {
             this.reset();
-        });
+        }, 2000);
     }
 };
 

@@ -297,23 +297,13 @@ const FarmGame = {
             AudioManager.playPuzzleComplete();
         }
 
-        const celebrationEl = document.createElement('div');
-        celebrationEl.className = 'farm-celebration';
-        celebrationEl.innerHTML = `
-            <div class="farm-celebration-content">
-                <h2>🎉 Alle dieren zijn blij! 🎉</h2>
-                <p>Je hebt de hele boerderij gevoerd!</p>
-                <div class="farm-animals-happy">
-                    ${this.animals.map(a => a.emoji).join(' ')}
-                </div>
-                <button class="farm-play-again-btn" id="farm-play-again">Opnieuw spelen</button>
-            </div>
-        `;
-        this.container.appendChild(celebrationEl);
+        // Sync completion to remote (no popup on tablet - child can't read)
+        this.syncGameState();
 
-        document.getElementById('farm-play-again').addEventListener('click', () => {
+        // Auto-reset after brief celebration
+        setTimeout(() => {
             this.reset();
-        });
+        }, 2000);
     }
 };
 

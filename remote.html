@@ -1238,6 +1238,42 @@
             padding: 20px;
             margin-bottom: 15px;
             text-align: center;
+            color: white;
+        }
+
+        .counting-answer-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .counting-answer-btn {
+            width: 60px;
+            height: 60px;
+            font-size: 28px;
+            font-weight: bold;
+            border: 3px solid white;
+            border-radius: 15px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            cursor: pointer;
+        }
+
+        .counting-answer-btn:active {
+            background: white;
+            color: #f57c00;
+        }
+
+        .counting-answer-btn.correct {
+            background: #4CAF50;
+            border-color: #4CAF50;
+        }
+
+        .counting-answer-btn.wrong {
+            background: #f44336;
+            border-color: #f44336;
         }
 
         .counting-question {
@@ -2075,11 +2111,13 @@
             <div class="game-settings" id="counting-settings" style="display: none;">
                 <h3>Tellen Instellingen</h3>
 
-                <!-- Target display for parent to tell child the answer -->
-                <div class="counting-target-display" id="counting-target-display" style="display: none;">
+                <!-- Target display for parent to answer -->
+                <div class="counting-target-display" id="counting-target-display">
                     <div class="counting-question">Hoeveel <span id="counting-item-name">-</span>?</div>
                     <div class="counting-emoji-display" id="counting-emoji-display">-</div>
-                    <div class="counting-answer-display" id="counting-answer-display">Antwoord: -</div>
+                    <div class="counting-answer-buttons" id="counting-answer-buttons">
+                        <!-- Buttons will be generated dynamically -->
+                    </div>
                     <div class="counting-round-info">
                         Ronde <span id="counting-round">1</span>/<span id="counting-max-rounds">5</span>
                         | Score: <span id="counting-score">0</span>
@@ -2359,7 +2397,7 @@
             </div>
         </div>
 
-        <div class="version-info">v3.3.0</div>
+        <div class="version-info">v3.4.0</div>
     </div>
 
     <script src="src/js/storage.js"></script>
@@ -3010,11 +3048,11 @@
                 }
             }
 
-            // Counting game display in settings
+            // Counting game display in settings with answer buttons
             if (gameState.game === 'counting') {
                 const countingDisplay = document.getElementById('counting-target-display');
                 const countingEmoji = document.getElementById('counting-emoji-display');
-                const countingAnswer = document.getElementById('counting-answer-display');
+                const countingButtons = document.getElementById('counting-answer-buttons');
                 const countingItemName = document.getElementById('counting-item-name');
                 const countingRound = document.getElementById('counting-round');
                 const countingMaxRounds = document.getElementById('counting-max-rounds');
@@ -3024,11 +3062,38 @@
                     countingDisplay.style.display = 'block';
                     if (countingEmoji && gameState.emoji) countingEmoji.textContent = gameState.emoji;
                     if (countingItemName && gameState.itemName) countingItemName.textContent = gameState.itemName;
-                    if (countingAnswer && gameState.correctAnswer !== undefined) countingAnswer.textContent = `Antwoord: ${gameState.correctAnswer}`;
                     if (countingRound && gameState.round !== undefined) countingRound.textContent = gameState.round;
                     if (countingMaxRounds && gameState.maxRounds !== undefined) countingMaxRounds.textContent = gameState.maxRounds;
                     if (countingScore && gameState.score !== undefined) countingScore.textContent = gameState.score;
+
+                    // Generate answer buttons (1-7 for now)
+                    if (countingButtons && gameState.correctAnswer !== undefined) {
+                        const maxNum = 7;
+                        let buttonsHtml = '';
+                        for (let i = 1; i <= maxNum; i++) {
+                            buttonsHtml += `<button class="counting-answer-btn" data-answer="${i}">${i}</button>`;
+                        }
+                        countingButtons.innerHTML = buttonsHtml;
+
+                        // Add click handlers
+                        countingButtons.querySelectorAll('.counting-answer-btn').forEach(btn => {
+                            btn.onclick = () => {
+                                const answer = parseInt(btn.dataset.answer);
+                                sendCountingAnswer(answer);
+                            };
+                        });
+                    }
                 }
+            }
+        }
+
+        // Send counting answer to tablet
+        function sendCountingAnswer(answer) {
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings').update({
+                    countingAnswer: answer,
+                    timestamp: Date.now()
+                });
             }
         }
 

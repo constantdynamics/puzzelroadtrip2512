@@ -282,20 +282,13 @@ const ColorSortGame = {
             AudioManager.playPuzzleComplete();
         }
 
-        const celebrationEl = document.createElement('div');
-        celebrationEl.className = 'color-sort-celebration';
-        celebrationEl.innerHTML = `
-            <div class="color-sort-celebration-content">
-                <h2>🌈 Super! 🌈</h2>
-                <p>Alles op kleur!</p>
-                <button class="color-sort-play-again-btn" id="color-sort-play-again">Opnieuw</button>
-            </div>
-        `;
-        this.container.appendChild(celebrationEl);
+        // Sync completion to remote (no popup on tablet - child can't read)
+        this.syncGameState();
 
-        document.getElementById('color-sort-play-again').addEventListener('click', () => {
+        // Auto-reset after brief celebration
+        setTimeout(() => {
             this.reset();
-        });
+        }, 2000);
     }
 };
 

@@ -308,23 +308,13 @@ const SizeSortGame = {
             AudioManager.playPuzzleComplete();
         }
 
-        const celebrationEl = document.createElement('div');
-        celebrationEl.className = 'size-sort-celebration';
-        celebrationEl.innerHTML = `
-            <div class="size-sort-celebration-content">
-                <h2>🎉 Super! 🎉</h2>
-                <p>Alles op volgorde!</p>
-                <div class="celebration-shapes">
-                    ${this.items.map(i => this.getShapeSVG(i.scale)).join('')}
-                </div>
-                <button class="size-sort-play-again-btn" id="size-sort-play-again">Opnieuw</button>
-            </div>
-        `;
-        this.container.appendChild(celebrationEl);
+        // Sync completion to remote (no popup on tablet - child can't read)
+        this.syncGameState();
 
-        document.getElementById('size-sort-play-again').addEventListener('click', () => {
+        // Auto-reset after brief celebration
+        setTimeout(() => {
             this.reset();
-        });
+        }, 2000);
     }
 };
 

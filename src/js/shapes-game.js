@@ -261,6 +261,7 @@ const ShapesGame = {
             }
 
             this.render();
+            this.setupEvents(); // Re-attach events after render
             this.syncGameState();
 
             if (this.matched === this.total) {
@@ -274,23 +275,13 @@ const ShapesGame = {
             AudioManager.playPuzzleComplete();
         }
 
-        setTimeout(() => {
-            if (this.container) {
-                const celebrationEl = document.createElement('div');
-                celebrationEl.className = 'shapes-celebration';
-                celebrationEl.innerHTML = `
-                    <div class="shapes-celebration-content">
-                        <h2>🎉</h2>
-                        <button class="shapes-play-again-btn" id="shapes-play-again">🔄</button>
-                    </div>
-                `;
-                this.container.appendChild(celebrationEl);
+        // Sync completion to remote (no popup on tablet - child can't read)
+        this.syncGameState();
 
-                document.getElementById('shapes-play-again').addEventListener('click', () => {
-                    this.reset();
-                });
-            }
-        }, 500);
+        // Auto-reset after celebration animation
+        setTimeout(() => {
+            this.reset();
+        }, 2000);
     }
 };
 

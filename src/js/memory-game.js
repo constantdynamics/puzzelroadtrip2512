@@ -223,24 +223,13 @@ const MemoryGame = {
             AudioManager.playPuzzleComplete();
         }
 
-        setTimeout(() => {
-            if (this.container) {
-                const celebrationEl = document.createElement('div');
-                celebrationEl.className = 'memory-celebration';
-                celebrationEl.innerHTML = `
-                    <div class="memory-celebration-content">
-                        <h2>🎉 Gewonnen! 🎉</h2>
-                        <p>Alle paren gevonden!</p>
-                        <button class="memory-play-again-btn" id="memory-play-again">🔄</button>
-                    </div>
-                `;
-                this.container.appendChild(celebrationEl);
+        // Sync completion to remote (no popup on tablet - child can't read)
+        this.syncGameState();
 
-                document.getElementById('memory-play-again').addEventListener('click', () => {
-                    this.reset();
-                });
-            }
-        }, 500);
+        // Auto-reset after brief celebration
+        setTimeout(() => {
+            this.reset();
+        }, 2000);
     },
 
     getProgress() {

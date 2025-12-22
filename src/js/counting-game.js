@@ -94,8 +94,6 @@ const CountingGame = {
     render() {
         if (!this.container) return;
 
-        const config = this.difficulties[this.difficulty];
-
         // Generate items with random positions
         const items = [];
         for (let i = 0; i < this.correctAnswer; i++) {
@@ -108,22 +106,17 @@ const CountingGame = {
             });
         }
 
-        // Generate number buttons (shuffled wrong answers + correct)
-        const numbers = this.generateNumberOptions();
-
-        // Visual-only interface (no text - parent reads from remote)
+        // Visual-only interface - NO buttons on tablet (parent answers on remote)
         this.container.innerHTML = `
             <div class="counting-game">
                 <div class="counting-header">
                     <div class="counting-visual-progress">
                         ${Array(this.maxRounds).fill(0).map((_, i) => `
-                            <span class="progress-circle ${i < this.rounds ? 'done' : ''} ${i === this.rounds - 1 ? 'current' : ''}">
-                                ${i < this.rounds - 1 ? '✓' : (i === this.rounds - 1 ? this.rounds : '')}
-                            </span>
+                            <span class="progress-circle ${i < this.rounds ? 'done' : ''} ${i === this.rounds - 1 ? 'current' : ''}"></span>
                         `).join('')}
                     </div>
                     <div class="counting-visual-score">
-                        ${'⭐'.repeat(this.score)}${'○'.repeat(this.rounds - 1 - this.score)}
+                        ${'⭐'.repeat(this.score)}
                     </div>
                 </div>
                 <div class="counting-question-visual">
@@ -139,60 +132,22 @@ const CountingGame = {
                         </div>
                     `).join('')}
                 </div>
-                <div class="counting-buttons">
-                    ${numbers.map(num => `
-                        <button class="counting-number-btn" data-number="${num}">
-                            ${num}
-                        </button>
-                    `).join('')}
-                </div>
             </div>
         `;
-
-        this.setupEvents();
+        // No events needed - parent answers on remote
     },
 
-    generateNumberOptions() {
-        const config = this.difficulties[this.difficulty];
-        const options = new Set([this.correctAnswer]);
-
-        // Add some wrong answers
-        while (options.size < Math.min(4, config.max)) {
-            const wrongAnswer = config.min + Math.floor(Math.random() * (config.max - config.min + 1));
-            options.add(wrongAnswer);
-        }
-
-        // Convert to array and shuffle
-        return Array.from(options).sort(() => Math.random() - 0.5);
-    },
-
-    setupEvents() {
-        this.container.querySelectorAll('.counting-number-btn').forEach(btn => {
-            const tap = () => {
-                const number = parseInt(btn.dataset.number);
-                this.checkAnswer(number, btn);
-            };
-
-            btn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                tap();
-            }, { passive: false });
-
-            btn.addEventListener('click', tap);
-        });
-    },
-
-    checkAnswer(number, buttonEl) {
+    // Called from remote when parent submits answer
+    submitAnswer(number) {
         if (number === this.correctAnswer) {
             // Correct!
             this.score++;
-            buttonEl.classList.add('correct');
 
             if (typeof AudioManager !== 'undefined') {
                 AudioManager.playPiecePlaced();
             }
 
-            // Show celebration briefly
+            // Show visual feedback
             this.showFeedback(true);
 
             // Sync score to remote
@@ -203,17 +158,11 @@ const CountingGame = {
             }, 1000);
         } else {
             // Wrong
-            buttonEl.classList.add('wrong');
-
             if (typeof AudioManager !== 'undefined') {
                 AudioManager.playClick();
             }
 
             this.showFeedback(false);
-
-            setTimeout(() => {
-                buttonEl.classList.remove('wrong');
-            }, 500);
         }
     },
 
@@ -233,7 +182,7 @@ const CountingGame = {
 
         const stars = this.score >= this.maxRounds ? 3 : (this.score >= this.maxRounds - 1 ? 2 : 1);
 
-        // Sync completion to remote
+        // Sync completion to remote (no popup on tablet - child can't read)
         if (typeof TabletApp !== 'undefined' && TabletApp.roomRef) {
             TabletApp.roomRef.child('gameState').update({
                 game: 'counting',
@@ -245,27 +194,10 @@ const CountingGame = {
             });
         }
 
-        // Visual-only celebration (no text)
-        this.container.innerHTML = `
-            <div class="counting-game">
-                <div class="counting-celebration">
-                    <div class="celebration-emoji">🎉🔢🎉</div>
-                    <div class="counting-stars">
-                        ${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}
-                    </div>
-                    <div class="counting-final-score">
-                        ${this.score}/${this.maxRounds}
-                    </div>
-                    <button class="counting-play-again-btn" id="counting-play-again">
-                        🔄
-                    </button>
-                </div>
-            </div>
-        `;
-
-        document.getElementById('counting-play-again').addEventListener('click', () => {
+        // Auto-reset after brief celebration
+        setTimeout(() => {
             this.reset();
-        });
+        }, 2000);
     }
 };
 
