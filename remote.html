@@ -2519,8 +2519,8 @@
 
         // Fullscreen button
         document.getElementById('fullscreen-btn').addEventListener('click', () => {
-            if (roomRef) {
-                roomRef.child('settings').update({
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings').update({
                     enterFullscreen: true,
                     timestamp: Date.now()
                 });
@@ -2534,8 +2534,8 @@
         screenOffBtn.addEventListener('click', () => {
             screenOffState = !screenOffState;
 
-            if (roomRef) {
-                roomRef.child('settings').update({
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings').update({
                     screenOff: screenOffState,
                     timestamp: Date.now()
                 });
@@ -2570,8 +2570,8 @@
 
         // Start Game button - actually switches the game on tablet
         document.getElementById('start-game-btn').addEventListener('click', () => {
-            if (roomRef) {
-                roomRef.child('settings').update({
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings').update({
                     currentGame: selectedGame,
                     switchGame: true,
                     timestamp: Date.now()
@@ -2587,8 +2587,8 @@
 
         // Memory difficulty
         document.getElementById('memory-difficulty')?.addEventListener('change', (e) => {
-            if (roomRef) {
-                roomRef.child('settings').update({
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings').update({
                     memoryDifficulty: e.target.value,
                     timestamp: Date.now()
                 });
@@ -2597,8 +2597,8 @@
 
         // Memory theme
         document.getElementById('memory-theme')?.addEventListener('change', (e) => {
-            if (roomRef) {
-                roomRef.child('settings').update({
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings').update({
                     memoryTheme: e.target.value,
                     timestamp: Date.now()
                 });
@@ -2607,8 +2607,8 @@
 
         // Shapes difficulty
         document.getElementById('shapes-difficulty')?.addEventListener('change', (e) => {
-            if (roomRef) {
-                roomRef.child('settings').update({
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings').update({
                     shapesDifficulty: e.target.value,
                     timestamp: Date.now()
                 });
@@ -2617,8 +2617,8 @@
 
         // Colors difficulty
         document.getElementById('colors-difficulty')?.addEventListener('change', (e) => {
-            if (roomRef) {
-                roomRef.child('settings').update({
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings').update({
                     colorsDifficulty: e.target.value,
                     timestamp: Date.now()
                 });
@@ -2627,8 +2627,8 @@
 
         // Counting difficulty
         document.getElementById('counting-difficulty')?.addEventListener('change', (e) => {
-            if (roomRef) {
-                roomRef.child('settings').update({
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings').update({
                     countingDifficulty: e.target.value,
                     timestamp: Date.now()
                 });
@@ -2637,8 +2637,8 @@
 
         // Drawing/Pictionary category
         document.getElementById('drawing-category')?.addEventListener('change', (e) => {
-            if (roomRef) {
-                roomRef.child('settings').update({
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings').update({
                     drawingCategory: e.target.value,
                     timestamp: Date.now()
                 });
