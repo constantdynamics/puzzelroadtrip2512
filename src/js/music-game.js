@@ -1,36 +1,46 @@
 // Music Instruments Game for Toddlers
-// Visual drums and cymbals that kids can understand
+// Visual instruments that kids can play
 
 const MusicGame = {
     container: null,
     audioContext: null,
     currentInstrument: 'drums',
 
+    // Current octave for keyboard instruments (1-3)
+    currentOctave: 2,
+
+    // Base frequencies for 3 octaves (C3, C4, C5)
+    octaveBaseFreqs: {
+        1: 130.81, // C3
+        2: 261.63, // C4 (middle C)
+        3: 523.25  // C5
+    },
+
+    // Note colors (rainbow order)
+    noteColors: ['#E53935', '#FF9800', '#FDD835', '#43A047', '#1E88E5', '#7B1FA2', '#E91E63'],
+
     instruments: {
-        drums: {
-            name: 'Drums',
-            items: [
-                { name: 'Kick', type: 'kick', visual: 'bass-drum' },
-                { name: 'Snare', type: 'snare', visual: 'snare-drum' },
-                { name: 'Tom', type: 'tom', visual: 'tom-drum' },
-                { name: 'Tom 2', type: 'tom2', visual: 'tom-drum-small' },
-                { name: 'Hi-Hat', type: 'hihat', visual: 'cymbal' },
-                { name: 'Crash', type: 'crash', visual: 'cymbal-big' }
-            ]
-        },
-        xylophone: {
-            name: 'Xylofoon',
-            notes: [
-                { note: 'C', freq: 523.25, color: '#E53935' },
-                { note: 'D', freq: 587.33, color: '#FF9800' },
-                { note: 'E', freq: 659.25, color: '#FDD835' },
-                { note: 'F', freq: 698.46, color: '#43A047' },
-                { note: 'G', freq: 783.99, color: '#1E88E5' },
-                { note: 'A', freq: 880.00, color: '#7B1FA2' },
-                { note: 'B', freq: 987.77, color: '#E91E63' },
-                { note: 'C2', freq: 1046.50, color: '#00ACC1' }
-            ]
-        }
+        drums: { name: 'Drums' },
+        xylophone: { name: 'Xylofoon' },
+        piano: { name: 'Piano' },
+        trumpet: { name: 'Trompet' },
+        saxophone: { name: 'Saxofoon' },
+        flute: { name: 'Fluit' },
+        accordion: { name: 'Accordeon' }
+    },
+
+    // Get notes for current octave
+    getNotesForOctave(octave) {
+        const baseFreq = this.octaveBaseFreqs[octave];
+        // Equal temperament frequency ratios
+        const ratios = [1, 1.122, 1.260, 1.335, 1.498, 1.682, 1.888, 2];
+        const noteNames = ['C', 'D', 'E', 'F', 'G', 'A', 'B', 'C+'];
+
+        return noteNames.map((note, i) => ({
+            note: note,
+            freq: baseFreq * ratios[i],
+            color: this.noteColors[i % 7]
+        }));
     },
 
     init(containerId) {
@@ -53,25 +63,54 @@ const MusicGame = {
         }
     },
 
+    setOctave(octave) {
+        if (octave >= 1 && octave <= 3) {
+            this.currentOctave = octave;
+            this.render();
+        }
+    },
+
     render() {
         if (!this.container) return;
+
+        const showOctaveControls = ['xylophone', 'piano', 'trumpet', 'saxophone', 'flute', 'accordion'].includes(this.currentInstrument);
 
         this.container.innerHTML = `
             <div class="music-game">
                 <div class="music-header">
                     <div class="instrument-tabs">
-                        <button class="instrument-tab ${this.currentInstrument === 'drums' ? 'active' : ''}"
-                                data-instrument="drums">
-                            ${this.getDrumSetIcon()}
+                        <button class="instrument-tab ${this.currentInstrument === 'drums' ? 'active' : ''}" data-instrument="drums">
+                            🥁
                         </button>
-                        <button class="instrument-tab ${this.currentInstrument === 'xylophone' ? 'active' : ''}"
-                                data-instrument="xylophone">
-                            ${this.getXylophoneIcon()}
+                        <button class="instrument-tab ${this.currentInstrument === 'xylophone' ? 'active' : ''}" data-instrument="xylophone">
+                            🎵
+                        </button>
+                        <button class="instrument-tab ${this.currentInstrument === 'piano' ? 'active' : ''}" data-instrument="piano">
+                            🎹
+                        </button>
+                        <button class="instrument-tab ${this.currentInstrument === 'trumpet' ? 'active' : ''}" data-instrument="trumpet">
+                            🎺
+                        </button>
+                        <button class="instrument-tab ${this.currentInstrument === 'saxophone' ? 'active' : ''}" data-instrument="saxophone">
+                            🎷
+                        </button>
+                        <button class="instrument-tab ${this.currentInstrument === 'flute' ? 'active' : ''}" data-instrument="flute">
+                            🪈
+                        </button>
+                        <button class="instrument-tab ${this.currentInstrument === 'accordion' ? 'active' : ''}" data-instrument="accordion">
+                            🪗
                         </button>
                     </div>
+                    ${showOctaveControls ? `
+                        <div class="octave-controls">
+                            <button class="octave-btn ${this.currentOctave === 1 ? 'active' : ''}" data-octave="1">Laag</button>
+                            <button class="octave-btn ${this.currentOctave === 2 ? 'active' : ''}" data-octave="2">Midden</button>
+                            <button class="octave-btn ${this.currentOctave === 3 ? 'active' : ''}" data-octave="3">Hoog</button>
+                        </div>
+                    ` : ''}
                 </div>
                 <div class="instrument-area">
-                    ${this.currentInstrument === 'drums' ? this.renderDrums() : this.renderXylophone()}
+                    ${this.renderCurrentInstrument()}
                 </div>
             </div>
         `;
@@ -79,25 +118,17 @@ const MusicGame = {
         this.setupEvents();
     },
 
-    getDrumSetIcon() {
-        return `<svg viewBox="0 0 60 60" width="50" height="50">
-            <ellipse cx="30" cy="45" rx="20" ry="8" fill="#8B4513" stroke="#5D3A1A" stroke-width="2"/>
-            <rect x="10" y="30" width="40" height="15" fill="#CD853F" stroke="#8B4513" stroke-width="2"/>
-            <ellipse cx="30" cy="30" rx="20" ry="8" fill="#DEB887" stroke="#8B4513" stroke-width="2"/>
-            <circle cx="15" cy="15" r="8" fill="#FFD700" stroke="#B8860B" stroke-width="2"/>
-            <circle cx="45" cy="15" r="8" fill="#FFD700" stroke="#B8860B" stroke-width="2"/>
-        </svg>`;
-    },
-
-    getXylophoneIcon() {
-        return `<svg viewBox="0 0 60 40" width="50" height="35">
-            <rect x="5" y="5" width="8" height="30" rx="2" fill="#E53935"/>
-            <rect x="14" y="7" width="8" height="26" rx="2" fill="#FF9800"/>
-            <rect x="23" y="9" width="8" height="22" rx="2" fill="#FDD835"/>
-            <rect x="32" y="11" width="8" height="18" rx="2" fill="#43A047"/>
-            <rect x="41" y="13" width="8" height="14" rx="2" fill="#1E88E5"/>
-            <rect x="50" y="15" width="5" height="10" rx="2" fill="#7B1FA2"/>
-        </svg>`;
+    renderCurrentInstrument() {
+        switch (this.currentInstrument) {
+            case 'drums': return this.renderDrums();
+            case 'xylophone': return this.renderXylophone();
+            case 'piano': return this.renderPiano();
+            case 'trumpet': return this.renderWindInstrument('trumpet');
+            case 'saxophone': return this.renderWindInstrument('saxophone');
+            case 'flute': return this.renderWindInstrument('flute');
+            case 'accordion': return this.renderAccordion();
+            default: return '';
+        }
     },
 
     renderDrums() {
@@ -124,27 +155,17 @@ const MusicGame = {
         return `
             <div class="drum-item cymbal ${position}" data-type="${type}">
                 <svg viewBox="0 0 120 60" class="cymbal-svg">
-                    <!-- Stand -->
                     <rect x="57" y="30" width="6" height="35" fill="#666" rx="2"/>
                     <rect x="50" y="60" width="20" height="5" fill="#444" rx="2"/>
-                    <!-- Cymbal -->
                     <ellipse cx="60" cy="25" rx="55" ry="15" fill="url(#cymbalGradient${type})" class="cymbal-plate"/>
-                    <ellipse cx="60" cy="25" rx="50" ry="12" fill="none" stroke="#B8860B" stroke-width="1" opacity="0.5"/>
-                    <ellipse cx="60" cy="25" rx="40" ry="9" fill="none" stroke="#B8860B" stroke-width="1" opacity="0.3"/>
                     <circle cx="60" cy="25" r="8" fill="#8B7355"/>
                     <circle cx="60" cy="25" r="4" fill="#444"/>
-                    ${isHiHat ? `
-                        <ellipse cx="60" cy="35" rx="50" ry="12" fill="url(#cymbalGradient${type}2)" opacity="0.8"/>
-                    ` : ''}
+                    ${isHiHat ? `<ellipse cx="60" cy="35" rx="50" ry="12" fill="url(#cymbalGradient${type})" opacity="0.8"/>` : ''}
                     <defs>
                         <radialGradient id="cymbalGradient${type}" cx="40%" cy="30%">
                             <stop offset="0%" stop-color="#FFE066"/>
                             <stop offset="50%" stop-color="#FFD700"/>
                             <stop offset="100%" stop-color="#B8860B"/>
-                        </radialGradient>
-                        <radialGradient id="cymbalGradient${type}2" cx="40%" cy="30%">
-                            <stop offset="0%" stop-color="#FFD54F"/>
-                            <stop offset="100%" stop-color="#A67C00"/>
                         </radialGradient>
                     </defs>
                 </svg>
@@ -161,23 +182,10 @@ const MusicGame = {
         return `
             <div class="drum-item tom-drum ${size}" data-type="${type}">
                 <svg viewBox="0 0 ${width} ${height}" class="tom-svg">
-                    <!-- Drum body -->
                     <ellipse cx="${width/2}" cy="${height-15}" rx="${width/2-10}" ry="12" fill="${darkColor}"/>
-                    <rect x="10" y="${height/3}" width="${width-20}" height="${height/2}" fill="${color}" />
-                    <rect x="10" y="${height/3}" width="${width-20}" height="${height/2}" fill="url(#tomShine${type})" />
-                    <!-- Metal rim -->
+                    <rect x="10" y="${height/3}" width="${width-20}" height="${height/2}" fill="${color}"/>
                     <ellipse cx="${width/2}" cy="${height/3}" rx="${width/2-10}" ry="12" fill="#888" stroke="#666" stroke-width="3"/>
-                    <!-- Drum head -->
                     <ellipse cx="${width/2}" cy="${height/3}" rx="${width/2-15}" ry="10" fill="#F5F5DC" stroke="#DDD" stroke-width="2"/>
-                    <!-- Shine -->
-                    <ellipse cx="${width/2-10}" cy="${height/3-2}" rx="${width/4}" ry="5" fill="rgba(255,255,255,0.3)"/>
-                    <defs>
-                        <linearGradient id="tomShine${type}" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" stop-color="rgba(255,255,255,0.1)"/>
-                            <stop offset="50%" stop-color="rgba(255,255,255,0.3)"/>
-                            <stop offset="100%" stop-color="rgba(0,0,0,0.1)"/>
-                        </linearGradient>
-                    </defs>
                 </svg>
             </div>
         `;
@@ -187,28 +195,14 @@ const MusicGame = {
         return `
             <div class="drum-item bass-drum" data-type="kick">
                 <svg viewBox="0 0 200 150" class="bass-svg">
-                    <!-- Drum body (cylinder on side) -->
                     <ellipse cx="30" cy="75" rx="25" ry="60" fill="#B71C1C"/>
                     <rect x="30" y="15" width="140" height="120" fill="#D32F2F"/>
-                    <rect x="30" y="15" width="140" height="120" fill="url(#bassShine)"/>
                     <ellipse cx="170" cy="75" rx="25" ry="60" fill="#EF5350" stroke="#B71C1C" stroke-width="3"/>
-                    <!-- Front head -->
                     <ellipse cx="170" cy="75" rx="20" ry="50" fill="#F5F5DC" stroke="#CCC" stroke-width="2"/>
-                    <!-- Logo area -->
-                    <ellipse cx="170" cy="75" rx="15" ry="35" fill="none" stroke="#D32F2F" stroke-width="3"/>
-                    <!-- Metal hoops -->
                     <ellipse cx="30" cy="75" rx="27" ry="62" fill="none" stroke="#888" stroke-width="4"/>
                     <ellipse cx="170" cy="75" rx="27" ry="62" fill="none" stroke="#888" stroke-width="4"/>
-                    <!-- Legs -->
                     <rect x="60" y="130" width="8" height="20" fill="#444"/>
                     <rect x="130" y="130" width="8" height="20" fill="#444"/>
-                    <defs>
-                        <linearGradient id="bassShine" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stop-color="rgba(255,255,255,0.2)"/>
-                            <stop offset="50%" stop-color="rgba(255,255,255,0)"/>
-                            <stop offset="100%" stop-color="rgba(0,0,0,0.2)"/>
-                        </linearGradient>
-                    </defs>
                 </svg>
             </div>
         `;
@@ -218,65 +212,102 @@ const MusicGame = {
         return `
             <div class="drum-item snare-drum" data-type="snare">
                 <svg viewBox="0 0 160 100" class="snare-svg">
-                    <!-- Stand legs -->
                     <line x1="40" y1="70" x2="20" y2="95" stroke="#666" stroke-width="4"/>
                     <line x1="120" y1="70" x2="140" y2="95" stroke="#666" stroke-width="4"/>
                     <line x1="80" y1="75" x2="80" y2="95" stroke="#666" stroke-width="4"/>
-                    <!-- Drum body -->
                     <ellipse cx="80" cy="65" rx="65" ry="15" fill="#555"/>
                     <rect x="15" y="35" width="130" height="30" fill="#777"/>
-                    <rect x="15" y="35" width="130" height="30" fill="url(#snareShine)"/>
-                    <!-- Metal shell details -->
-                    <rect x="15" y="35" width="130" height="4" fill="#999"/>
-                    <rect x="15" y="61" width="130" height="4" fill="#999"/>
-                    <!-- Top rim -->
                     <ellipse cx="80" cy="35" rx="65" ry="15" fill="#888" stroke="#666" stroke-width="3"/>
-                    <!-- Drum head -->
                     <ellipse cx="80" cy="35" rx="58" ry="12" fill="#F5F5DC" stroke="#DDD" stroke-width="2"/>
-                    <!-- Shine -->
-                    <ellipse cx="70" cy="32" rx="30" ry="6" fill="rgba(255,255,255,0.4)"/>
-                    <defs>
-                        <linearGradient id="snareShine" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" stop-color="rgba(255,255,255,0.1)"/>
-                            <stop offset="50%" stop-color="rgba(255,255,255,0.3)"/>
-                            <stop offset="100%" stop-color="rgba(0,0,0,0.1)"/>
-                        </linearGradient>
-                    </defs>
                 </svg>
             </div>
         `;
     },
 
     renderXylophone() {
-        const notes = this.instruments.xylophone.notes;
+        const notes = this.getNotesForOctave(this.currentOctave);
         const barHeights = [180, 165, 150, 135, 120, 105, 90, 75];
 
         return `
             <div class="xylophone">
                 <div class="xylophone-frame">
                     ${notes.map((note, i) => `
-                        <div class="xylophone-bar-container" data-index="${i}">
+                        <div class="xylophone-bar-container" data-index="${i}" data-freq="${note.freq}">
                             <svg viewBox="0 0 60 ${barHeights[i] + 20}" class="xylophone-bar-svg">
-                                <!-- Bar shadow -->
                                 <rect x="8" y="12" width="44" height="${barHeights[i]}" rx="5" fill="rgba(0,0,0,0.2)"/>
-                                <!-- Main bar -->
                                 <rect x="5" y="8" width="50" height="${barHeights[i]}" rx="6" fill="${note.color}"/>
-                                <!-- Shine -->
                                 <rect x="8" y="10" width="20" height="${barHeights[i] - 10}" rx="4" fill="rgba(255,255,255,0.3)"/>
-                                <!-- Holes for cord -->
                                 <circle cx="30" cy="20" r="4" fill="rgba(0,0,0,0.3)"/>
                                 <circle cx="30" cy="${barHeights[i] - 5}" r="4" fill="rgba(0,0,0,0.3)"/>
                             </svg>
                         </div>
                     `).join('')}
                 </div>
-                <!-- Mallets decoration -->
-                <div class="xylophone-mallets">
-                    <svg viewBox="0 0 100 60" class="mallet-svg">
-                        <rect x="10" y="30" width="80" height="8" rx="4" fill="#8B4513"/>
-                        <circle cx="10" cy="34" r="12" fill="#FF5722"/>
-                        <circle cx="90" cy="34" r="12" fill="#FF5722"/>
-                    </svg>
+            </div>
+        `;
+    },
+
+    renderPiano() {
+        const notes = this.getNotesForOctave(this.currentOctave);
+        // White keys: C, D, E, F, G, A, B (indices 0,1,2,3,4,5,6)
+        // Black keys between: C#, D#, F#, G#, A# (after indices 0,1,3,4,5)
+        const blackKeyPositions = [0, 1, 3, 4, 5]; // After which white keys to place black keys
+
+        return `
+            <div class="piano-keyboard">
+                <div class="piano-white-keys">
+                    ${notes.slice(0, 7).map((note, i) => `
+                        <div class="piano-key white" data-index="${i}" data-freq="${note.freq}">
+                            <span class="key-label">${note.note}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="piano-black-keys">
+                    ${blackKeyPositions.map((pos, i) => {
+                        const baseFreq = notes[pos].freq;
+                        const sharpFreq = baseFreq * 1.0595; // Semitone up
+                        return `<div class="piano-key black" data-black-pos="${pos}" data-freq="${sharpFreq}" style="left: ${pos * 14.28 + 10}%"></div>`;
+                    }).join('')}
+                </div>
+            </div>
+        `;
+    },
+
+    renderWindInstrument(type) {
+        const notes = this.getNotesForOctave(this.currentOctave);
+        const instrumentEmoji = { trumpet: '🎺', saxophone: '🎷', flute: '🪈' }[type];
+        const instrumentColor = { trumpet: '#FFD700', saxophone: '#D4AF37', flute: '#C0C0C0' }[type];
+
+        return `
+            <div class="wind-instrument ${type}">
+                <div class="wind-instrument-display">
+                    <span class="wind-emoji">${instrumentEmoji}</span>
+                </div>
+                <div class="wind-buttons">
+                    ${notes.map((note, i) => `
+                        <button class="wind-note-btn" data-index="${i}" data-freq="${note.freq}" style="background: ${note.color}">
+                            ${note.note}
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    },
+
+    renderAccordion() {
+        const notes = this.getNotesForOctave(this.currentOctave);
+
+        return `
+            <div class="accordion-instrument">
+                <div class="accordion-display">
+                    <span class="accordion-emoji">🪗</span>
+                </div>
+                <div class="accordion-buttons">
+                    ${notes.map((note, i) => `
+                        <button class="accordion-btn" data-index="${i}" data-freq="${note.freq}" style="background: ${note.color}">
+                            ${note.note}
+                        </button>
+                    `).join('')}
                 </div>
             </div>
         `;
@@ -287,6 +318,13 @@ const MusicGame = {
         this.container.querySelectorAll('.instrument-tab').forEach(tab => {
             tab.addEventListener('click', () => {
                 this.setInstrument(tab.dataset.instrument);
+            });
+        });
+
+        // Octave controls
+        this.container.querySelectorAll('.octave-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.setOctave(parseInt(btn.dataset.octave));
             });
         });
 
@@ -302,13 +340,15 @@ const MusicGame = {
                 item.addEventListener('touchstart', playSound, { passive: false });
                 item.addEventListener('mousedown', playSound);
             });
-        } else {
-            // Xylophone
+        }
+
+        // Xylophone
+        if (this.currentInstrument === 'xylophone') {
             this.container.querySelectorAll('.xylophone-bar-container').forEach(bar => {
                 const playSound = (e) => {
                     e.preventDefault();
-                    const index = parseInt(bar.dataset.index);
-                    this.playXylophoneNote(index);
+                    const freq = parseFloat(bar.dataset.freq);
+                    this.playToneNote(freq, 'xylophone');
                     bar.classList.add('hit');
                     setTimeout(() => bar.classList.remove('hit'), 150);
                 };
@@ -316,34 +356,130 @@ const MusicGame = {
                 bar.addEventListener('mousedown', playSound);
             });
         }
+
+        // Piano
+        if (this.currentInstrument === 'piano') {
+            this.container.querySelectorAll('.piano-key').forEach(key => {
+                const playSound = (e) => {
+                    e.preventDefault();
+                    const freq = parseFloat(key.dataset.freq);
+                    this.playToneNote(freq, 'piano');
+                    key.classList.add('hit');
+                    setTimeout(() => key.classList.remove('hit'), 150);
+                };
+                key.addEventListener('touchstart', playSound, { passive: false });
+                key.addEventListener('mousedown', playSound);
+            });
+        }
+
+        // Wind instruments
+        if (['trumpet', 'saxophone', 'flute'].includes(this.currentInstrument)) {
+            this.container.querySelectorAll('.wind-note-btn').forEach(btn => {
+                const playSound = (e) => {
+                    e.preventDefault();
+                    const freq = parseFloat(btn.dataset.freq);
+                    this.playToneNote(freq, this.currentInstrument);
+                    btn.classList.add('hit');
+                    setTimeout(() => btn.classList.remove('hit'), 150);
+                };
+                btn.addEventListener('touchstart', playSound, { passive: false });
+                btn.addEventListener('mousedown', playSound);
+            });
+        }
+
+        // Accordion
+        if (this.currentInstrument === 'accordion') {
+            this.container.querySelectorAll('.accordion-btn').forEach(btn => {
+                const playSound = (e) => {
+                    e.preventDefault();
+                    const freq = parseFloat(btn.dataset.freq);
+                    this.playToneNote(freq, 'accordion');
+                    btn.classList.add('hit');
+                    setTimeout(() => btn.classList.remove('hit'), 150);
+                };
+                btn.addEventListener('touchstart', playSound, { passive: false });
+                btn.addEventListener('mousedown', playSound);
+            });
+        }
     },
 
-    playXylophoneNote(index) {
+    playToneNote(freq, instrumentType) {
         if (!this.audioContext) return;
 
         if (this.audioContext.state === 'suspended') {
             this.audioContext.resume();
         }
 
-        const note = this.instruments.xylophone.notes[index];
-        if (!note) return;
-
+        const now = this.audioContext.currentTime;
         const oscillator = this.audioContext.createOscillator();
         const gainNode = this.audioContext.createGain();
 
         oscillator.connect(gainNode);
         gainNode.connect(this.audioContext.destination);
 
-        // Xylophone-like sound (sine with quick decay)
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(note.freq, this.audioContext.currentTime);
+        // Different wave types and envelopes for different instruments
+        switch (instrumentType) {
+            case 'xylophone':
+                oscillator.type = 'sine';
+                gainNode.gain.setValueAtTime(0.6, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 1.0);
+                oscillator.start(now);
+                oscillator.stop(now + 1.0);
+                break;
 
-        // Quick attack, medium decay for xylophone sound
-        gainNode.gain.setValueAtTime(0.6, this.audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 1.0);
+            case 'piano':
+                oscillator.type = 'triangle';
+                gainNode.gain.setValueAtTime(0.5, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 1.5);
+                oscillator.start(now);
+                oscillator.stop(now + 1.5);
+                break;
 
-        oscillator.start(this.audioContext.currentTime);
-        oscillator.stop(this.audioContext.currentTime + 1.0);
+            case 'trumpet':
+                oscillator.type = 'sawtooth';
+                gainNode.gain.setValueAtTime(0, now);
+                gainNode.gain.linearRampToValueAtTime(0.4, now + 0.05);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
+                oscillator.start(now);
+                oscillator.stop(now + 0.8);
+                break;
+
+            case 'saxophone':
+                oscillator.type = 'sawtooth';
+                gainNode.gain.setValueAtTime(0, now);
+                gainNode.gain.linearRampToValueAtTime(0.35, now + 0.03);
+                gainNode.gain.setValueAtTime(0.3, now + 0.1);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 1.0);
+                oscillator.start(now);
+                oscillator.stop(now + 1.0);
+                break;
+
+            case 'flute':
+                oscillator.type = 'sine';
+                gainNode.gain.setValueAtTime(0, now);
+                gainNode.gain.linearRampToValueAtTime(0.4, now + 0.1);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 1.2);
+                oscillator.start(now);
+                oscillator.stop(now + 1.2);
+                break;
+
+            case 'accordion':
+                oscillator.type = 'square';
+                gainNode.gain.setValueAtTime(0.2, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
+                oscillator.start(now);
+                oscillator.stop(now + 0.8);
+                break;
+
+            default:
+                oscillator.type = 'sine';
+                gainNode.gain.setValueAtTime(0.5, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 1.0);
+                oscillator.start(now);
+                oscillator.stop(now + 1.0);
+        }
+
+        oscillator.frequency.setValueAtTime(freq, now);
     },
 
     playDrum(type) {
@@ -356,73 +492,48 @@ const MusicGame = {
         const now = this.audioContext.currentTime;
 
         switch(type) {
-            case 'kick':
-                this.playKick(now);
-                break;
-            case 'snare':
-                this.playSnare(now);
-                break;
-            case 'hihat':
-                this.playHiHat(now);
-                break;
-            case 'crash':
-                this.playCrash(now);
-                break;
-            case 'tom':
-                this.playTom(now, 150);
-                break;
-            case 'tom2':
-                this.playTom(now, 200);
-                break;
+            case 'kick': this.playKick(now); break;
+            case 'snare': this.playSnare(now); break;
+            case 'hihat': this.playHiHat(now); break;
+            case 'crash': this.playCrash(now); break;
+            case 'tom': this.playTom(now, 150); break;
+            case 'tom2': this.playTom(now, 200); break;
         }
     },
 
     playKick(time) {
         const osc = this.audioContext.createOscillator();
         const gain = this.audioContext.createGain();
-
         osc.connect(gain);
         gain.connect(this.audioContext.destination);
-
         osc.frequency.setValueAtTime(150, time);
         osc.frequency.exponentialRampToValueAtTime(0.01, time + 0.5);
-
         gain.gain.setValueAtTime(1, time);
         gain.gain.exponentialRampToValueAtTime(0.01, time + 0.5);
-
         osc.start(time);
         osc.stop(time + 0.5);
     },
 
     playSnare(time) {
-        // Noise for snare
         const bufferSize = this.audioContext.sampleRate * 0.2;
         const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
         const data = buffer.getChannelData(0);
-
-        for (let i = 0; i < bufferSize; i++) {
-            data[i] = Math.random() * 2 - 1;
-        }
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
 
         const noise = this.audioContext.createBufferSource();
         const noiseGain = this.audioContext.createGain();
         const filter = this.audioContext.createBiquadFilter();
-
         noise.buffer = buffer;
         filter.type = 'highpass';
         filter.frequency.setValueAtTime(1000, time);
-
         noise.connect(filter);
         filter.connect(noiseGain);
         noiseGain.connect(this.audioContext.destination);
-
         noiseGain.gain.setValueAtTime(0.5, time);
         noiseGain.gain.exponentialRampToValueAtTime(0.01, time + 0.2);
-
         noise.start(time);
         noise.stop(time + 0.2);
 
-        // Add a bit of tone
         const osc = this.audioContext.createOscillator();
         const oscGain = this.audioContext.createGain();
         osc.connect(oscGain);
@@ -438,26 +549,19 @@ const MusicGame = {
         const bufferSize = this.audioContext.sampleRate * 0.08;
         const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
         const data = buffer.getChannelData(0);
-
-        for (let i = 0; i < bufferSize; i++) {
-            data[i] = Math.random() * 2 - 1;
-        }
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
 
         const noise = this.audioContext.createBufferSource();
         const filter = this.audioContext.createBiquadFilter();
         const gain = this.audioContext.createGain();
-
         noise.buffer = buffer;
         filter.type = 'highpass';
         filter.frequency.setValueAtTime(7000, time);
-
         noise.connect(filter);
         filter.connect(gain);
         gain.connect(this.audioContext.destination);
-
         gain.gain.setValueAtTime(0.3, time);
         gain.gain.exponentialRampToValueAtTime(0.01, time + 0.08);
-
         noise.start(time);
         noise.stop(time + 0.08);
     },
@@ -466,26 +570,19 @@ const MusicGame = {
         const bufferSize = this.audioContext.sampleRate * 1.0;
         const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
         const data = buffer.getChannelData(0);
-
-        for (let i = 0; i < bufferSize; i++) {
-            data[i] = Math.random() * 2 - 1;
-        }
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
 
         const noise = this.audioContext.createBufferSource();
         const filter = this.audioContext.createBiquadFilter();
         const gain = this.audioContext.createGain();
-
         noise.buffer = buffer;
         filter.type = 'highpass';
         filter.frequency.setValueAtTime(3000, time);
-
         noise.connect(filter);
         filter.connect(gain);
         gain.connect(this.audioContext.destination);
-
         gain.gain.setValueAtTime(0.4, time);
         gain.gain.exponentialRampToValueAtTime(0.01, time + 1.0);
-
         noise.start(time);
         noise.stop(time + 1.0);
     },
@@ -493,16 +590,12 @@ const MusicGame = {
     playTom(time, baseFreq) {
         const osc = this.audioContext.createOscillator();
         const gain = this.audioContext.createGain();
-
         osc.connect(gain);
         gain.connect(this.audioContext.destination);
-
         osc.frequency.setValueAtTime(baseFreq, time);
         osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.5, time + 0.3);
-
         gain.gain.setValueAtTime(0.7, time);
         gain.gain.exponentialRampToValueAtTime(0.01, time + 0.3);
-
         osc.start(time);
         osc.stop(time + 0.3);
     }
