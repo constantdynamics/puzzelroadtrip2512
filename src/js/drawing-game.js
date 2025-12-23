@@ -179,29 +179,36 @@ const DrawingGame = {
                         <span class="prompt-text">Laten we tekenen!</span>
                     </div>
                 </div>
-                <div class="drawing-canvas-wrapper">
-                    <canvas id="drawing-canvas"></canvas>
-                </div>
-                <div class="drawing-toolbar">
-                    <div class="color-palette" id="color-palette">
-                        ${this.colors.map(color => `
-                            <button class="color-btn ${color === this.currentColor ? 'active' : ''}"
-                                    style="background: ${color}; ${color === '#FFFFFF' ? 'border: 2px solid #ccc;' : ''}"
-                                    data-color="${color}">
-                            </button>
-                        `).join('')}
+                <div class="drawing-main">
+                    <!-- Left sidebar - colors -->
+                    <div class="drawing-sidebar-left">
+                        <div class="color-palette" id="color-palette">
+                            ${this.colors.map(color => `
+                                <button class="color-btn ${color === this.currentColor ? 'active' : ''}"
+                                        style="background: ${color}; ${color === '#FFFFFF' ? 'border: 2px solid #ccc;' : ''}"
+                                        data-color="${color}">
+                                </button>
+                            `).join('')}
+                        </div>
                     </div>
-                    <div class="brush-sizes" id="brush-sizes">
-                        ${this.brushSizes.map((size, i) => `
-                            <button class="brush-btn ${i === this.currentBrushIndex ? 'active' : ''}"
-                                    data-index="${i}">
-                                <span class="brush-dot" style="width: ${size}px; height: ${size}px;"></span>
-                            </button>
-                        `).join('')}
+                    <!-- Canvas - maximum size -->
+                    <div class="drawing-canvas-wrapper">
+                        <canvas id="drawing-canvas"></canvas>
                     </div>
-                    <div class="drawing-actions">
-                        <button class="action-btn" id="clear-btn">🗑️</button>
-                        <button class="action-btn" id="new-prompt-btn">🎲</button>
+                    <!-- Right sidebar - brushes and actions -->
+                    <div class="drawing-sidebar-right">
+                        <div class="brush-sizes" id="brush-sizes">
+                            ${this.brushSizes.map((size, i) => `
+                                <button class="brush-btn ${i === this.currentBrushIndex ? 'active' : ''}"
+                                        data-index="${i}">
+                                    <span class="brush-dot" style="width: ${size}px; height: ${size}px;"></span>
+                                </button>
+                            `).join('')}
+                        </div>
+                        <div class="drawing-actions">
+                            <button class="action-btn" id="clear-btn">🗑️</button>
+                            <button class="action-btn" id="new-prompt-btn">🎲</button>
+                        </div>
                     </div>
                 </div>
             </div>

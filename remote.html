@@ -867,23 +867,33 @@
             cursor: pointer;
         }
 
-        /* Remote Drawing Canvas Screen */
+        /* Remote Drawing Canvas Screen - Maximized canvas layout */
         .remote-drawing-screen {
             display: none;
-            padding: 10px;
+            padding: 8px;
+            height: 100vh;
+            max-height: 100vh;
+            overflow: hidden;
+        }
+
+        .remote-drawing-screen .card-inner {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
         .remote-drawing-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 10px;
-            gap: 10px;
+            gap: 8px;
+            padding: 5px 0;
+            flex-shrink: 0;
         }
 
         .remote-drawing-header .back-btn {
-            padding: 8px 12px;
-            font-size: 12px;
+            padding: 6px 10px;
+            font-size: 11px;
             flex-shrink: 0;
         }
 
@@ -892,41 +902,74 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 12px;
-            padding: 10px 15px;
+            border-radius: 10px;
+            padding: 8px 12px;
             color: white;
         }
 
         .remote-drawing-word .word-emoji {
-            font-size: 24px;
+            font-size: 20px;
         }
 
         .remote-drawing-word .word-text {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
         }
 
         .remote-drawing-new-word-btn {
-            width: 45px;
-            height: 45px;
+            width: 38px;
+            height: 38px;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             background: #f5f5f5;
-            font-size: 20px;
+            font-size: 18px;
             cursor: pointer;
             flex-shrink: 0;
         }
 
+        /* Main drawing area with canvas and side tools */
+        .remote-drawing-main {
+            display: flex;
+            flex: 1;
+            gap: 8px;
+            min-height: 0;
+            margin-top: 8px;
+        }
+
+        /* Left sidebar - colors */
+        .remote-drawing-sidebar-left {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .remote-color-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+
+        .remote-color-btn.active {
+            border-color: #333;
+            transform: scale(1.15);
+        }
+
+        /* Canvas wrapper - takes maximum space */
         .remote-drawing-canvas-wrapper {
-            width: 100%;
-            aspect-ratio: 4/3;
+            flex: 1;
             background: white;
-            border-radius: 15px;
+            border-radius: 12px;
             border: 3px solid #ddd;
             overflow: hidden;
             touch-action: none;
+            min-height: 0;
         }
 
         #remote-drawing-canvas {
@@ -935,44 +978,19 @@
             display: block;
         }
 
-        .remote-drawing-toolbar {
+        /* Right sidebar - brushes and actions */
+        .remote-drawing-sidebar-right {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .remote-color-palette {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
             gap: 8px;
-        }
-
-        .remote-color-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: 3px solid transparent;
-            cursor: pointer;
-            transition: transform 0.15s;
-        }
-
-        .remote-color-btn.active {
-            border-color: #333;
-            transform: scale(1.1);
-        }
-
-        .remote-brush-sizes {
-            display: flex;
             justify-content: center;
-            gap: 15px;
+            flex-shrink: 0;
         }
 
         .remote-brush-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
             border: 2px solid #ddd;
             background: white;
             display: flex;
@@ -991,19 +1009,13 @@
             border-radius: 50%;
         }
 
-        .remote-drawing-actions {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-
         .remote-action-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
             border: 2px solid #ddd;
             background: white;
-            font-size: 24px;
+            font-size: 20px;
             cursor: pointer;
         }
 
@@ -2435,35 +2447,38 @@
             <button class="back-btn" id="queue-back-btn" style="margin-top: 10px;">← Terug</button>
         </div>
 
-        <!-- Remote Drawing Canvas Screen -->
+        <!-- Remote Drawing Canvas Screen - Canvas at top, tools on sides -->
         <div class="card remote-drawing-screen" id="remote-drawing-screen">
+            <!-- Header with word at top -->
             <div class="remote-drawing-header">
-                <button class="back-btn" id="remote-drawing-back-btn">← Terug</button>
+                <button class="back-btn" id="remote-drawing-back-btn">←</button>
                 <div class="remote-drawing-word" id="remote-drawing-word">
                     <span class="word-emoji">🎨</span>
                     <span class="word-text">-</span>
                 </div>
                 <button class="remote-drawing-new-word-btn" id="remote-drawing-new-word-btn">🎲</button>
             </div>
-            <div class="remote-drawing-canvas-wrapper">
-                <canvas id="remote-drawing-canvas"></canvas>
-            </div>
-            <div class="remote-drawing-toolbar">
-                <div class="remote-color-palette" id="remote-color-palette">
+            <!-- Main area: left colors, canvas center, right brushes -->
+            <div class="remote-drawing-main">
+                <!-- Left sidebar - colors -->
+                <div class="remote-drawing-sidebar-left" id="remote-color-palette">
                     <!-- Colors will be generated by JS -->
                 </div>
-                <div class="remote-brush-sizes" id="remote-brush-sizes">
+                <!-- Canvas - maximum size -->
+                <div class="remote-drawing-canvas-wrapper">
+                    <canvas id="remote-drawing-canvas"></canvas>
+                </div>
+                <!-- Right sidebar - brushes and clear -->
+                <div class="remote-drawing-sidebar-right">
                     <button class="remote-brush-btn" data-size="8">
                         <span class="brush-dot" style="width: 8px; height: 8px;"></span>
                     </button>
                     <button class="remote-brush-btn active" data-size="15">
-                        <span class="brush-dot" style="width: 15px; height: 15px;"></span>
+                        <span class="brush-dot" style="width: 12px; height: 12px;"></span>
                     </button>
                     <button class="remote-brush-btn" data-size="25">
-                        <span class="brush-dot" style="width: 25px; height: 25px;"></span>
+                        <span class="brush-dot" style="width: 18px; height: 18px;"></span>
                     </button>
-                </div>
-                <div class="remote-drawing-actions">
                     <button class="remote-action-btn" id="remote-clear-btn">🗑️</button>
                 </div>
             </div>
@@ -2712,7 +2727,7 @@
             </div>
         </div>
 
-        <div class="version-info">v3.9.0</div>
+        <div class="version-info">v3.9.1</div>
     </div>
 
     <script src="src/js/storage.js"></script>
