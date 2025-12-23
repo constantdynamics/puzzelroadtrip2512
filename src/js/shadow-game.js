@@ -168,19 +168,12 @@ const ShadowGame = {
             </button>
         `).join('');
 
+        // Visual-only interface - NO settings on tablet (parent controls on remote)
         this.container.innerHTML = `
             <div class="shadow-game">
                 <div class="shadow-header">
-                    <div class="shadow-settings">
-                        <div class="shadow-categories">
-                            ${categoryButtons}
-                        </div>
-                        <div class="shadow-counts">
-                            ${countButtons}
-                        </div>
-                    </div>
-                    <div class="shadow-score">
-                        ${this.matched}/${this.total}
+                    <div class="shadow-visual-score">
+                        ${'⭐'.repeat(this.matched)}${'☆'.repeat(this.total - this.matched)}
                     </div>
                 </div>
                 <div class="shadow-play-area">
@@ -208,21 +201,7 @@ const ShadowGame = {
     },
 
     setupEvents() {
-        // Category buttons
-        this.container.querySelectorAll('.shadow-category-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                this.setCategory(btn.dataset.category);
-                this.reset();
-            });
-        });
-
-        // Count buttons
-        this.container.querySelectorAll('.shadow-count-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                this.setCount(parseInt(btn.dataset.count));
-                this.reset();
-            });
-        });
+        // Settings are controlled from remote - no buttons on tablet
 
         const draggables = this.container.querySelectorAll('.shadow-draggable');
 

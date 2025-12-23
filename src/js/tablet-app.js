@@ -304,6 +304,21 @@ const TabletApp = {
             GameManager.setCountingDifficulty(settings.countingDifficulty);
         }
 
+        // Shadow game settings
+        if (settings.shadowCategory !== undefined) {
+            if (typeof ShadowGame !== 'undefined') {
+                ShadowGame.setCategory(settings.shadowCategory);
+                ShadowGame.reset();
+            }
+        }
+
+        if (settings.shadowCount !== undefined) {
+            if (typeof ShadowGame !== 'undefined') {
+                ShadowGame.setCount(settings.shadowCount);
+                ShadowGame.reset();
+            }
+        }
+
         // Drawing/Pictionary category
         if (settings.drawingCategory !== undefined) {
             GameManager.setDrawingCategory(settings.drawingCategory);

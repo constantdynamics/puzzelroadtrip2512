@@ -2121,6 +2121,30 @@
                 </div>
             </div>
 
+            <!-- Shadow Settings -->
+            <div class="game-settings" id="shadow-settings" style="display: none;">
+                <h3>Schaduw Instellingen</h3>
+                <div class="setting-row">
+                    <span class="setting-label">Categorie</span>
+                    <select class="setting-select" id="shadow-category">
+                        <option value="animals">🐘 Dieren</option>
+                        <option value="vehicles">🚗 Voertuigen</option>
+                        <option value="objects">⭐ Voorwerpen</option>
+                        <option value="food">🍕 Eten</option>
+                    </select>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Aantal</span>
+                    <select class="setting-select" id="shadow-count">
+                        <option value="2">2 items</option>
+                        <option value="3" selected>3 items</option>
+                        <option value="4">4 items</option>
+                        <option value="5">5 items</option>
+                        <option value="6">6 items</option>
+                    </select>
+                </div>
+            </div>
+
             <!-- Colors Settings -->
             <div class="game-settings" id="colors-settings" style="display: none;">
                 <h3>Kleuren Instellingen</h3>
@@ -2449,7 +2473,7 @@
             </div>
         </div>
 
-        <div class="version-info">v3.7.0</div>
+        <div class="version-info">v3.8.0</div>
     </div>
 
     <script src="src/js/storage.js"></script>
@@ -3299,7 +3323,7 @@
                 btn.classList.add('active');
 
                 // Show/hide game-specific settings
-                const settingsPanels = ['memory', 'drawing', 'shapes', 'colors', 'counting'];
+                const settingsPanels = ['memory', 'drawing', 'shapes', 'colors', 'counting', 'shadow'];
                 settingsPanels.forEach(panel => {
                     const el = document.getElementById(`${panel}-settings`);
                     if (el) el.style.display = game === panel ? 'block' : 'none';
@@ -3359,6 +3383,26 @@
             if (RemoteControl.roomRef) {
                 RemoteControl.roomRef.child('settings').update({
                     colorsDifficulty: e.target.value,
+                    timestamp: Date.now()
+                });
+            }
+        });
+
+        // Shadow category
+        document.getElementById('shadow-category')?.addEventListener('change', (e) => {
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings').update({
+                    shadowCategory: e.target.value,
+                    timestamp: Date.now()
+                });
+            }
+        });
+
+        // Shadow count
+        document.getElementById('shadow-count')?.addEventListener('change', (e) => {
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings').update({
+                    shadowCount: parseInt(e.target.value),
                     timestamp: Date.now()
                 });
             }
