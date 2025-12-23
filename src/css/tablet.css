@@ -2063,15 +2063,15 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: flex-end;
-    gap: 20px;
+    gap: 25px;
     padding: 30px;
     background: rgba(255,255,255,0.1);
     border-radius: 25px;
 }
 
 .size-sort-slot {
-    width: 120px;
-    height: 130px;
+    width: 160px;
+    height: 170px;
     background: rgba(255,255,255,0.15);
     border: 4px dashed rgba(255,255,255,0.4);
     border-radius: 20px;
@@ -2106,10 +2106,10 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 30px;
+    gap: 40px;
     flex-wrap: wrap;
     padding: 20px;
-    min-height: 120px;
+    min-height: 160px;
 }
 
 .size-sort-shape {
@@ -2213,14 +2213,14 @@ html, body {
 .color-sort-bins {
     display: flex;
     justify-content: center;
-    gap: 30px;
+    gap: 50px;
     flex-wrap: wrap;
 }
 
 .color-sort-bin {
-    width: 180px;
-    min-height: 200px;
-    border: 5px solid;
+    width: 200px;
+    min-height: 220px;
+    border: 6px solid;
     border-radius: 25px;
     display: flex;
     flex-direction: column;
@@ -2236,7 +2236,7 @@ html, body {
     text-align: center;
     color: white;
     font-weight: bold;
-    font-size: 22px;
+    font-size: 26px;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
 }
 
@@ -2244,36 +2244,36 @@ html, body {
     flex: 1;
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 10px;
     padding: 15px;
     align-content: flex-start;
     justify-content: center;
 }
 
 .color-sort-bin .bin-item {
-    font-size: 40px;
+    font-size: 50px;
 }
 
 .color-sort-items {
     display: flex;
     justify-content: center;
-    gap: 25px;
+    gap: 35px;
     flex-wrap: wrap;
     padding: 25px;
     background: rgba(255,255,255,0.1);
     border-radius: 25px;
-    min-height: 130px;
+    min-height: 150px;
 }
 
 .color-sort-item {
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
     background: white;
     border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 55px;
+    font-size: 70px;
     cursor: grab;
     box-shadow: 0 6px 20px rgba(0,0,0,0.25);
     transition: transform 0.15s;

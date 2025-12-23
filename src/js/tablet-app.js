@@ -151,6 +151,20 @@ const TabletApp = {
                         this.applyRemoteSettings(settings);
                     }
                 });
+
+                // Listen for remote drawing strokes
+                this.lastRemoteStrokeId = 0;
+                RemoteControl.roomRef.child('remoteDrawing').on('value', (snapshot) => {
+                    const strokeData = snapshot.val();
+                    if (strokeData && typeof DrawingGame !== 'undefined' && DrawingGame.ctx) {
+                        if (strokeData.clear) {
+                            DrawingGame.clear();
+                        } else if (strokeData.strokeId > this.lastRemoteStrokeId) {
+                            this.lastRemoteStrokeId = strokeData.strokeId;
+                            this.renderRemoteStroke(strokeData);
+                        }
+                    }
+                });
             } else {
                 // Retry until roomRef is available
                 setTimeout(setupListener, 1000);
@@ -159,6 +173,40 @@ const TabletApp = {
 
         // Start after a short delay to ensure Firebase is ready
         setTimeout(setupListener, 2000);
+    },
+
+    // Render a stroke from remote drawing on tablet's canvas
+    renderRemoteStroke(strokeData) {
+        if (typeof DrawingGame === 'undefined' || !DrawingGame.canvas || !DrawingGame.ctx) return;
+
+        const canvas = DrawingGame.canvas;
+        const ctx = DrawingGame.ctx;
+
+        // Convert normalized coordinates (0-1) to canvas coordinates
+        const x1 = strokeData.x1 * canvas.width;
+        const y1 = strokeData.y1 * canvas.height;
+        const x2 = strokeData.x2 * canvas.width;
+        const y2 = strokeData.y2 * canvas.height;
+        const color = strokeData.color || '#000000';
+        const size = strokeData.size || 15;
+
+        if (strokeData.isDot) {
+            // Draw a dot
+            ctx.beginPath();
+            ctx.arc(x2, y2, size / 2, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+        } else {
+            // Draw a line
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = size;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.stroke();
+        }
     },
 
     // Apply settings received from remote
@@ -369,6 +417,65 @@ const TabletApp = {
             }
             if (RemoteControl.roomRef) {
                 RemoteControl.roomRef.child('settings/countingAnswer').remove();
+            }
+        }
+
+        // Drawing game controls from remote main screen
+        if (settings.drawingNewWord) {
+            if (typeof DrawingGame !== 'undefined') {
+                DrawingGame.newPrompt();
+            }
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings/drawingNewWord').remove();
+            }
+        }
+
+        if (settings.drawingClear) {
+            if (typeof DrawingGame !== 'undefined') {
+                DrawingGame.clear();
+            }
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings/drawingClear').remove();
+            }
+        }
+
+        // Memory game reset from remote
+        if (settings.memoryReset) {
+            if (typeof MemoryGame !== 'undefined') {
+                MemoryGame.reset();
+            }
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings/memoryReset').remove();
+            }
+        }
+
+        // Shadow game reset from remote
+        if (settings.shadowReset) {
+            if (typeof ShadowGame !== 'undefined') {
+                ShadowGame.reset();
+            }
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings/shadowReset').remove();
+            }
+        }
+
+        // Counting game reset from remote
+        if (settings.countingReset) {
+            if (typeof CountingGame !== 'undefined') {
+                CountingGame.reset();
+            }
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings/countingReset').remove();
+            }
+        }
+
+        // Carwash game reset from remote
+        if (settings.carwashReset) {
+            if (typeof CarwashGame !== 'undefined') {
+                CarwashGame.reset();
+            }
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('settings/carwashReset').remove();
             }
         }
 

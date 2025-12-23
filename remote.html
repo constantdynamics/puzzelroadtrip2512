@@ -327,6 +327,45 @@
             grid-template-columns: 1fr;
         }
 
+        /* Game-specific controls */
+        .game-controls {
+            margin-bottom: 10px;
+        }
+
+        .game-control-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+
+        .game-control-row .nav-btn {
+            flex: 1;
+        }
+
+        /* More options toggle */
+        .more-options {
+            margin-top: 5px;
+        }
+
+        .more-options-toggle {
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            border: 1px dashed #ccc;
+            border-radius: 10px;
+            color: #666;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .more-options-toggle:active {
+            background: #f5f5f5;
+        }
+
+        .more-options-content {
+            margin-top: 10px;
+        }
+
         /* Games Screen */
         .games-screen {
             display: none;
@@ -825,6 +864,162 @@
             border-radius: 10px;
             background: white;
             color: #666;
+            cursor: pointer;
+        }
+
+        /* Remote Drawing Canvas Screen */
+        .remote-drawing-screen {
+            display: none;
+            padding: 10px;
+        }
+
+        .remote-drawing-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+
+        .remote-drawing-header .back-btn {
+            padding: 8px 12px;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .remote-drawing-word {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 10px 15px;
+            color: white;
+        }
+
+        .remote-drawing-word .word-emoji {
+            font-size: 24px;
+        }
+
+        .remote-drawing-word .word-text {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .remote-drawing-new-word-btn {
+            width: 45px;
+            height: 45px;
+            border: none;
+            border-radius: 10px;
+            background: #f5f5f5;
+            font-size: 20px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .remote-drawing-canvas-wrapper {
+            width: 100%;
+            aspect-ratio: 4/3;
+            background: white;
+            border-radius: 15px;
+            border: 3px solid #ddd;
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        #remote-drawing-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .remote-drawing-toolbar {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .remote-color-palette {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .remote-color-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+
+        .remote-color-btn.active {
+            border-color: #333;
+            transform: scale(1.1);
+        }
+
+        .remote-brush-sizes {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .remote-brush-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            border: 2px solid #ddd;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .remote-brush-btn.active {
+            border-color: #4CAF50;
+            background: #E8F5E9;
+        }
+
+        .remote-brush-btn .brush-dot {
+            background: #333;
+            border-radius: 50%;
+        }
+
+        .remote-drawing-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .remote-action-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            border: 2px solid #ddd;
+            background: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .remote-action-btn:active {
+            background: #f5f5f5;
+        }
+
+        .pictionary-draw-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             cursor: pointer;
         }
 
@@ -1896,68 +2091,57 @@
                 <span>Verbonden met tablet</span>
             </div>
 
-            <!-- Puzzle Preview -->
-            <div class="puzzle-preview" id="puzzle-preview">
-                <div class="puzzle-preview-header">
-                    <span id="preview-progress-text">0/40</span>
+            <!-- Live View - Shows current game/puzzle -->
+            <div class="live-view-container" id="live-view-container">
+                <!-- Puzzle Preview -->
+                <div class="puzzle-preview" id="puzzle-preview">
+                    <div class="puzzle-preview-header">
+                        <span id="preview-progress-text">0/40</span>
+                    </div>
+                    <img class="puzzle-preview-img" id="preview-img" src="" alt="Puzzel preview">
+                    <div class="puzzle-progress-bar">
+                        <div class="puzzle-progress-fill" id="preview-progress-fill" style="width: 0%"></div>
+                    </div>
+                    <div class="puzzle-complete-badge" id="puzzle-complete-badge">🎉 Puzzel Af!</div>
                 </div>
-                <img class="puzzle-preview-img" id="preview-img" src="" alt="Puzzel preview">
-                <div class="puzzle-progress-bar">
-                    <div class="puzzle-progress-fill" id="preview-progress-fill" style="width: 0%"></div>
+
+                <!-- Game Preview (shows current game state for non-puzzle games) -->
+                <div class="game-preview" id="game-preview" style="display: none;">
+                    <div class="game-preview-header">
+                        <span class="game-preview-icon" id="game-preview-icon">🎮</span>
+                        <span class="game-preview-name" id="game-preview-name">Spel</span>
+                    </div>
+                    <!-- Live screenshot from tablet -->
+                    <img class="game-preview-screenshot" id="game-screenshot" src="" alt="Game preview" style="display: none;">
+                    <div class="game-preview-content" id="game-preview-content">
+                        <!-- Dynamic game content will be inserted here -->
+                    </div>
                 </div>
-                <div class="puzzle-complete-badge" id="puzzle-complete-badge">🎉 Puzzel Af!</div>
             </div>
 
-            <!-- Game Preview (shows current game state for non-puzzle games) -->
-            <div class="game-preview" id="game-preview" style="display: none;">
-                <div class="game-preview-header">
-                    <span class="game-preview-icon" id="game-preview-icon">🎮</span>
-                    <span class="game-preview-name" id="game-preview-name">Spel</span>
-                </div>
-                <!-- Live screenshot from tablet -->
-                <img class="game-preview-screenshot" id="game-screenshot" src="" alt="Game preview" style="display: none;">
-                <div class="game-preview-content" id="game-preview-content">
-                    <!-- Dynamic game content will be inserted here -->
+            <!-- Game-specific controls (dynamic based on current game) -->
+            <div class="game-controls" id="game-controls">
+                <!-- Puzzle controls (default) -->
+                <div class="game-control-row" id="puzzle-controls">
+                    <button class="nav-btn primary" id="piece-btn">
+                        <span class="icon">🧩</span>
+                        <span class="label">Stukje geven</span>
+                    </button>
                 </div>
             </div>
 
-            <!-- Row 1: Piece + Bucketlist -->
-            <div class="nav-grid">
-                <button class="nav-btn primary" id="piece-btn">
-                    <span class="icon">🧩</span>
-                    <span class="label">Stukje geven</span>
-                </button>
-                <button class="nav-btn secondary" id="show-tasks-btn">
-                    <span class="icon">✅</span>
-                    <span class="label">Bucketlist</span>
-                </button>
-            </div>
-
-            <!-- Row 2: Puzzelbieb + Wachtrij -->
-            <div class="nav-grid">
-                <button class="nav-btn secondary" id="show-library-btn">
-                    <span class="icon">🖼️</span>
-                    <span class="label">Puzzelbieb</span>
-                </button>
-                <button class="nav-btn secondary" id="show-queue-btn">
-                    <span class="icon">📚</span>
-                    <span class="label">Wachtrij</span>
-                </button>
-            </div>
-
-            <!-- Row 3: Spellen + Pause -->
+            <!-- Main action buttons -->
             <div class="nav-grid">
                 <button class="nav-btn secondary" id="show-games-btn">
                     <span class="icon">🎮</span>
                     <span class="label">Spellen</span>
                 </button>
-                <button class="nav-btn secondary" id="pause-btn">
-                    <span class="icon">⏸️</span>
-                    <span class="label">Pauzeer</span>
+                <button class="nav-btn secondary" id="show-settings-btn">
+                    <span class="icon">⚙️</span>
+                    <span class="label">Instellingen</span>
                 </button>
             </div>
 
-            <!-- Row 4: Fullscreen + Scherm uit -->
             <div class="nav-grid">
                 <button class="nav-btn secondary" id="fullscreen-btn">
                     <span class="icon">📺</span>
@@ -1969,12 +2153,33 @@
                 </button>
             </div>
 
-            <!-- Row 5: Settings -->
-            <div class="nav-grid single">
-                <button class="nav-btn secondary" id="show-settings-btn">
-                    <span class="icon">⚙️</span>
-                    <span class="label">Instellingen</span>
+            <!-- Secondary buttons (collapsible) -->
+            <div class="more-options">
+                <button class="more-options-toggle" id="more-options-toggle">
+                    Meer opties ▼
                 </button>
+                <div class="more-options-content" id="more-options-content" style="display: none;">
+                    <div class="nav-grid">
+                        <button class="nav-btn secondary" id="show-tasks-btn">
+                            <span class="icon">✅</span>
+                            <span class="label">Bucketlist</span>
+                        </button>
+                        <button class="nav-btn secondary" id="pause-btn">
+                            <span class="icon">⏸️</span>
+                            <span class="label">Pauzeer</span>
+                        </button>
+                    </div>
+                    <div class="nav-grid">
+                        <button class="nav-btn secondary" id="show-library-btn">
+                            <span class="icon">🖼️</span>
+                            <span class="label">Puzzelbieb</span>
+                        </button>
+                        <button class="nav-btn secondary" id="show-queue-btn">
+                            <span class="icon">📚</span>
+                            <span class="label">Wachtrij</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -2092,6 +2297,7 @@
                             <div id="pictionary-current-word" style="font-size: 24px; font-weight: bold; padding: 10px;">-</div>
                         </div>
                         <button class="pictionary-new-word-btn" id="pictionary-new-word-btn-settings" style="margin-top: 10px;">🎲 Nieuw woord</button>
+                        <button class="pictionary-draw-btn" id="open-remote-canvas-btn" style="margin-top: 10px;">✏️ Teken op telefoon</button>
                     </div>
                 </div>
 
@@ -2229,6 +2435,39 @@
             <button class="back-btn" id="queue-back-btn" style="margin-top: 10px;">← Terug</button>
         </div>
 
+        <!-- Remote Drawing Canvas Screen -->
+        <div class="card remote-drawing-screen" id="remote-drawing-screen">
+            <div class="remote-drawing-header">
+                <button class="back-btn" id="remote-drawing-back-btn">← Terug</button>
+                <div class="remote-drawing-word" id="remote-drawing-word">
+                    <span class="word-emoji">🎨</span>
+                    <span class="word-text">-</span>
+                </div>
+                <button class="remote-drawing-new-word-btn" id="remote-drawing-new-word-btn">🎲</button>
+            </div>
+            <div class="remote-drawing-canvas-wrapper">
+                <canvas id="remote-drawing-canvas"></canvas>
+            </div>
+            <div class="remote-drawing-toolbar">
+                <div class="remote-color-palette" id="remote-color-palette">
+                    <!-- Colors will be generated by JS -->
+                </div>
+                <div class="remote-brush-sizes" id="remote-brush-sizes">
+                    <button class="remote-brush-btn" data-size="8">
+                        <span class="brush-dot" style="width: 8px; height: 8px;"></span>
+                    </button>
+                    <button class="remote-brush-btn active" data-size="15">
+                        <span class="brush-dot" style="width: 15px; height: 15px;"></span>
+                    </button>
+                    <button class="remote-brush-btn" data-size="25">
+                        <span class="brush-dot" style="width: 25px; height: 25px;"></span>
+                    </button>
+                </div>
+                <div class="remote-drawing-actions">
+                    <button class="remote-action-btn" id="remote-clear-btn">🗑️</button>
+                </div>
+            </div>
+        </div>
 
         <!-- Settings Screen -->
         <div class="card settings-screen" id="settings-screen">
@@ -2903,6 +3142,12 @@
             const gamePreviewName = document.getElementById('game-preview-name');
             const gamePreviewContent = document.getElementById('game-preview-content');
 
+            // Update game-specific controls based on current game
+            const currentGame = gameState.game || 'puzzle';
+            if (typeof updateGameControls === 'function') {
+                updateGameControls(currentGame);
+            }
+
             // If it's puzzle game, show puzzle preview, hide game preview
             if (gameState.game === 'puzzle' || !gameState.game) {
                 if (puzzlePreview) puzzlePreview.style.display = 'block';
@@ -3471,6 +3716,213 @@
             sendNewPictionaryWord();
         });
 
+        // === REMOTE DRAWING CANVAS ===
+        const remoteDrawingScreen = document.getElementById('remote-drawing-screen');
+        const remoteDrawingCanvas = document.getElementById('remote-drawing-canvas');
+        let remoteDrawingCtx = null;
+        let remoteIsDrawing = false;
+        let remoteLastX = 0;
+        let remoteLastY = 0;
+        let remoteCurrentColor = '#FF6B6B';
+        let remoteBrushSize = 15;
+        let lastStrokeId = 0;
+
+        const remoteColors = [
+            '#FF6B6B', '#FF8E53', '#FFD93D', '#6BCB77', '#4D96FF',
+            '#9B59B6', '#FF69B4', '#8B4513', '#000000', '#FFFFFF'
+        ];
+
+        // Initialize remote drawing canvas
+        function initRemoteDrawingCanvas() {
+            if (!remoteDrawingCanvas) return;
+
+            remoteDrawingCtx = remoteDrawingCanvas.getContext('2d');
+
+            // Set canvas size
+            resizeRemoteCanvas();
+            window.addEventListener('resize', resizeRemoteCanvas);
+
+            // Generate color palette
+            const colorPalette = document.getElementById('remote-color-palette');
+            if (colorPalette) {
+                colorPalette.innerHTML = remoteColors.map(color => `
+                    <button class="remote-color-btn ${color === remoteCurrentColor ? 'active' : ''}"
+                            style="background: ${color}; ${color === '#FFFFFF' ? 'border: 2px solid #ccc;' : ''}"
+                            data-color="${color}">
+                    </button>
+                `).join('');
+
+                colorPalette.querySelectorAll('.remote-color-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        remoteCurrentColor = btn.dataset.color;
+                        colorPalette.querySelectorAll('.remote-color-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        // White = eraser
+                        if (remoteCurrentColor === '#FFFFFF') {
+                            remoteBrushSize = 30;
+                        }
+                    });
+                });
+            }
+
+            // Brush size buttons
+            document.querySelectorAll('.remote-brush-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    remoteBrushSize = parseInt(btn.dataset.size);
+                    document.querySelectorAll('.remote-brush-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            });
+
+            // Drawing events
+            remoteDrawingCanvas.addEventListener('mousedown', remoteStartDrawing);
+            remoteDrawingCanvas.addEventListener('mousemove', remoteDraw);
+            remoteDrawingCanvas.addEventListener('mouseup', remoteStopDrawing);
+            remoteDrawingCanvas.addEventListener('mouseout', remoteStopDrawing);
+
+            remoteDrawingCanvas.addEventListener('touchstart', remoteHandleTouch, { passive: false });
+            remoteDrawingCanvas.addEventListener('touchmove', remoteHandleTouch, { passive: false });
+            remoteDrawingCanvas.addEventListener('touchend', remoteStopDrawing);
+
+            // Clear button
+            document.getElementById('remote-clear-btn')?.addEventListener('click', () => {
+                remoteClearCanvas();
+                syncRemoteClear();
+            });
+
+            // New word button
+            document.getElementById('remote-drawing-new-word-btn')?.addEventListener('click', () => {
+                sendNewPictionaryWord();
+            });
+        }
+
+        function resizeRemoteCanvas() {
+            if (!remoteDrawingCanvas || !remoteDrawingCtx) return;
+
+            const wrapper = remoteDrawingCanvas.parentElement;
+            if (!wrapper) return;
+
+            remoteDrawingCanvas.width = wrapper.clientWidth;
+            remoteDrawingCanvas.height = wrapper.clientHeight;
+
+            // Clear with white
+            remoteDrawingCtx.fillStyle = '#FFFFFF';
+            remoteDrawingCtx.fillRect(0, 0, remoteDrawingCanvas.width, remoteDrawingCanvas.height);
+            remoteDrawingCtx.lineCap = 'round';
+            remoteDrawingCtx.lineJoin = 'round';
+        }
+
+        function remoteClearCanvas() {
+            if (!remoteDrawingCtx || !remoteDrawingCanvas) return;
+            remoteDrawingCtx.fillStyle = '#FFFFFF';
+            remoteDrawingCtx.fillRect(0, 0, remoteDrawingCanvas.width, remoteDrawingCanvas.height);
+        }
+
+        function remoteHandleTouch(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = remoteDrawingCanvas.getBoundingClientRect();
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+
+            if (e.type === 'touchstart') {
+                remoteStartDrawing({ offsetX: x, offsetY: y });
+            } else if (e.type === 'touchmove') {
+                remoteDraw({ offsetX: x, offsetY: y });
+            }
+        }
+
+        function remoteStartDrawing(e) {
+            remoteIsDrawing = true;
+            remoteLastX = e.offsetX;
+            remoteLastY = e.offsetY;
+
+            // Draw a dot
+            remoteDrawingCtx.beginPath();
+            remoteDrawingCtx.arc(e.offsetX, e.offsetY, remoteBrushSize / 2, 0, Math.PI * 2);
+            remoteDrawingCtx.fillStyle = remoteCurrentColor;
+            remoteDrawingCtx.fill();
+
+            // Sync dot to tablet
+            syncRemoteStroke(remoteLastX, remoteLastY, e.offsetX, e.offsetY, true);
+        }
+
+        function remoteDraw(e) {
+            if (!remoteIsDrawing) return;
+
+            remoteDrawingCtx.beginPath();
+            remoteDrawingCtx.moveTo(remoteLastX, remoteLastY);
+            remoteDrawingCtx.lineTo(e.offsetX, e.offsetY);
+            remoteDrawingCtx.strokeStyle = remoteCurrentColor;
+            remoteDrawingCtx.lineWidth = remoteBrushSize;
+            remoteDrawingCtx.stroke();
+
+            // Sync stroke to tablet
+            syncRemoteStroke(remoteLastX, remoteLastY, e.offsetX, e.offsetY, false);
+
+            remoteLastX = e.offsetX;
+            remoteLastY = e.offsetY;
+        }
+
+        function remoteStopDrawing() {
+            remoteIsDrawing = false;
+        }
+
+        // Sync stroke to Firebase for tablet to receive
+        function syncRemoteStroke(x1, y1, x2, y2, isDot) {
+            if (!RemoteControl.roomRef) return;
+
+            // Normalize coordinates (0-1 range for different screen sizes)
+            const canvasW = remoteDrawingCanvas.width;
+            const canvasH = remoteDrawingCanvas.height;
+
+            lastStrokeId++;
+
+            RemoteControl.roomRef.child('remoteDrawing').update({
+                strokeId: lastStrokeId,
+                x1: x1 / canvasW,
+                y1: y1 / canvasH,
+                x2: x2 / canvasW,
+                y2: y2 / canvasH,
+                color: remoteCurrentColor,
+                size: remoteBrushSize,
+                isDot: isDot,
+                timestamp: Date.now()
+            });
+        }
+
+        function syncRemoteClear() {
+            if (!RemoteControl.roomRef) return;
+            RemoteControl.roomRef.child('remoteDrawing').update({
+                clear: true,
+                timestamp: Date.now()
+            });
+        }
+
+        // Open remote drawing canvas button
+        document.getElementById('open-remote-canvas-btn')?.addEventListener('click', () => {
+            showScreen(remoteDrawingScreen);
+            initRemoteDrawingCanvas();
+            updateRemoteDrawingWord();
+        });
+
+        // Back button from remote drawing
+        document.getElementById('remote-drawing-back-btn')?.addEventListener('click', () => {
+            showScreen(gamesScreen);
+        });
+
+        // Update word display in remote drawing screen
+        function updateRemoteDrawingWord() {
+            const wordEl = document.getElementById('remote-drawing-word');
+            const currentWord = document.getElementById('pictionary-current-word')?.textContent;
+            if (wordEl && currentWord) {
+                const emoji = wordEl.querySelector('.word-emoji');
+                const text = wordEl.querySelector('.word-text');
+                // Try to extract emoji from current word
+                if (text) text.textContent = currentWord;
+            }
+        }
+
         // Library tabs
         document.querySelectorAll('.library-tab').forEach(tab => {
             tab.addEventListener('click', () => {
@@ -3559,6 +4011,152 @@
             btn.classList.toggle('active', isPaused);
             await sendSettings({ timerPaused: isPaused });
         });
+
+        // More options toggle
+        const moreOptionsToggle = document.getElementById('more-options-toggle');
+        const moreOptionsContent = document.getElementById('more-options-content');
+        let moreOptionsOpen = false;
+
+        moreOptionsToggle.addEventListener('click', () => {
+            moreOptionsOpen = !moreOptionsOpen;
+            moreOptionsContent.style.display = moreOptionsOpen ? 'block' : 'none';
+            moreOptionsToggle.textContent = moreOptionsOpen ? 'Minder opties ▲' : 'Meer opties ▼';
+        });
+
+        // Game-specific controls system
+        let currentGameOnTablet = 'puzzle';
+        const gameControlsContainer = document.getElementById('game-controls');
+        const puzzleControlsEl = document.getElementById('puzzle-controls');
+
+        function updateGameControls(gameName) {
+            currentGameOnTablet = gameName;
+
+            // Remove all existing game control rows except puzzle
+            const existingControls = gameControlsContainer.querySelectorAll('.game-control-row:not(#puzzle-controls)');
+            existingControls.forEach(el => el.remove());
+
+            // Show/hide puzzle controls
+            puzzleControlsEl.style.display = gameName === 'puzzle' ? 'flex' : 'none';
+
+            // Add game-specific controls based on current game
+            if (gameName === 'drawing') {
+                // Drawing/Pictionary controls
+                const drawingControls = document.createElement('div');
+                drawingControls.className = 'game-control-row';
+                drawingControls.id = 'drawing-controls';
+                drawingControls.innerHTML = `
+                    <button class="nav-btn primary" id="drawing-new-word-btn">
+                        <span class="icon">🎲</span>
+                        <span class="label">Nieuw woord</span>
+                    </button>
+                    <button class="nav-btn secondary" id="drawing-clear-btn">
+                        <span class="icon">🗑️</span>
+                        <span class="label">Wissen</span>
+                    </button>
+                `;
+                gameControlsContainer.appendChild(drawingControls);
+
+                // Add event listeners
+                document.getElementById('drawing-new-word-btn').addEventListener('click', () => {
+                    if (RemoteControl.roomRef) {
+                        RemoteControl.roomRef.child('settings').update({
+                            drawingNewWord: true,
+                            timestamp: Date.now()
+                        });
+                    }
+                });
+                document.getElementById('drawing-clear-btn').addEventListener('click', () => {
+                    if (RemoteControl.roomRef) {
+                        RemoteControl.roomRef.child('settings').update({
+                            drawingClear: true,
+                            timestamp: Date.now()
+                        });
+                    }
+                });
+            } else if (gameName === 'memory') {
+                const memoryControls = document.createElement('div');
+                memoryControls.className = 'game-control-row';
+                memoryControls.id = 'memory-controls';
+                memoryControls.innerHTML = `
+                    <button class="nav-btn primary" id="memory-new-btn">
+                        <span class="icon">🔄</span>
+                        <span class="label">Nieuw spel</span>
+                    </button>
+                `;
+                gameControlsContainer.appendChild(memoryControls);
+
+                document.getElementById('memory-new-btn').addEventListener('click', () => {
+                    if (RemoteControl.roomRef) {
+                        RemoteControl.roomRef.child('settings').update({
+                            memoryReset: true,
+                            timestamp: Date.now()
+                        });
+                    }
+                });
+            } else if (gameName === 'shadow') {
+                const shadowControls = document.createElement('div');
+                shadowControls.className = 'game-control-row';
+                shadowControls.id = 'shadow-controls';
+                shadowControls.innerHTML = `
+                    <button class="nav-btn primary" id="shadow-new-btn">
+                        <span class="icon">🔄</span>
+                        <span class="label">Nieuw spel</span>
+                    </button>
+                `;
+                gameControlsContainer.appendChild(shadowControls);
+
+                document.getElementById('shadow-new-btn').addEventListener('click', () => {
+                    if (RemoteControl.roomRef) {
+                        RemoteControl.roomRef.child('settings').update({
+                            shadowReset: true,
+                            timestamp: Date.now()
+                        });
+                    }
+                });
+            } else if (gameName === 'counting') {
+                const countingControls = document.createElement('div');
+                countingControls.className = 'game-control-row';
+                countingControls.id = 'counting-controls';
+                countingControls.innerHTML = `
+                    <button class="nav-btn primary" id="counting-new-btn">
+                        <span class="icon">🔄</span>
+                        <span class="label">Nieuw spel</span>
+                    </button>
+                `;
+                gameControlsContainer.appendChild(countingControls);
+
+                document.getElementById('counting-new-btn').addEventListener('click', () => {
+                    if (RemoteControl.roomRef) {
+                        RemoteControl.roomRef.child('settings').update({
+                            countingReset: true,
+                            timestamp: Date.now()
+                        });
+                    }
+                });
+            } else if (gameName === 'music') {
+                // Music game has no controls needed from remote
+            } else if (gameName === 'carwash') {
+                const carwashControls = document.createElement('div');
+                carwashControls.className = 'game-control-row';
+                carwashControls.id = 'carwash-controls';
+                carwashControls.innerHTML = `
+                    <button class="nav-btn primary" id="carwash-new-btn">
+                        <span class="icon">🚗</span>
+                        <span class="label">Nieuwe auto</span>
+                    </button>
+                `;
+                gameControlsContainer.appendChild(carwashControls);
+
+                document.getElementById('carwash-new-btn').addEventListener('click', () => {
+                    if (RemoteControl.roomRef) {
+                        RemoteControl.roomRef.child('settings').update({
+                            carwashReset: true,
+                            timestamp: Date.now()
+                        });
+                    }
+                });
+            }
+        }
 
         // Save button - saves all pending settings and goes back
         document.getElementById('settings-save-btn').addEventListener('click', async () => {

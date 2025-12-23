@@ -80,7 +80,7 @@ const SizeSortGame = {
     },
 
     getShapeSVG(scale, isPlaceholder = false) {
-        const baseSize = 100;
+        const baseSize = 140;
         const size = baseSize * scale;
         const color = isPlaceholder ? '#DDD' : this.currentShape.color;
         const stroke = isPlaceholder ? '#999' : this.getDarkColor(this.currentShape.color);

@@ -9,48 +9,48 @@ const SortingGame = {
     total: 0,
     draggedItem: null,
 
-    // Sorting challenges
+    // Sorting challenges - using high contrast colors for toddlers
     challenges: {
         food_toys: {
             name: 'Eten of Speelgoed?',
             categories: [
-                { id: 'food', name: 'Eten', emoji: '🍽️', color: '#FF6B6B', items: ['🍎', '🍕', '🍦', '🥕', '🍪', '🧁', '🍔', '🌮'] },
-                { id: 'toys', name: 'Speelgoed', emoji: '🧸', color: '#4D96FF', items: ['🧸', '🎮', '🎨', '⚽', '🪀', '🎪', '🎯', '🪁'] }
+                { id: 'food', name: 'Eten', emoji: '🍽️', color: '#E53935', items: ['🍎', '🍕', '🍦', '🥕', '🍪', '🧁', '🍔', '🌮'] },
+                { id: 'toys', name: 'Speelgoed', emoji: '🧸', color: '#1565C0', items: ['🧸', '🎮', '🎨', '⚽', '🪀', '🎪', '🎯', '🪁'] }
             ]
         },
         land_water: {
             name: 'Land of Water?',
             categories: [
-                { id: 'land', name: 'Land', emoji: '🌳', color: '#6BCB77', items: ['🐘', '🦁', '🐕', '🐈', '🐰', '🦒', '🐻', '🐵'] },
-                { id: 'water', name: 'Water', emoji: '🌊', color: '#4D96FF', items: ['🐳', '🐟', '🦈', '🐙', '🦀', '🐬', '🦑', '🐠'] }
+                { id: 'land', name: 'Land', emoji: '🌳', color: '#2E7D32', items: ['🐘', '🦁', '🐕', '🐈', '🐰', '🦒', '🐻', '🐵'] },
+                { id: 'water', name: 'Water', emoji: '🌊', color: '#0277BD', items: ['🐳', '🐟', '🦈', '🐙', '🦀', '🐬', '🦑', '🐠'] }
             ]
         },
         hot_cold: {
             name: 'Warm of Koud?',
             categories: [
-                { id: 'hot', name: 'Warm', emoji: '☀️', color: '#FF8E53', items: ['☀️', '🔥', '🌶️', '🏖️', '🌴', '🍦', '🥵', '🏜️'] },
-                { id: 'cold', name: 'Koud', emoji: '❄️', color: '#74B9FF', items: ['❄️', '⛄', '🧊', '🐧', '🎿', '🌨️', '🥶', '🧣'] }
+                { id: 'hot', name: 'Warm', emoji: '☀️', color: '#E65100', items: ['☀️', '🔥', '🌶️', '🏖️', '🌴', '🍦', '🥵', '🏜️'] },
+                { id: 'cold', name: 'Koud', emoji: '❄️', color: '#0288D1', items: ['❄️', '⛄', '🧊', '🐧', '🎿', '🌨️', '🥶', '🧣'] }
             ]
         },
         day_night: {
             name: 'Dag of Nacht?',
             categories: [
-                { id: 'day', name: 'Dag', emoji: '☀️', color: '#FFD93D', items: ['☀️', '🌻', '🐓', '🦋', '🌈', '⛅', '🐝', '🌺'] },
-                { id: 'night', name: 'Nacht', emoji: '🌙', color: '#6C5CE7', items: ['🌙', '⭐', '🦉', '🦇', '🌃', '💤', '🛏️', '🌌'] }
+                { id: 'day', name: 'Dag', emoji: '☀️', color: '#F9A825', items: ['☀️', '🌻', '🐓', '🦋', '🌈', '⛅', '🐝', '🌺'] },
+                { id: 'night', name: 'Nacht', emoji: '🌙', color: '#4527A0', items: ['🌙', '⭐', '🦉', '🦇', '🌃', '💤', '🛏️', '🌌'] }
             ]
         },
         fly_walk: {
             name: 'Vliegen of Lopen?',
             categories: [
-                { id: 'fly', name: 'Vliegen', emoji: '🦅', color: '#74B9FF', items: ['🦅', '🐦', '🦋', '🐝', '🦇', '✈️', '🚁', '🎈'] },
-                { id: 'walk', name: 'Lopen', emoji: '🐕', color: '#A29BFE', items: ['🐕', '🐈', '🐘', '🐢', '🦁', '🐰', '🦒', '🐻'] }
+                { id: 'fly', name: 'Vliegen', emoji: '🦅', color: '#00ACC1', items: ['🦅', '🐦', '🦋', '🐝', '🦇', '✈️', '🚁', '🎈'] },
+                { id: 'walk', name: 'Lopen', emoji: '🐕', color: '#6D4C41', items: ['🐕', '🐈', '🐘', '🐢', '🦁', '🐰', '🦒', '🐻'] }
             ]
         },
         fruits_veggies: {
             name: 'Fruit of Groente?',
             categories: [
-                { id: 'fruits', name: 'Fruit', emoji: '🍎', color: '#FF6B6B', items: ['🍎', '🍌', '🍊', '🍇', '🍓', '🍑', '🍒', '🥝'] },
-                { id: 'veggies', name: 'Groente', emoji: '🥦', color: '#6BCB77', items: ['🥦', '🥕', '🥒', '🌽', '🍆', '🥬', '🧅', '🫑'] }
+                { id: 'fruits', name: 'Fruit', emoji: '🍎', color: '#C62828', items: ['🍎', '🍌', '🍊', '🍇', '🍓', '🍑', '🍒', '🥝'] },
+                { id: 'veggies', name: 'Groente', emoji: '🥦', color: '#388E3C', items: ['🥦', '🥕', '🥒', '🌽', '🍆', '🥬', '🧅', '🫑'] }
             ]
         }
     },
