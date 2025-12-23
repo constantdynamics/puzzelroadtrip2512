@@ -2727,7 +2727,7 @@
             </div>
         </div>
 
-        <div class="version-info">v3.9.1</div>
+        <div class="version-info">v3.9.2</div>
     </div>
 
     <script src="src/js/storage.js"></script>
@@ -3161,6 +3161,16 @@
             const currentGame = gameState.game || 'puzzle';
             if (typeof updateGameControls === 'function') {
                 updateGameControls(currentGame);
+            }
+
+            // Close remote drawing screen if not in drawing/pictionary game
+            const remoteDrawingScreen = document.getElementById('remote-drawing-screen');
+            if (remoteDrawingScreen && currentGame !== 'drawing') {
+                if (remoteDrawingScreen.style.display === 'block' ||
+                    getComputedStyle(remoteDrawingScreen).display !== 'none') {
+                    // Go back to connected screen
+                    showScreen(document.getElementById('connected-screen'));
+                }
             }
 
             // If it's puzzle game, show puzzle preview, hide game preview
