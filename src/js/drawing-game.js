@@ -341,18 +341,18 @@ const DrawingGame = {
         }
     },
 
-    clear() {
+    clear(silent = false) {
         if (!this.ctx || !this.canvas) return;
 
         this.ctx.fillStyle = '#FFFFFF';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        if (typeof AudioManager !== 'undefined') {
+        if (!silent && typeof AudioManager !== 'undefined') {
             AudioManager.playClick();
         }
     },
 
-    newPrompt() {
+    newPrompt(silent = false) {
         const prompts = this.getAllPrompts();
         if (prompts.length === 0) return;
 
@@ -382,7 +382,7 @@ const DrawingGame = {
         // Sync new prompt to remote
         this.syncGameState();
 
-        if (typeof AudioManager !== 'undefined') {
+        if (!silent && typeof AudioManager !== 'undefined') {
             AudioManager.playTaskComplete();
         }
     },

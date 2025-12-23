@@ -154,12 +154,14 @@ const TabletApp = {
 
                 // Listen for remote drawing strokes
                 this.lastRemoteStrokeId = 0;
+                this.lastRemoteClearTimestamp = 0;
                 RemoteControl.roomRef.child('remoteDrawing').on('value', (snapshot) => {
                     const strokeData = snapshot.val();
                     if (strokeData && typeof DrawingGame !== 'undefined' && DrawingGame.ctx) {
-                        if (strokeData.clear) {
-                            DrawingGame.clear();
-                        } else if (strokeData.strokeId > this.lastRemoteStrokeId) {
+                        if (strokeData.clear && strokeData.timestamp > this.lastRemoteClearTimestamp) {
+                            this.lastRemoteClearTimestamp = strokeData.timestamp;
+                            DrawingGame.clear(true); // Silent mode - no sound
+                        } else if (strokeData.strokeId && strokeData.strokeId > this.lastRemoteStrokeId) {
                             this.lastRemoteStrokeId = strokeData.strokeId;
                             this.renderRemoteStroke(strokeData);
                         }
@@ -381,7 +383,7 @@ const TabletApp = {
 
         if (settings.pictionaryNewWord) {
             if (typeof DrawingGame !== 'undefined') {
-                DrawingGame.newPrompt();
+                DrawingGame.newPrompt(true); // Silent mode - no sound from remote actions
             }
             if (RemoteControl.roomRef) {
                 RemoteControl.roomRef.child('settings/pictionaryNewWord').remove();
@@ -423,7 +425,7 @@ const TabletApp = {
         // Drawing game controls from remote main screen
         if (settings.drawingNewWord) {
             if (typeof DrawingGame !== 'undefined') {
-                DrawingGame.newPrompt();
+                DrawingGame.newPrompt(true); // Silent mode - no sound from remote actions
             }
             if (RemoteControl.roomRef) {
                 RemoteControl.roomRef.child('settings/drawingNewWord').remove();
@@ -432,7 +434,7 @@ const TabletApp = {
 
         if (settings.drawingClear) {
             if (typeof DrawingGame !== 'undefined') {
-                DrawingGame.clear();
+                DrawingGame.clear(true); // Silent mode - no sound from remote actions
             }
             if (RemoteControl.roomRef) {
                 RemoteControl.roomRef.child('settings/drawingClear').remove();
