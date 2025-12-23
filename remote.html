@@ -276,6 +276,15 @@
             background: white;
         }
 
+        .nav-btn.fullscreen-active {
+            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%) !important;
+            color: white !important;
+        }
+
+        .nav-btn.fullscreen-active .label {
+            color: white !important;
+        }
+
         .nav-btn.secondary:hover {
             background: #fafafa;
         }
@@ -1039,6 +1048,25 @@
             cursor: pointer;
             min-width: 100px;
             text-align: center;
+        }
+
+        /* Volume slider */
+        .volume-slider {
+            width: 120px;
+            height: 8px;
+            border-radius: 4px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
         }
 
         /* Colors game target display */
@@ -2270,6 +2298,19 @@
                 </button>
             </div>
 
+            <div class="setting-row">
+                <span class="setting-label">🔊 Geluid</span>
+                <select class="setting-select" id="sound-toggle">
+                    <option value="on">Aan</option>
+                    <option value="off">Uit</option>
+                </select>
+            </div>
+
+            <div class="setting-row">
+                <span class="setting-label">🔉 Volume</span>
+                <input type="range" id="volume-slider" min="0" max="100" value="80" class="volume-slider">
+            </div>
+
             <div class="setting-row" style="border-bottom:none;">
                 <span class="setting-label">❓ Uitleg</span>
                 <button class="setting-select" id="start-tutorial-btn" style="background:#2196F3;color:white;border:none;">
@@ -2408,7 +2449,7 @@
             </div>
         </div>
 
-        <div class="version-info">v3.6.0</div>
+        <div class="version-info">v3.7.0</div>
     </div>
 
     <script src="src/js/storage.js"></script>
@@ -2795,6 +2836,9 @@
                 RemoteControl.onGameScreenshotUpdate = (screenshotData) => {
                     updateGameScreenshot(screenshotData);
                 };
+
+                // Start listening for fullscreen status
+                listenForFullscreenStatus();
 
                 showScreen(connectedScreen);
                 populateTaskCategories();
@@ -3200,7 +3244,8 @@
         });
 
         // Fullscreen button
-        document.getElementById('fullscreen-btn').addEventListener('click', () => {
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        fullscreenBtn.addEventListener('click', () => {
             if (RemoteControl.roomRef) {
                 RemoteControl.roomRef.child('settings').update({
                     enterFullscreen: true,
@@ -3208,6 +3253,18 @@
                 });
             }
         });
+
+        // Listen for fullscreen status from tablet
+        function listenForFullscreenStatus() {
+            if (RemoteControl.roomRef) {
+                RemoteControl.roomRef.child('tabletStatus').on('value', (snapshot) => {
+                    const status = snapshot.val();
+                    if (status && status.isFullscreen !== undefined) {
+                        fullscreenBtn.classList.toggle('fullscreen-active', status.isFullscreen);
+                    }
+                });
+            }
+        }
 
         // Screen off button
         let screenOffState = false;
@@ -3402,6 +3459,16 @@
         // Puzzle lines (on/off)
         document.getElementById('puzzle-lines').addEventListener('change', (e) => {
             pendingSettings.puzzleLines = e.target.value === 'on';
+        });
+
+        // Sound toggle (on/off)
+        document.getElementById('sound-toggle').addEventListener('change', (e) => {
+            pendingSettings.soundEnabled = e.target.value === 'on';
+        });
+
+        // Volume slider
+        document.getElementById('volume-slider').addEventListener('input', (e) => {
+            pendingSettings.volume = parseInt(e.target.value);
         });
 
         // Vehicle grid (mini buttons)

@@ -162,6 +162,12 @@ const GameManager = {
         // Update header
         this.updateHeader();
 
+        // Show/hide timer bar (only visible for puzzle)
+        const timerBar = document.querySelector('.visual-timer-bar');
+        if (timerBar) {
+            timerBar.style.display = gameName === 'puzzle' ? 'block' : 'none';
+        }
+
         // Start screenshot sync for non-puzzle games
         if (gameName === 'puzzle') {
             this.stopScreenshotSync();

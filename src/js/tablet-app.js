@@ -91,6 +91,10 @@ const TabletApp = {
         document.addEventListener('touchstart', enterFullscreenOnTouch, { once: true });
         document.addEventListener('click', enterFullscreenOnTouch, { once: true });
 
+        // Listen for fullscreen changes to sync status to remote
+        document.addEventListener('fullscreenchange', () => this.syncFullscreenStatus());
+        document.addEventListener('webkitfullscreenchange', () => this.syncFullscreenStatus());
+
         // Start remote control automatically
         this.startRemoteControl();
 
@@ -1146,6 +1150,14 @@ const TabletApp = {
         const vehicleEl = document.getElementById('timer-vehicle');
         if (vehicleEl) {
             vehicleEl.textContent = emoji;
+            // Flip vehicles that face the wrong direction (need to face right)
+            // Tractor, motorcycle, helicopter, boat face left by default - flip them
+            const flipVehicles = ['🚜', '🏍️', '🚁', '🚤'];
+            if (flipVehicles.includes(emoji)) {
+                vehicleEl.style.transform = 'translateY(-50%) scaleX(-1)';
+            } else {
+                vehicleEl.style.transform = 'translateY(-50%)';
+            }
         }
     },
 
@@ -1314,6 +1326,17 @@ const TabletApp = {
             this.enterFullscreen();
         } else {
             this.exitFullscreen();
+        }
+    },
+
+    // Sync fullscreen status to Firebase for remote display
+    syncFullscreenStatus() {
+        const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
+        if (RemoteControl.roomRef) {
+            RemoteControl.roomRef.child('tabletStatus').update({
+                isFullscreen: isFullscreen,
+                timestamp: Date.now()
+            });
         }
     }
 };
